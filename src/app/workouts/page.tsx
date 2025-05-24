@@ -2,8 +2,10 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import WorkoutDisplay from "@/components/workouts/WorkoutDisplay";
-import type { Workout } from "@/types/domain";
-import { Dumbbell } from "lucide-react";
+import type { Workout, MachineInfo } from "@/types/domain";
+import { Dumbbell, Home, Cog } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import MachineInfoCard from "@/components/workouts/MachineInfoCard";
 
 // Mock data for workouts - replace with actual data fetching
 const mockWorkouts: Workout[] = [
@@ -129,43 +131,91 @@ const mockWorkouts: Workout[] = [
   },
 ];
 
+const mockMachineInfo: MachineInfo[] = [
+  {
+    id: "machine001",
+    name: "Máquina de Press de Pecho",
+    description: "Desarrolla la fuerza y el tamaño de los músculos pectorales, deltoides anteriores y tríceps. Permite un movimiento guiado y seguro.",
+    imagePlaceholderUrl: "https://placehold.co/600x400.png",
+    dataAiHint: "chest press machine",
+    affectedMuscleGroups: ["Pectorales", "Hombros (frontal)", "Tríceps"],
+    commonExercises: [{id: "ex_m001", name: "Press de pecho en máquina"}],
+  },
+  {
+    id: "machine002",
+    name: "Máquina de Jalón Dorsal (Lat Pulldown)",
+    description: "Fortalece los músculos de la espalda, especialmente los dorsales anchos, bíceps y antebrazos. Ideal para mejorar la amplitud de la espalda.",
+    imagePlaceholderUrl: "https://placehold.co/600x400.png",
+    dataAiHint: "lat pulldown machine",
+    affectedMuscleGroups: ["Dorsales", "Bíceps", "Espalda Media"],
+     commonExercises: [{id: "ex_m002", name: "Jalón dorsal al pecho"}],
+  },
+  {
+    id: "machine003",
+    name: "Prensa de Piernas (Leg Press)",
+    description: "Trabaja los cuádriceps, glúteos e isquiotibiales. Una alternativa a las sentadillas, especialmente útil para levantar grandes pesos con apoyo lumbar.",
+    imagePlaceholderUrl: "https://placehold.co/600x400.png",
+    dataAiHint: "leg press machine",
+    affectedMuscleGroups: ["Cuádriceps", "Glúteos", "Isquiotibiales"],
+     commonExercises: [{id: "ex_m003", name: "Prensa de piernas"}],
+  },
+];
+
 
 export default function WorkoutsPage() {
-  // For now, display the first mock workout.
-  // Later, this could be selectable or based on user's current plan.
-  const currentWorkout = mockWorkouts[0]; 
-  // const homeWorkout = mockWorkouts[1];
+  const gymWorkout = mockWorkouts.find(w => w.type === 'gym');
+  const homeWorkout = mockWorkouts.find(w => w.type === 'home');
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-0">
       <header className="mb-8 text-center md:text-left">
-        <h1 className="text-3xl font-bold text-primary mb-1">
-          Entrenamiento Personalizado
+        <h1 className="text-4xl font-bold text-primary mb-1">
+          Explora Entrenamientos y Guías
         </h1>
         <p className="text-lg text-muted-foreground">
-          {currentWorkout.targetAudience}
+          Encuentra rutinas para el gimnasio, para casa, y aprende sobre el equipamiento.
         </p>
       </header>
 
-      {/* This could be a tab system in the future: Entrenamientos, Máquinas, Rutinas Casa */}
-      <Button variant="default" size="lg" className="w-full md:w-auto mb-6 text-lg">
-        <Dumbbell className="mr-2 h-5 w-5" />
-        Entrenamientos
-      </Button>
-      
-      {currentWorkout && <WorkoutDisplay workout={currentWorkout} />}
-      
-      {/* Example of showing another workout type */}
-      {/* {homeWorkout && (
-        <div className="mt-12">
-          <h2 className="text-2xl font-semibold text-primary mb-4">Rutinas para Casa</h2>
-          <WorkoutDisplay workout={homeWorkout} />
-        </div>
-      )} */}
+      <Tabs defaultValue="gym" className="w-full">
+        <TabsList className="grid w-full grid-cols-3 mb-6">
+          <TabsTrigger value="gym"><Dumbbell className="mr-2 h-4 w-4" />Gimnasio</TabsTrigger>
+          <TabsTrigger value="home"><Home className="mr-2 h-4 w-4" />En Casa</TabsTrigger>
+          <TabsTrigger value="machines"><Cog className="mr-2 h-4 w-4" />Guía de Máquinas</TabsTrigger>
+        </TabsList>
 
-      {/* TODO: Add sections for "Para qué sirve cada máquina" and more "Rutinas para casa" */}
-      {/* These could be separate components or tabs within this page */}
+        <TabsContent value="gym">
+          {gymWorkout ? (
+            <WorkoutDisplay workout={gymWorkout} />
+          ) : (
+            <Card><CardContent className="p-6 text-center text-muted-foreground">No hay entrenamientos de gimnasio disponibles.</CardContent></Card>
+          )}
+        </TabsContent>
 
+        <TabsContent value="home">
+          {homeWorkout ? (
+            <WorkoutDisplay workout={homeWorkout} />
+          ) : (
+             <Card><CardContent className="p-6 text-center text-muted-foreground">No hay rutinas para casa disponibles.</CardContent></Card>
+          )}
+        </TabsContent>
+
+        <TabsContent value="machines">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-2xl text-primary">Guía de Máquinas de Gimnasio</CardTitle>
+              <CardDescription>Aprende para qué sirve cada máquina y qué músculos trabaja.</CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {mockMachineInfo.length > 0 ? (
+                mockMachineInfo.map(machine => <MachineInfoCard key={machine.id} machine={machine} />)
+              ) : (
+                <p className="text-muted-foreground text-center py-4">No hay información de máquinas disponible.</p>
+              )}
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }

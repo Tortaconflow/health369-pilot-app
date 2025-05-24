@@ -95,6 +95,7 @@ export type Exercise = {
   imagePlaceholderUrl: string;
   videoUrl?: string; // Optional link to a video demonstration
   notes?: string; // e.g., "110-140lpm" for treadmill
+  dataAiHint?: string;
 };
 
 export type Workout = {
@@ -108,12 +109,12 @@ export type Workout = {
   progress?: number; // e.g., 0 for 0%
 };
 
-// Future:
-// export type MachineInfo = {
-//   id: string;
-//   name: string;
-//   description: string; // what it's for
-//   imagePlaceholderUrl: string;
-//   affectedMuscleGroups: string[];
-//   commonExercises: Exercise[];
-// };
+export type MachineInfo = {
+  id: string;
+  name: string;
+  description: string;
+  imagePlaceholderUrl: string;
+  dataAiHint?: string;
+  affectedMuscleGroups: string[];
+  commonExercises?: { name: string; id: string }[];
+};
