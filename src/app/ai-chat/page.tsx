@@ -1,15 +1,16 @@
+
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, type FormEvent } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar'; // AvatarImage no es necesario si usamos iconos
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Send, Sparkles, User, Bot, Loader2 } from 'lucide-react';
 import { handleRecipeChat } from '@/app/actions/chatActions';
 import { useToast } from '@/hooks/use-toast';
-import LogoIcon from '@/components/icons/LogoIcon'; // Asumiendo que tienes un LogoIcon
+import { cn } from '@/lib/utils';
 
 interface ChatMessage {
   id: string;
@@ -23,13 +24,11 @@ export default function AIChatPage() {
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
   const scrollAreaRef = useRef<HTMLDivElement>(null);
+  const viewportRef = useRef<HTMLDivElement>(null);
 
   const scrollToBottom = () => {
-    if (scrollAreaRef.current) {
-      const scrollViewport = scrollAreaRef.current.querySelector('div[data-radix-scroll-area-viewport]');
-      if (scrollViewport) {
-        scrollViewport.scrollTop = scrollViewport.scrollHeight;
-      }
+    if (viewportRef.current) {
+      viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   };
 
@@ -45,7 +44,7 @@ export default function AIChatPage() {
   }, []);
 
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!input.trim() || isLoading) return;
 
@@ -55,13 +54,17 @@ export default function AIChatPage() {
       content: input.trim(),
     };
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
+    const currentInput = input.trim();
     setInput('');
     setIsLoading(true);
 
-    const chatHistoryForAPI = messages.map(msg => ({ role: msg.role, content: msg.content }));
+    // Para el historial, no incluimos el mensaje inicial si es el único mensaje del asistente
+    const chatHistoryForAPI = messages
+        .filter(msg => !(msg.id === 'init-bot' && messages.filter(m => m.role === 'assistant').length === 1))
+        .map(msg => ({ role: msg.role, content: msg.content }));
 
     try {
-      const result = await handleRecipeChat({ userQuery: newUserMessage.content, chatHistory: chatHistoryForAPI });
+      const result = await handleRecipeChat({ userQuery: currentInput, chatHistory: chatHistoryForAPI });
       if (result.success && result.data) {
         const newAssistantMessage: ChatMessage = {
           id: `assistant-${Date.now()}`,
@@ -96,14 +99,16 @@ export default function AIChatPage() {
       setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
     } finally {
       setIsLoading(false);
+      // Ensure scroll to bottom after response and loading state update
+      setTimeout(scrollToBottom, 0);
     }
   };
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-0 flex flex-col h-[calc(100vh-10rem)] max-h-[800px]">
-      <Card className="w-full max-w-2xl mx-auto shadow-xl flex flex-col flex-1">
-        <CardHeader className="text-center border-b">
-          <div className="inline-block p-2 bg-primary/10 rounded-full mx-auto mb-2">
+    <div className="container mx-auto py-8 px-4 md:px-0 flex flex-col h-[calc(100vh-8rem)] max-h-[800px] items-center">
+      <Card className="w-full max-w-2xl shadow-xl flex flex-col flex-1 rounded-lg">
+        <CardHeader className="text-center border-b pb-4">
+          <div className="inline-block p-2.5 bg-primary/10 rounded-full mx-auto mb-2">
             <Sparkles className="h-8 w-8 text-primary" />
           </div>
           <CardTitle className="text-2xl font-bold text-primary">
@@ -112,48 +117,50 @@ export default function AIChatPage() {
           <p className="text-muted-foreground text-sm">Tu asistente personal para recetas y consejos de cocina.</p>
         </CardHeader>
         <CardContent className="p-0 flex-1 overflow-hidden">
-          <ScrollArea className="h-full p-4" ref={scrollAreaRef}>
-            <div className="space-y-4">
+          <ScrollArea className="h-full" ref={scrollAreaRef}>
+            <div ref={viewportRef} className="h-full p-4 space-y-4">
               {messages.map((message) => (
                 <div
                   key={message.id}
-                  className={`flex items-end gap-2 ${
+                  className={cn(
+                    "flex items-end gap-2",
                     message.role === 'user' ? 'justify-end' : 'justify-start'
-                  }`}
+                  )}
                 >
                   {message.role === 'assistant' && (
-                    <Avatar className="h-8 w-8 self-start">
-                       <div className="bg-primary rounded-full p-1.5">
+                    <Avatar className="h-8 w-8 self-start shrink-0">
+                       <AvatarFallback className="bg-primary rounded-full p-1.5">
                         <Bot className="h-5 w-5 text-primary-foreground" />
-                       </div>
+                       </AvatarFallback>
                     </Avatar>
                   )}
                   <div
-                    className={`max-w-[75%] rounded-lg p-3 shadow-sm ${
+                    className={cn(
+                      "max-w-[75%] rounded-xl p-3 shadow-sm",
                       message.role === 'user'
                         ? 'bg-primary text-primary-foreground rounded-br-none'
                         : 'bg-muted text-foreground rounded-bl-none'
-                    }`}
+                    )}
                   >
                     <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   </div>
                   {message.role === 'user' && (
-                     <Avatar className="h-8 w-8 self-start">
-                        <div className="bg-accent rounded-full p-1.5">
+                     <Avatar className="h-8 w-8 self-start shrink-0">
+                        <AvatarFallback className="bg-accent rounded-full p-1.5">
                           <User className="h-5 w-5 text-accent-foreground" />
-                        </div>
+                        </AvatarFallback>
                     </Avatar>
                   )}
                 </div>
               ))}
                {isLoading && (
                 <div className="flex items-end gap-2 justify-start">
-                  <Avatar className="h-8 w-8 self-start">
-                    <div className="bg-primary rounded-full p-1.5">
+                  <Avatar className="h-8 w-8 self-start shrink-0">
+                    <AvatarFallback className="bg-primary rounded-full p-1.5">
                         <Bot className="h-5 w-5 text-primary-foreground" />
-                    </div>
+                    </AvatarFallback>
                   </Avatar>
-                  <div className="max-w-[75%] rounded-lg p-3 shadow-sm bg-muted text-foreground rounded-bl-none">
+                  <div className="max-w-[75%] rounded-xl p-3 shadow-sm bg-muted text-foreground rounded-bl-none">
                     <Loader2 className="h-5 w-5 animate-spin text-primary" />
                   </div>
                 </div>
@@ -161,8 +168,8 @@ export default function AIChatPage() {
             </div>
           </ScrollArea>
         </CardContent>
-        <form onSubmit={handleSubmit} className="border-t p-4 bg-background">
-          <div className="flex items-center gap-2">
+        <CardFooter className="border-t p-4 bg-background">
+          <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full">
             <Input
               type="text"
               placeholder="Escribe tu pregunta sobre recetas..."
@@ -170,14 +177,17 @@ export default function AIChatPage() {
               onChange={(e) => setInput(e.target.value)}
               disabled={isLoading}
               className="flex-1"
+              autoComplete="off"
             />
-            <Button type="submit" disabled={isLoading || !input.trim()} size="icon" className="bg-accent hover:bg-accent/90">
+            <Button type="submit" disabled={isLoading || !input.trim()} size="icon" className="bg-accent hover:bg-accent/90 text-accent-foreground shrink-0">
               <Send className="h-5 w-5" />
               <span className="sr-only">Enviar</span>
             </Button>
-          </div>
-        </form>
+          </form>
+        </CardFooter>
       </Card>
     </div>
   );
 }
+
+    
