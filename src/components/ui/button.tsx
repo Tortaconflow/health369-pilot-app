@@ -9,18 +9,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-primary text-primary-foreground hover:bg-primary/90",
+        default: "bg-accent text-accent-foreground hover:bg-accent/90", // Naranja Vibrante
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline:
-          "border border-input bg-background hover:bg-accent hover:text-accent-foreground",
-        secondary:
-          "bg-secondary text-secondary-foreground hover:bg-secondary/80",
+        outline: // Verde Esmeralda claro (bg-background), texto negro (text-foreground), borde Verde Esmeralda (border-primary)
+          "border-2 border-primary bg-background text-foreground hover:bg-primary/10 hover:text-primary-foreground",
+        secondary: // Verde Esmeralda (bg-primary), texto blanco (text-primary-foreground)
+          "bg-primary text-primary-foreground hover:bg-primary/90",
         ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-primary underline-offset-4 hover:underline",
+        link: "text-secondary underline-offset-4 hover:underline", // Azul Suave for links
       },
       size: {
-        default: "h-10 px-4 py-2",
+        default: "h-10 px-4 py-2", // Default rounded-md (8px with 0.75rem radius)
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",

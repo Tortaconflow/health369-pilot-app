@@ -37,7 +37,7 @@ export default function HomePage() {
         />
       </div>
 
-      <Card className="w-full max-w-4xl mx-auto shadow-xl overflow-hidden">
+      <Card className="w-full max-w-4xl mx-auto shadow-xl overflow-hidden rounded-lg"> {/* Applied new radius */}
         <div className="md:flex">
           <div className="md:shrink-0">
             <Image 
@@ -51,7 +51,7 @@ export default function HomePage() {
           </div>
           <div className="p-8">
             <CardHeader>
-              <CardTitle className="text-3xl font-bold text-primary">¿Listo para Transformarte?</CardTitle>
+              <CardTitle className="text-3xl font-bold text-primary">¿Listo para Transformarte?</CardTitle> {/* This will be h1 style from globals.css -> Montserrat 24px. If CardTitle is not h1, it might need adjustment or CardTitle uses h2 styling by default. */}
               <CardDescription className="text-lg text-foreground/70 mt-2">
                 Health369 Piloto te proporciona las herramientas, la comunidad y el apoyo experto que necesitas para tener éxito.
               </CardDescription>
@@ -74,7 +74,8 @@ export default function HomePage() {
             </CardContent>
             <CardFooter className="mt-6">
               <Link href="/dashboard" passHref legacyBehavior>
-                <Button size="lg" className="w-full md:w-auto bg-primary hover:bg-primary/90 text-primary-foreground">
+                {/* Primary button will use Naranja Vibrante (accent) */}
+                <Button size="lg" className="w-full md:w-auto"> 
                   Comenzar <ArrowRight className="ml-2 h-5 w-5" />
                 </Button>
               </Link>
@@ -95,11 +96,12 @@ interface FeatureCardProps {
 
 function FeatureCard({ icon, title, description, href }: FeatureCardProps) {
   return (
-    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300">
+    <Card className="shadow-lg hover:shadow-xl transition-shadow duration-300 rounded-lg"> {/* Applied new radius */}
       <CardHeader className="items-center text-center">
         <div className="p-4 bg-accent/20 rounded-full mb-4">
           {icon}
         </div>
+        {/* CardTitle is h2 by default -> Montserrat 18px */}
         <CardTitle className="text-2xl font-semibold text-primary">{title}</CardTitle>
       </CardHeader>
       <CardContent className="text-center">
@@ -107,7 +109,8 @@ function FeatureCard({ icon, title, description, href }: FeatureCardProps) {
       </CardContent>
       <CardFooter className="justify-center">
         <Link href={href} passHref legacyBehavior>
-          <Button variant="outline" className="text-primary border-primary hover:bg-primary/10">
+          {/* Outline button will use Verde Esmeralda border */}
+          <Button variant="outline" className="text-primary hover:text-primary-foreground">
             Saber Más <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>

@@ -6,11 +6,12 @@ import LogoIcon from '@/components/icons/LogoIcon';
 export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-gradient-to-br from-background to-primary/10 p-4">
-      <Card className="w-full max-w-md shadow-2xl">
+      <Card className="w-full max-w-md shadow-2xl rounded-lg"> {/* Applied new radius */}
         <CardHeader className="text-center space-y-2">
-          <Link href="/" className="inline-block">
+          <Link href="/" className="inline-block no-underline"> {/* Ensure Link doesn't inherit global 'a' styles if not desired here */}
             <LogoIcon className="h-12 w-12 mx-auto" />
           </Link>
+          {/* CardTitle is h2 by default -> Montserrat 18px. The text-3xl here will override it to a larger Montserrat. */}
           <CardTitle className="text-3xl font-bold text-primary">Iniciar Sesión en Health369</CardTitle>
           <CardDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardDescription>
         </CardHeader>
@@ -19,17 +20,19 @@ export default function LoginPage() {
           <div className="space-y-4">
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-foreground">Correo Electrónico</label>
-              <input type="email" id="email" className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="tu@ejemplo.com" />
+              <input type="email" id="email" className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm" placeholder="tu@ejemplo.com" />
             </div>
             <div>
               <label htmlFor="password"className="block text-sm font-medium text-foreground">Contraseña</label>
-              <input type="password" id="password" className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-primary focus:border-primary sm:text-sm" placeholder="••••••••" />
+              <input type="password" id="password" className="mt-1 block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:outline-none focus:ring-ring focus:border-ring sm:text-sm" placeholder="••••••••" />
             </div>
           </div>
-          <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">Iniciar Sesión</Button>
+          {/* Primary button will use Naranja Vibrante (accent) */}
+          <Button className="w-full">Iniciar Sesión</Button>
           <p className="text-center text-sm text-muted-foreground">
             ¿No tienes una cuenta?{" "}
-            <Link href="/signup" className="font-medium text-primary hover:underline">
+            {/* Link component will use global 'a' styles: Roboto 12px, text-secondary (Azul Suave) */}
+            <Link href="/signup" className="font-medium hover:underline">
               Regístrate
             </Link>
           </p>
