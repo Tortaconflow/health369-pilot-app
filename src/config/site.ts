@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass } from 'lucide-react';
+import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell } from 'lucide-react';
 
 export type NavItem = {
   title: string;
@@ -42,6 +42,11 @@ export const siteConfig: SiteConfig = {
       icon: Compass,
     },
     {
+      title: "Entrenamientos",
+      href: "/workouts",
+      icon: Dumbbell,
+    },
+    {
       title: "Expertos",
       href: "/experts",
       icon: Users,
@@ -75,6 +80,12 @@ export const siteConfig: SiteConfig = {
       href: "/profile",
       icon: UserCircle,
       description: "Gestiona tu perfil y configuraciones."
+    },
+    {
+      title: "Entrenamientos",
+      href: "/workouts",
+      icon: Dumbbell, // Using Dumbbell icon
+      description: "Planes de ejercicio y guías."
     },
     {
       title: "Conectar",
@@ -121,4 +132,3 @@ export const siteConfig: SiteConfig = {
     },
   ],
 };
-

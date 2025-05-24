@@ -1,3 +1,4 @@
+
 export type Expert = {
   id: string;
   name: string;
@@ -80,3 +81,39 @@ export type AISuggestions = {
   recipe: RecipeSuggestion;
   routine: RoutineSuggestion;
 };
+
+export type Exercise = {
+  id: string;
+  name: string;
+  description?: string; // How to do it, details.
+  sets?: number | string; // e.g., 4 or "2-3"
+  reps?: number | string; // e.g., 12 or "8-12"
+  duration?: string; // e.g., "30s", "5 min."
+  weight?: string; // e.g., "22.5 kg", "propio peso"
+  equipment?: string[]; // e.g., ["banda de resistencia", "mancuernas"]
+  muscleGroups?: string[];
+  imagePlaceholderUrl: string;
+  videoUrl?: string; // Optional link to a video demonstration
+  notes?: string; // e.g., "110-140lpm" for treadmill
+};
+
+export type Workout = {
+  id: string;
+  name: string; // e.g., "Pectoral+Espalda+Glúteos"
+  dayDescription?: string; // e.g., "1 día de entrenamiento"
+  estimatedTime: string; // e.g., "1h. 42 min."
+  targetAudience: string; // e.g., "para hombres y mujeres"
+  type: "gym" | "home" | "mixed";
+  exercises: Exercise[];
+  progress?: number; // e.g., 0 for 0%
+};
+
+// Future:
+// export type MachineInfo = {
+//   id: string;
+//   name: string;
+//   description: string; // what it's for
+//   imagePlaceholderUrl: string;
+//   affectedMuscleGroups: string[];
+//   commonExercises: Exercise[];
+// };
