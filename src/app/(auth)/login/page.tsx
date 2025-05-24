@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { LeafIcon } from "lucide-react";
+import LogoIcon from '@/components/icons/LogoIcon';
 
 export default function LoginPage() {
   return (
@@ -9,7 +9,7 @@ export default function LoginPage() {
       <Card className="w-full max-w-md shadow-2xl">
         <CardHeader className="text-center space-y-2">
           <Link href="/" className="inline-block">
-            <LeafIcon className="h-12 w-12 text-primary mx-auto" />
+            <LogoIcon className="h-12 w-12 mx-auto" />
           </Link>
           <CardTitle className="text-3xl font-bold text-primary">Iniciar Sesión en Health369</CardTitle>
           <CardDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardDescription>

@@ -20,7 +20,7 @@ import { Button } from '@/components/ui/button';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { UserNav } from './UserNav';
 import { cn } from '@/lib/utils';
-import { LeafIcon } from 'lucide-react';
+import LogoIcon from '@/components/icons/LogoIcon';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const { open, setOpen, isMobile, toggleSidebar } = useSidebar();
@@ -31,7 +31,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <Sidebar collapsible="icon" variant="sidebar" side="left" className="border-r">
         <SidebarHeader className="p-4">
           <Link href="/" className="flex items-center gap-2 font-semibold text-sidebar-foreground">
-            <LeafIcon className="h-7 w-7 text-sidebar-primary" />
+            <LogoIcon className="h-7 w-7" />
             <span className={cn("text-lg", open || isMobile ? "inline" : "hidden group-data-[collapsible=icon]:hidden")}>
               Health369
             </span>
