@@ -42,13 +42,14 @@ Based on the user data provided:
 User Data: {{{userData}}}
 
 Generate a personalized recipe suggestion and a personalized routine suggestion to help the user achieve their goals.
-Your response MUST be a JSON object matching the following structure:
+Your response MUST be a valid JSON object and NOTHING ELSE. Do not include any explanatory text, comments, or markdown formatting before or after the JSON.
+The JSON object must have two keys: "recipeSuggestion" and "routineSuggestion".
+Example of the exact JSON format required:
 {
-  "recipeSuggestion": "string (This should be a personalized recipe suggestion. Example: 'Ensalada de Quinoa con Pollo a la Parrilla: Mezcla quinoa cocida, pollo a la parrilla en cubos, pimientos picados, pepino y un aderezo ligero de limón y aceite de oliva.')",
-  "routineSuggestion": "string (This should be a personalized routine suggestion. Example: 'Entrenamiento de Cuerpo Completo (30 min): 10 min de cardio ligero (trote), 3 series de 12 sentadillas, 3 series de 10 flexiones, 3 series de 15 planchas (30 seg cada una).')"
+  "recipeSuggestion": "Ensalada de Quinoa con Pollo a la Parrilla: Mezcla quinoa cocida, pollo a la parrilla en cubos, pimientos picados, pepino y un aderezo ligero de limón y aceite de oliva.",
+  "routineSuggestion": "Entrenamiento de Cuerpo Completo (30 min): 10 min de cardio ligero (trote), 3 series de 12 sentadillas, 3 series de 10 flexiones, 3 series de 15 planchas (30 seg cada una)."
 }
-
-Ensure your output is a valid JSON object.`,
+`,
 });
 
 const aiSuggestionsFlow = ai.defineFlow(
