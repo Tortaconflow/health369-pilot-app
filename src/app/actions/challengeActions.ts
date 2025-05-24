@@ -24,7 +24,7 @@ export async function createChallenge(
 ): Promise<{ success: boolean; data?: Challenge; error?: string }> {
   const validation = CreateChallengeSchema.safeParse(input);
   if (!validation.success) {
-    return { success: false, error: validation.error.flatten().fieldErrors Mapped to string };
+    return { success: false, error: JSON.stringify(validation.error.flatten().fieldErrors) };
   }
 
   try {
