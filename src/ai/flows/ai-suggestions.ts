@@ -1,3 +1,4 @@
+
 'use server';
 
 /**
@@ -36,12 +37,18 @@ const prompt = ai.definePrompt({
   name: 'aiSuggestionsPrompt',
   input: {schema: AISuggestionsInputSchema},
   output: {schema: AISuggestionsOutputSchema},
-  prompt: `You are a personalized health and fitness assistant. Based on the user data provided, generate a personalized recipe suggestion and a personalized routine suggestion to help the user achieve their goals.
-
+  prompt: `You are a personalized health and fitness assistant.
+Based on the user data provided:
 User Data: {{{userData}}}
 
-Recipe Suggestion:
-Routine Suggestion:`,
+Generate a personalized recipe suggestion and a personalized routine suggestion to help the user achieve their goals.
+Your response MUST be a JSON object matching the following structure:
+{
+  "recipeSuggestion": "string (This should be a personalized recipe suggestion. Example: 'Ensalada de Quinoa con Pollo a la Parrilla: Mezcla quinoa cocida, pollo a la parrilla en cubos, pimientos picados, pepino y un aderezo ligero de limón y aceite de oliva.')",
+  "routineSuggestion": "string (This should be a personalized routine suggestion. Example: 'Entrenamiento de Cuerpo Completo (30 min): 10 min de cardio ligero (trote), 3 series de 12 sentadillas, 3 series de 10 flexiones, 3 series de 15 planchas (30 seg cada una).')"
+}
+
+Ensure your output is a valid JSON object.`,
 });
 
 const aiSuggestionsFlow = ai.defineFlow(
@@ -52,6 +59,10 @@ const aiSuggestionsFlow = ai.defineFlow(
   },
   async input => {
     const {output} = await prompt(input);
-    return output!;
+    if (!output) {
+      throw new Error('AI model did not return an output matching the expected schema.');
+    }
+    return output;
   }
 );
+
