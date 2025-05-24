@@ -1,5 +1,6 @@
+
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon } from 'lucide-react';
+import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass } from 'lucide-react';
 
 export type NavItem = {
   title: string;
@@ -36,6 +37,11 @@ export const siteConfig: SiteConfig = {
       icon: LayoutDashboard,
     },
     {
+      title: "Guía Inicial",
+      href: "/onboarding",
+      icon: Compass,
+    },
+    {
       title: "Expertos",
       href: "/experts",
       icon: Users,
@@ -57,6 +63,12 @@ export const siteConfig: SiteConfig = {
       href: "/dashboard",
       icon: LayoutDashboard,
       description: "Tu centro personal de salud y fitness."
+    },
+    {
+      title: "Guía Inicial",
+      href: "/onboarding",
+      icon: Compass,
+      description: "Configura tus preferencias iniciales."
     },
     {
       title: "Mi Perfil",
@@ -109,3 +121,4 @@ export const siteConfig: SiteConfig = {
     },
   ],
 };
+
