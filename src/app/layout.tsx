@@ -17,8 +17,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Health369 Pilot',
-  description: 'Revolutionizing health and fitness goals.',
+  title: 'Health369 Piloto',
+  description: 'Revolucionando las metas de salud y fitness.',
 };
 
 export default function RootLayout({
@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
+    <html lang="es" suppressHydrationWarning>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased font-sans`}>
         <QueryProvider>
           <SidebarProvider defaultOpen={true}>

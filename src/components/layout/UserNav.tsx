@@ -17,14 +17,14 @@ import { LogOut, User, Settings, CreditCard, LifeBuoy } from "lucide-react";
 
 // Placeholder for authentication state
 const isAuthenticated = true; 
-const userName = "Pilot User";
-const userEmail = "user@health369.com";
+const userName = "Usuario Piloto"; // Translated
+const userEmail = "usuario@health369.com"; // Translated (example)
 
 export function UserNav() {
   if (!isAuthenticated) {
     return (
       <Link href="/login" legacyBehavior passHref>
-        <Button variant="outline">Login</Button>
+        <Button variant="outline">Iniciar Sesión</Button>
       </Link>
     );
   }
@@ -53,21 +53,21 @@ export function UserNav() {
           <Link href="/profile" passHref>
             <DropdownMenuItem>
               <User className="mr-2 h-4 w-4" />
-              <span>Profile</span>
+              <span>Perfil</span>
               <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
           <Link href="/profile#billing" passHref>
             <DropdownMenuItem>
               <CreditCard className="mr-2 h-4 w-4" />
-              <span>Billing</span>
+              <span>Facturación</span>
               <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
           <Link href="/profile#settings" passHref>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />
-              <span>Settings</span>
+              <span>Ajustes</span>
               <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
             </DropdownMenuItem>
           </Link>
@@ -76,12 +76,12 @@ export function UserNav() {
          <Link href="/support" passHref>
             <DropdownMenuItem>
                 <LifeBuoy className="mr-2 h-4 w-4" />
-                <span>Support</span>
+                <span>Soporte</span>
             </DropdownMenuItem>
         </Link>
         <DropdownMenuItem disabled>
             <LogOut className="mr-2 h-4 w-4" />
-            <span>Log out</span>
+            <span>Cerrar Sesión</span>
             <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
         </DropdownMenuItem>
       </DropdownMenuContent>

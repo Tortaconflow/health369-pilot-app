@@ -12,6 +12,12 @@ interface ChallengeCardProps {
 }
 
 export default function ChallengeCard({ challenge }: ChallengeCardProps) {
+  const statusTextMap: Record<Challenge['status'], string> = {
+    active: "Activo",
+    upcoming: "Próximo",
+    completed: "Completado"
+  };
+
   const getStatusColor = (status: Challenge['status']) => {
     switch (status) {
       case 'active': return 'bg-green-500 text-white';
@@ -20,6 +26,8 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
       default: return 'bg-gray-300';
     }
   };
+  const challengeStatusText = statusTextMap[challenge.status] || challenge.status.charAt(0).toUpperCase() + challenge.status.slice(1);
+
 
   return (
     <Card className="shadow-md hover:shadow-xl transition-shadow duration-300 flex flex-col h-full overflow-hidden">
@@ -33,7 +41,7 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
           data-ai-hint="challenge theme"
         />
         <Badge className={cn("absolute top-3 right-3 px-2 py-1 text-xs font-semibold", getStatusColor(challenge.status))}>
-          {challenge.status.charAt(0).toUpperCase() + challenge.status.slice(1)}
+          {challengeStatusText}
         </Badge>
          <div className="absolute bottom-0 left-0 w-full p-4 bg-gradient-to-t from-black/80 to-transparent">
           <CardTitle className="text-2xl font-bold text-white leading-tight">{challenge.name}</CardTitle>
@@ -43,22 +51,22 @@ export default function ChallengeCard({ challenge }: ChallengeCardProps) {
         <CardDescription className="text-sm text-foreground/80 mb-4 line-clamp-3">{challenge.description}</CardDescription>
         
         <div className="space-y-2 text-sm text-foreground/90">
-          <InfoItem icon={<Target className="text-primary" />} label="Objective" value={challenge.objective} />
-          <InfoItem icon={<Clock className="text-primary" />} label="Duration" value={challenge.duration} />
-          <InfoItem icon={<Users className="text-primary" />} label="Participants" value={`${challenge.participants.length} joined`} />
-          <InfoItem icon={<Zap className="text-primary" />} label="Entry Fee" value={`🪙 ${challenge.entryFee} coins`} />
+          <InfoItem icon={<Target className="text-primary" />} label="Objetivo" value={challenge.objective} />
+          <InfoItem icon={<Clock className="text-primary" />} label="Duración" value={challenge.duration} />
+          <InfoItem icon={<Users className="text-primary" />} label="Participantes" value={`${challenge.participants.length} unidos`} />
+          <InfoItem icon={<Zap className="text-primary" />} label="Cuota" value={`🪙 ${challenge.entryFee} monedas`} />
           {challenge.status === 'upcoming' && (
-             <InfoItem icon={<CalendarDays className="text-primary" />} label="Starts" value={new Date(challenge.startDate).toLocaleDateString()} />
+             <InfoItem icon={<CalendarDays className="text-primary" />} label="Inicia" value={new Date(challenge.startDate).toLocaleDateString()} />
           )}
           {challenge.status === 'active' && (
-             <InfoItem icon={<CalendarDays className="text-primary" />} label="Ends" value={new Date(challenge.endDate).toLocaleDateString()} />
+             <InfoItem icon={<CalendarDays className="text-primary" />} label="Finaliza" value={new Date(challenge.endDate).toLocaleDateString()} />
           )}
         </div>
       </CardContent>
       <CardFooter className="p-6 border-t">
         <Link href={`/challenges/${challenge.id}`} passHref legacyBehavior>
           <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
-            View Details <ArrowRight className="ml-2 h-4 w-4" />
+            Ver Detalles <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
       </CardFooter>

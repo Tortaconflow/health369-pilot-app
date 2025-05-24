@@ -22,32 +22,32 @@ export default function ExpertCard({ expert }: ExpertCardProps) {
         <CardDescription className="text-accent font-medium">{expert.specialty}</CardDescription>
         <div className="flex items-center mt-1 text-yellow-500">
           <Star className="h-5 w-5 mr-1 fill-current" /> {expert.rating.toFixed(1)}
-          <span className="text-muted-foreground ml-1 text-sm">({expert.experienceYears} yrs exp.)</span>
+          <span className="text-muted-foreground ml-1 text-sm">({expert.experienceYears} años exp.)</span>
         </div>
       </CardHeader>
       <CardContent className="p-6 flex-grow">
         <p className="text-sm text-foreground/80 leading-relaxed line-clamp-3 mb-4">{expert.bio}</p>
         <div className="space-y-1">
-          <h4 className="font-semibold text-sm text-foreground">Certifications:</h4>
+          <h4 className="font-semibold text-sm text-foreground">Certificaciones:</h4>
           <div className="flex flex-wrap gap-1">
             {expert.certifications.slice(0, 2).map((cert) => (
               <Badge key={cert} variant="secondary" className="text-xs">{cert}</Badge>
             ))}
-            {expert.certifications.length > 2 && <Badge variant="outline" className="text-xs">+{expert.certifications.length - 2} more</Badge>}
+            {expert.certifications.length > 2 && <Badge variant="outline" className="text-xs">+{expert.certifications.length - 2} más</Badge>}
           </div>
         </div>
       </CardContent>
       <CardFooter className="p-6 border-t flex flex-col sm:flex-row gap-2 justify-between">
         <Link href={`/experts/${expert.id}`} passHref legacyBehavior>
           <Button variant="outline" className="w-full sm:w-auto text-primary border-primary hover:bg-primary/10">
-            View Profile <ArrowRight className="ml-2 h-4 w-4" />
+            Ver Perfil <ArrowRight className="ml-2 h-4 w-4" />
           </Button>
         </Link>
         <div className="flex gap-2 w-full sm:w-auto">
-            <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10" title="Chat (coming soon)">
+            <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10" title="Chatear (próximamente)">
                 <MessageSquare className="h-5 w-5" />
             </Button>
-            <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10" title="Video Call (coming soon)">
+            <Button variant="ghost" size="icon" className="text-primary hover:bg-primary/10" title="Videollamada (próximamente)">
                 <Video className="h-5 w-5" />
             </Button>
         </div>

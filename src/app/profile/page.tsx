@@ -13,17 +13,17 @@ import Image from "next/image";
 // Mock data - replace with actual data fetching
 const mockUserProfile: UserProfileType = {
   id: "user123",
-  name: "Alex Johnson",
-  email: "alex.j@example.com",
+  name: "Alex García", // Translated
+  email: "alex.g@example.com",
   avatarUrl: "https://placehold.co/200x200.png",
   level: 5,
   experiencePoints: 450,
-  badges: ["Early Adopter", "Challenge Starter", "Streak Master"],
+  badges: ["Madrugador", "Iniciador de Desafíos", "Maestro de Rachas"], // Translated
   virtualCurrency: 1500,
-  healthGoals: ["Lose 5kg by July", "Run 5k thrice a week", "Eat more vegetables"],
+  healthGoals: ["Perder 5kg para julio", "Correr 5k tres veces por semana", "Comer más verduras"], // Translated
   preferences: {
-    notifications: "enabled",
-    theme: "light",
+    notifications: "enabled", // Consider translating "enabled" if shown in UI
+    theme: "light", // "claro" / "oscuro"
   },
   progress: {
     weight: 75,
@@ -49,13 +49,13 @@ export default function ProfilePage() {
               <p className="text-lg text-muted-foreground">{mockUserProfile.email}</p>
               <div className="mt-2 flex items-center gap-4">
                 <div className="flex items-center text-yellow-500">
-                  <Star className="h-5 w-5 mr-1" /> Level {mockUserProfile.level}
+                  <Star className="h-5 w-5 mr-1" /> Nivel {mockUserProfile.level}
                 </div>
                 <div className="flex items-center text-accent">
                   <Zap className="h-5 w-5 mr-1" /> {mockUserProfile.experiencePoints} XP
                 </div>
                 <div className="flex items-center text-green-500">
-                  🪙 {mockUserProfile.virtualCurrency} Coins
+                  🪙 {mockUserProfile.virtualCurrency} Monedas
                 </div>
               </div>
             </div>
@@ -64,53 +64,53 @@ export default function ProfilePage() {
         <CardContent className="p-6">
           <Tabs defaultValue="overview" className="w-full">
             <TabsList className="grid w-full grid-cols-2 md:grid-cols-4 mb-6">
-              <TabsTrigger value="overview">Overview</TabsTrigger>
-              <TabsTrigger value="progress">Progress</TabsTrigger>
-              <TabsTrigger value="badges">Badges</TabsTrigger>
-              <TabsTrigger value="settings">Settings</TabsTrigger>
+              <TabsTrigger value="overview">Resumen</TabsTrigger>
+              <TabsTrigger value="progress">Progreso</TabsTrigger>
+              <TabsTrigger value="badges">Insignias</TabsTrigger>
+              <TabsTrigger value="settings">Ajustes</TabsTrigger>
             </TabsList>
 
             <TabsContent value="overview">
-              <Section title="Health Goals">
+              <Section title="Metas de Salud">
                 <ul className="list-disc list-inside space-y-1 text-foreground/90">
                   {mockUserProfile.healthGoals?.map(goal => <li key={goal}>{goal}</li>)}
                 </ul>
               </Section>
               <Separator className="my-6" />
-              <Section title="Recent Activity">
-                <p className="text-muted-foreground">Joined "Summer Shred Challenge".</p>
-                <p className="text-muted-foreground">Completed "Morning Run" 3 times this week.</p>
+              <Section title="Actividad Reciente">
+                <p className="text-muted-foreground">Se unió al "Desafío de Verano".</p>
+                <p className="text-muted-foreground">Completó "Carrera Matutina" 3 veces esta semana.</p>
               </Section>
             </TabsContent>
 
             <TabsContent value="progress">
-              <Section title="Current Stats">
+              <Section title="Estadísticas Actuales">
                 <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <StatDisplay label="Weight" value={`${mockUserProfile.progress?.weight || 'N/A'} kg`} />
-                    <StatDisplay label="Waist" value={`${mockUserProfile.progress?.waist || 'N/A'} cm`} />
-                    <StatDisplay label="Muscle Mass" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
+                    <StatDisplay label="Peso" value={`${mockUserProfile.progress?.weight || 'N/A'} kg`} />
+                    <StatDisplay label="Cintura" value={`${mockUserProfile.progress?.waist || 'N/A'} cm`} />
+                    <StatDisplay label="Masa Muscular" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-4">
-                    Last updated: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString()}
+                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString()}
                 </p>
               </Section>
               <Separator className="my-6" />
-              <Section title="Progress Photos">
+              <Section title="Fotos de Progreso">
                  <div className="grid grid-cols-2 gap-4">
                     <div>
-                        <h4 className="font-semibold mb-2">Before</h4>
-                        <Image src="https://placehold.co/300x400.png?text=Before" alt="Before photo" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
+                        <h4 className="font-semibold mb-2">Antes</h4>
+                        <Image src="https://placehold.co/300x400.png?text=Antes" alt="Foto Antes" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
                     </div>
                     <div>
-                        <h4 className="font-semibold mb-2">After (Example)</h4>
-                        <Image src="https://placehold.co/300x400.png?text=After" alt="After photo example" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
+                        <h4 className="font-semibold mb-2">Después (Ejemplo)</h4>
+                        <Image src="https://placehold.co/300x400.png?text=Despues" alt="Foto Después Ejemplo" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
                     </div>
                  </div>
               </Section>
             </TabsContent>
             
             <TabsContent value="badges">
-              <Section title="Earned Badges">
+              <Section title="Insignias Ganadas">
                 <div className="flex flex-wrap gap-3">
                   {mockUserProfile.badges.map(badge => (
                     <Badge key={badge} variant="secondary" className="px-3 py-1 text-sm bg-accent/20 text-accent-foreground border-accent">
@@ -123,22 +123,22 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings">
-              <Section title="Account Information">
+              <Section title="Información de la Cuenta">
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">Nombre Completo</Label>
                     <Input id="name" defaultValue={mockUserProfile.name} />
                   </div>
                   <div>
-                    <Label htmlFor="email">Email</Label>
+                    <Label htmlFor="email">Correo Electrónico</Label>
                     <Input id="email" type="email" defaultValue={mockUserProfile.email} disabled />
                   </div>
-                  <Button><Edit3 className="h-4 w-4 mr-2" />Save Changes</Button>
+                  <Button><Edit3 className="h-4 w-4 mr-2" />Guardar Cambios</Button>
                 </div>
               </Section>
               <Separator className="my-6" />
-              <Section title="Security">
-                 <Button variant="outline"><Shield className="h-4 w-4 mr-2" />Change Password</Button>
+              <Section title="Seguridad">
+                 <Button variant="outline"><Shield className="h-4 w-4 mr-2" />Cambiar Contraseña</Button>
               </Section>
             </TabsContent>
           </Tabs>

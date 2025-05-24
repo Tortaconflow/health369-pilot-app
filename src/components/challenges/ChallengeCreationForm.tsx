@@ -20,18 +20,19 @@ import { CalendarIcon, PlusCircle } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
+import { es } from "date-fns/locale"; // Import Spanish locale for date-fns
 import { useToast } from "@/hooks/use-toast";
 import { createChallenge } from "@/app/actions/challengeActions"; // Server Action
 
 const challengeFormSchema = z.object({
-  name: z.string().min(5, "Challenge name must be at least 5 characters.").max(100),
-  description: z.string().min(10, "Description must be at least 10 characters.").max(500),
-  objective: z.string().min(5, "Objective must be at least 5 characters.").max(150),
-  durationValue: z.coerce.number().int().positive("Duration must be a positive number."),
+  name: z.string().min(5, "El nombre del desafío debe tener al menos 5 caracteres.").max(100),
+  description: z.string().min(10, "La descripción debe tener al menos 10 caracteres.").max(500),
+  objective: z.string().min(5, "El objetivo debe tener al menos 5 caracteres.").max(150),
+  durationValue: z.coerce.number().int().positive("La duración debe ser un número positivo."),
   durationUnit: z.enum(["days", "weeks", "months"]),
-  startDate: z.date({ required_error: "Start date is required." }),
-  entryFee: z.coerce.number().int().min(0, "Entry fee cannot be negative.").optional().default(0),
-  // coverImageUrl: z.string().url("Must be a valid URL for cover image.").optional(),
+  startDate: z.date({ required_error: "La fecha de inicio es obligatoria." }),
+  entryFee: z.coerce.number().int().min(0, "La cuota de entrada no puede ser negativa.").optional().default(0),
+  // coverImageUrl: z.string().url("Debe ser una URL válida para la imagen de portada.").optional(),
 });
 
 type ChallengeFormValues = z.infer<typeof challengeFormSchema>;
@@ -50,7 +51,12 @@ export default function ChallengeCreationForm() {
   });
 
   async function onSubmit(data: ChallengeFormValues) {
-    const duration = `${data.durationValue} ${data.durationUnit}`;
+    const durationUnitMap = {
+      days: "días",
+      weeks: "semanas",
+      months: "meses"
+    };
+    const duration = `${data.durationValue} ${durationUnitMap[data.durationUnit]}`;
     const { durationValue, durationUnit, ...restOfData } = data;
     
     // Calculate end date based on start date and duration
@@ -78,22 +84,22 @@ export default function ChallengeCreationForm() {
       const result = await createChallenge(challengeDataForAction);
       if (result.success) {
         toast({
-          title: "Challenge Created!",
-          description: `"${data.name}" has been successfully created.`,
+          title: "¡Desafío Creado!",
+          description: `"${data.name}" se ha creado con éxito.`,
         });
         form.reset();
         // Potentially redirect: router.push(`/challenges/${result.data.id}`);
       } else {
         toast({
           title: "Error",
-          description: result.error || "Failed to create challenge.",
+          description: result.error || "No se pudo crear el desafío.",
           variant: "destructive",
         });
       }
     } catch (error) {
        toast({
           title: "Error",
-          description: "An unexpected error occurred.",
+          description: "Ocurrió un error inesperado.",
           variant: "destructive",
         });
     }
@@ -107,11 +113,11 @@ export default function ChallengeCreationForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Challenge Name</FormLabel>
+              <FormLabel>Nombre del Desafío</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., 30-Day Fitness Kickstart" {...field} />
+                <Input placeholder="Ej: Transformación Fitness 30 Días" {...field} />
               </FormControl>
-              <FormDescription>A catchy name for your challenge.</FormDescription>
+              <FormDescription>Un nombre atractivo para tu desafío.</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -121,9 +127,9 @@ export default function ChallengeCreationForm() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description</FormLabel>
+              <FormLabel>Descripción</FormLabel>
               <FormControl>
-                <Textarea placeholder="Briefly describe what this challenge is about..." {...field} className="min-h-[100px]" />
+                <Textarea placeholder="Describe brevemente de qué trata este desafío..." {...field} className="min-h-[100px]" />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -134,11 +140,11 @@ export default function ChallengeCreationForm() {
           name="objective"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Measurable Objective</FormLabel>
+              <FormLabel>Objetivo Medible</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Lose 5kg, Run 100km total, Meditate 15 mins daily" {...field} />
+                <Input placeholder="Ej: Perder 5kg, Correr 100km en total, Meditar 15 min diarios" {...field} />
               </FormControl>
-              <FormDescription>What's the primary goal of this challenge?</FormDescription>
+              <FormDescription>¿Cuál es el objetivo principal de este desafío?</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -149,19 +155,19 @@ export default function ChallengeCreationForm() {
             name="durationValue"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Duration</FormLabel>
+                <FormLabel>Duración</FormLabel>
                 <div className="flex gap-2">
                     <FormControl>
-                        <Input type="number" placeholder="e.g., 30" {...field} className="w-24"/>
+                        <Input type="number" placeholder="Ej: 30" {...field} className="w-24"/>
                     </FormControl>
                      <FormField
                         control={form.control}
                         name="durationUnit"
                         render={({ field: unitField }) => (
                             <select {...unitField} className="flex h-10 items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50">
-                                <option value="days">Days</option>
-                                <option value="weeks">Weeks</option>
-                                <option value="months">Months</option>
+                                <option value="days">Días</option>
+                                <option value="weeks">Semanas</option>
+                                <option value="months">Meses</option>
                             </select>
                         )}
                         />
@@ -175,7 +181,7 @@ export default function ChallengeCreationForm() {
             name="startDate"
             render={({ field }) => (
                 <FormItem className="flex flex-col">
-                <FormLabel>Start Date</FormLabel>
+                <FormLabel>Fecha de Inicio</FormLabel>
                 <Popover>
                     <PopoverTrigger asChild>
                     <FormControl>
@@ -187,7 +193,7 @@ export default function ChallengeCreationForm() {
                         )}
                         >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {field.value ? format(field.value, "PPP") : <span>Pick a date</span>}
+                        {field.value ? format(field.value, "PPP", { locale: es }) : <span>Elige una fecha</span>}
                         </Button>
                     </FormControl>
                     </PopoverTrigger>
@@ -198,6 +204,7 @@ export default function ChallengeCreationForm() {
                         onSelect={field.onChange}
                         disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) } // Disable past dates
                         initialFocus
+                        locale={es} // Set Spanish locale for Calendar
                     />
                     </PopoverContent>
                 </Popover>
@@ -211,11 +218,11 @@ export default function ChallengeCreationForm() {
           name="entryFee"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Entry Fee (Virtual Coins 🪙)</FormLabel>
+              <FormLabel>Cuota de Entrada (Monedas Virtuales 🪙)</FormLabel>
               <FormControl>
-                <Input type="number" placeholder="0 (Optional)" {...field} />
+                <Input type="number" placeholder="0 (Opcional)" {...field} />
               </FormControl>
-              <FormDescription>Optional cost to join. Winner takes the pot!</FormDescription>
+              <FormDescription>Costo opcional para unirse. ¡El ganador se lleva el bote!</FormDescription>
               <FormMessage />
             </FormItem>
           )}
@@ -223,7 +230,7 @@ export default function ChallengeCreationForm() {
         {/* Add Cover Image Upload Later if needed */}
         {/* Add Invite Friends Functionality Later */}
         <Button type="submit" size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-            <PlusCircle className="mr-2 h-5 w-5" /> Create Challenge
+            <PlusCircle className="mr-2 h-5 w-5" /> Crear Desafío
         </Button>
       </form>
     </Form>

@@ -25,7 +25,7 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
     const selectedFile = event.target.files?.[0];
     if (selectedFile) {
       if (selectedFile.size > 5 * 1024 * 1024) { // 5MB limit
-        toast({ title: "File too large", description: "Please select a file smaller than 5MB.", variant: "destructive"});
+        toast({ title: "Archivo demasiado grande", description: "Por favor, selecciona un archivo menor de 5MB.", variant: "destructive"});
         return;
       }
       setFile(selectedFile);
@@ -40,7 +40,7 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
 
   const handleAuthenticate = async () => {
     if (!file || !preview) {
-      toast({ title: "No file selected", description: "Please select a photo to authenticate.", variant: "destructive" });
+      toast({ title: "Ningún archivo seleccionado", description: "Por favor, selecciona una foto para autenticar.", variant: "destructive" });
       return;
     }
     setIsLoading(true);
@@ -48,14 +48,14 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
       const result = await handlePhotoAuthentication({ photoDataUri: preview, checkManipulation: true });
       if (result.success && result.data) {
         onPhotoAuthenticated(result.data);
-        toast({ title: "Photo Authenticated", description: "Watermark applied. Check results below.", className: "bg-green-500 text-white" });
+        toast({ title: "Foto Autenticada", description: "Marca de agua aplicada. Revisa los resultados abajo.", className: "bg-green-500 text-white" });
       } else {
         onPhotoAuthenticated(null);
-        toast({ title: "Authentication Failed", description: result.error || "Could not authenticate photo.", variant: "destructive" });
+        toast({ title: "Autenticación Fallida", description: result.error || "No se pudo autenticar la foto.", variant: "destructive" });
       }
     } catch (error) {
       onPhotoAuthenticated(null);
-      toast({ title: "Error", description: "An unexpected error occurred during authentication.", variant: "destructive" });
+      toast({ title: "Error", description: "Ocurrió un error inesperado durante la autenticación.", variant: "destructive" });
       console.error("Photo authentication error:", error);
     } finally {
       setIsLoading(false);
@@ -76,7 +76,7 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
       <div className="flex items-center gap-4">
         <div className="relative w-24 h-24 border-2 border-dashed rounded-md flex items-center justify-center bg-background overflow-hidden group">
           {preview ? (
-            <Image src={preview} alt="Preview" layout="fill" objectFit="cover" />
+            <Image src={preview} alt="Vista previa" layout="fill" objectFit="cover" />
           ) : (
             <Camera className="h-8 w-8 text-muted-foreground group-hover:text-primary" />
           )}
@@ -90,17 +90,17 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
           />
         </div>
         <div className="flex-1">
-            <h4 className="font-medium text-sm">Upload Progress Photo</h4>
-            <p className="text-xs text-muted-foreground">PNG, JPG, WEBP. Max 5MB.</p>
+            <h4 className="font-medium text-sm">Subir Foto de Progreso</h4>
+            <p className="text-xs text-muted-foreground">PNG, JPG, WEBP. Máx 5MB.</p>
              {!currentPhotoInfo && file && (
                 <Button onClick={handleAuthenticate} disabled={isLoading || !file} className="mt-2 w-full sm:w-auto" size="sm">
                 {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <UploadCloud className="mr-2 h-4 w-4" />}
-                Authenticate Photo
+                Autenticar Foto
                 </Button>
             )}
         </div>
         {(file || currentPhotoInfo) && (
-             <Button onClick={handleReset} variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" title="Clear selection">
+             <Button onClick={handleReset} variant="ghost" size="icon" className="text-muted-foreground hover:text-destructive" title="Limpiar selección">
                 <RefreshCw className="h-5 w-5" />
             </Button>
         )}
@@ -111,9 +111,9 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
         <div className="space-y-3 mt-4">
           <Alert variant="default" className="bg-green-50 border-green-200">
              <CheckCircle className="h-5 w-5 text-green-600" />
-            <AlertTitle className="text-green-700">Photo Authenticated & Watermarked!</AlertTitle>
+            <AlertTitle className="text-green-700">¡Foto Autenticada y con Marca de Agua!</AlertTitle>
             <AlertDescription className="text-green-600">
-              <Image src={currentPhotoInfo.watermarkedPhotoDataUri} alt="Watermarked" width={200} height={200} className="mt-2 rounded-md border" data-ai-hint="watermarked photo" />
+              <Image src={currentPhotoInfo.watermarkedPhotoDataUri} alt="Foto con marca de agua" width={200} height={200} className="mt-2 rounded-md border" data-ai-hint="watermarked photo" />
             </AlertDescription>
           </Alert>
           {currentPhotoInfo.manipulationDetected !== undefined && (
@@ -124,10 +124,10 @@ export default function PhotoUpload({ onPhotoAuthenticated, currentPhotoInfo }: 
                 <CheckCircle className="h-5 w-5 text-blue-600" />
               }
               <AlertTitle className={currentPhotoInfo.manipulationDetected ? "" : "text-blue-700"}>
-                Manipulation Check: {currentPhotoInfo.manipulationDetected ? "Potential Issues Detected" : "Looks Good!"}
+                Verificación de Manipulación: {currentPhotoInfo.manipulationDetected ? "Posibles Problemas Detectados" : "¡Se Ve Bien!"}
               </AlertTitle>
               <AlertDescription className={currentPhotoInfo.manipulationDetected ? "" : "text-blue-600"}>
-                {currentPhotoInfo.detectionDetails || (currentPhotoInfo.manipulationDetected ? "AI analysis suggests potential tampering." : "No obvious signs of manipulation detected.")}
+                {currentPhotoInfo.detectionDetails || (currentPhotoInfo.manipulationDetected ? "El análisis de IA sugiere posible manipulación." : "No se detectaron signos obvios de manipulación.")}
               </AlertDescription>
             </Alert>
           )}

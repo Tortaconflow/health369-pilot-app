@@ -10,15 +10,15 @@ import { generateAISuggestions } from "@/app/actions/suggestionActions";
 // Mock data - replace with actual data fetching
 const mockUserProfile: UserProfile = {
   id: "user123",
-  name: "Alex Johnson",
-  email: "alex.j@example.com",
+  name: "Alex García", // Translated
+  email: "alex.g@example.com",
   avatarUrl: "https://placehold.co/100x100.png",
   level: 5,
   experiencePoints: 450,
-  badges: ["Early Adopter", "Challenge Starter"],
+  badges: ["Madrugador", "Iniciador de Desafíos"], // Translated
   virtualCurrency: 1500,
   currentChallengeIds: ["challenge001"],
-  healthGoals: ["Lose 5kg", "Improve stamina"],
+  healthGoals: ["Perder 5kg", "Mejorar resistencia"], // Translated
   progress: {
     weight: 75, // kg
     waist: 80, // cm
@@ -29,15 +29,15 @@ const mockUserProfile: UserProfile = {
 
 export default async function DashboardPage() {
   // In a real app, user data would be fetched or passed
-  const userDataForAISuggestions = `User health goals: ${mockUserProfile.healthGoals?.join(', ') || 'Not specified'}. Current weight: ${mockUserProfile.progress?.weight || 'N/A'} kg. Recent activity: Participated in 1 challenge.`;
+  const userDataForAISuggestions = `Objetivos de salud del usuario: ${mockUserProfile.healthGoals?.join(', ') || 'No especificado'}. Peso actual: ${mockUserProfile.progress?.weight || 'N/A'} kg. Actividad reciente: Participó en 1 desafío.`; // Translated
   
   let aiSuggestions: AISuggestionsType | null = null;
   try {
     const suggestionResult = await generateAISuggestions({ userData: userDataForAISuggestions });
     if (suggestionResult.success && suggestionResult.data) {
       aiSuggestions = {
-        recipe: { name: suggestionResult.data.recipeSuggestion, description: "AI recommended recipe", ingredients: [], instructions: ""},
-        routine: { name: suggestionResult.data.routineSuggestion, description: "AI recommended routine", exercises: []}
+        recipe: { name: suggestionResult.data.recipeSuggestion, description: "Receta recomendada por IA", ingredients: [], instructions: ""}, // Translated description
+        routine: { name: suggestionResult.data.routineSuggestion, description: "Rutina recomendada por IA", exercises: []} // Translated description
       }
     }
   } catch (error) {
@@ -48,22 +48,22 @@ export default async function DashboardPage() {
   return (
     <div className="container mx-auto py-8 px-4 md:px-0">
       <div className="mb-8">
-        <h1 className="text-4xl font-bold text-primary">Welcome back, {mockUserProfile.name}!</h1>
-        <p className="text-lg text-muted-foreground">Here's your health and fitness overview.</p>
+        <h1 className="text-4xl font-bold text-primary">¡Bienvenido de nuevo, {mockUserProfile.name}!</h1>
+        <p className="text-lg text-muted-foreground">Aquí tienes tu resumen de salud y fitness.</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        <StatCard icon={<Target className="h-8 w-8" />} title="Level" value={mockUserProfile.level.toString()} description="Keep it up!" />
-        <StatCard icon={<Zap className="h-8 w-8" />} title="XP" value={mockUserProfile.experiencePoints.toString()} description="Towards next level" />
-        <StatCard icon={<BarChart3 className="h-8 w-8" />} title="Coins" value={`🪙 ${mockUserProfile.virtualCurrency}`} description="Earn more in challenges" />
+        <StatCard icon={<Target className="h-8 w-8" />} title="Nivel" value={mockUserProfile.level.toString()} description="¡Sigue así!" />
+        <StatCard icon={<Zap className="h-8 w-8" />} title="XP" value={mockUserProfile.experiencePoints.toString()} description="Hacia el siguiente nivel" />
+        <StatCard icon={<BarChart3 className="h-8 w-8" />} title="Monedas" value={`🪙 ${mockUserProfile.virtualCurrency}`} description="Gana más en desafíos" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <Card className="shadow-lg">
             <CardHeader>
-              <CardTitle className="text-2xl">Your Active Challenges</CardTitle>
-              <CardDescription>Stay on track and crush your goals.</CardDescription>
+              <CardTitle className="text-2xl">Tus Desafíos Activos</CardTitle>
+              <CardDescription>Mantente en el camino y alcanza tus metas.</CardDescription>
             </CardHeader>
             <CardContent>
               {mockUserProfile.currentChallengeIds && mockUserProfile.currentChallengeIds.length > 0 ? (
@@ -72,10 +72,10 @@ export default async function DashboardPage() {
                 ))
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground mb-4">You're not currently in any challenges.</p>
+                  <p className="text-muted-foreground mb-4">Actualmente no estás en ningún desafío.</p>
                   <Link href="/challenges" passHref legacyBehavior>
                     <Button>
-                      Explore Challenges <ArrowRight className="ml-2 h-4 w-4" />
+                      Explorar Desafíos <ArrowRight className="ml-2 h-4 w-4" />
                     </Button>
                   </Link>
                 </div>
@@ -88,28 +88,28 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle className="text-2xl flex items-center">
               <Sparkles className="h-6 w-6 mr-2 text-accent" />
-              AI Suggestions
+              Sugerencias de IA
             </CardTitle>
-            <CardDescription>Personalized tips for you.</CardDescription>
+            <CardDescription>Consejos personalizados para ti.</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {aiSuggestions ? (
               <>
                 <AISuggestionCard 
                   icon={<CookingPot className="h-8 w-8 text-primary"/>} 
-                  title="Recipe Idea" 
+                  title="Idea de Receta" 
                   suggestion={aiSuggestions.recipe.name} 
-                  description="A healthy and delicious meal to fuel your day."
+                  description="Una comida saludable y deliciosa para energizar tu día."
                 />
                 <AISuggestionCard 
                   icon={<Dumbbell className="h-8 w-8 text-primary"/>} 
-                  title="Workout Tip" 
+                  title="Consejo de Entrenamiento" 
                   suggestion={aiSuggestions.routine.name} 
-                  description="Try this routine to boost your progress."
+                  description="Prueba esta rutina para impulsar tu progreso."
                 />
               </>
             ) : (
-              <p className="text-muted-foreground">AI suggestions are being generated or are unavailable at the moment.</p>
+              <p className="text-muted-foreground">Las sugerencias de IA se están generando o no están disponibles en este momento.</p>
             )}
           </CardContent>
         </Card>
@@ -145,8 +145,8 @@ function ChallengeTeaserCard({ challengeId }: { challengeId: string }) {
   // In a real app, fetch challenge details by ID
   const mockChallenge = {
     id: challengeId,
-    name: "30-Day Fitness Blast",
-    coverImageUrl: "https://placehold.co/600x300.png?text=Challenge+Cover"
+    name: "Explosión de Fitness en 30 Días", // Translated
+    coverImageUrl: "https://placehold.co/600x300.png?text=Portada+Desafio" // Translated placeholder text
   };
 
   return (
@@ -168,9 +168,9 @@ function ChallengeTeaserCard({ challengeId }: { challengeId: string }) {
         </div>
         <CardContent className="p-4">
           <div className="flex justify-between items-center">
-             <p className="text-sm text-muted-foreground">View progress and details</p>
+             <p className="text-sm text-muted-foreground">Ver progreso y detalles</p>
              <Button variant="outline" size="sm">
-                View Challenge <ArrowRight className="ml-2 h-4 w-4" />
+                Ver Desafío <ArrowRight className="ml-2 h-4 w-4" />
              </Button>
           </div>
         </CardContent>

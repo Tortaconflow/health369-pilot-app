@@ -24,10 +24,10 @@ import { useState } from "react";
 import type { AuthenticatePhotoOutput } from "@/ai/flows/photo-authentication";
 
 const progressFormSchema = z.object({
-  weight: z.coerce.number().positive("Weight must be a positive number.").optional(),
-  waist: z.coerce.number().positive("Waist measurement must be positive.").optional(),
-  muscleMassPercentage: z.coerce.number().min(0).max(100, "Muscle mass % must be between 0-100.").optional(),
-  notes: z.string().max(500, "Notes too long").optional(),
+  weight: z.coerce.number().positive("El peso debe ser un número positivo.").optional(),
+  waist: z.coerce.number().positive("La medida de cintura debe ser positiva.").optional(),
+  muscleMassPercentage: z.coerce.number().min(0).max(100, "El % de masa muscular debe estar entre 0-100.").optional(),
+  notes: z.string().max(500, "Notas demasiado largas").optional(),
   // Photo upload will be handled separately but linked here
 });
 
@@ -51,8 +51,8 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
   async function onSubmit(data: ProgressFormValues) {
     if (!uploadedPhotoInfo?.watermarkedPhotoDataUri && (!data.weight && !data.waist && !data.muscleMassPercentage)) {
         toast({
-            title: "Incomplete Submission",
-            description: "Please provide at least one piece of progress data (measurement or photo).",
+            title: "Envío Incompleto",
+            description: "Por favor, proporciona al menos un dato de progreso (medida o foto).",
             variant: "destructive",
         });
         return;
@@ -72,8 +72,8 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
       const result = await submitChallengeProgress(progressData);
       if (result.success) {
         toast({
-          title: "Progress Submitted!",
-          description: "Your progress has been successfully logged.",
+          title: "¡Progreso Enviado!",
+          description: "Tu progreso ha sido registrado exitosamente.",
           className: "bg-green-500 text-white",
           icon: <CheckCircle className="h-5 w-5" />,
         });
@@ -82,14 +82,14 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
       } else {
         toast({
           title: "Error",
-          description: result.error || "Failed to submit progress.",
+          description: result.error || "No se pudo enviar el progreso.",
           variant: "destructive",
         });
       }
     } catch (error) {
        toast({
           title: "Error",
-          description: "An unexpected error occurred while submitting progress.",
+          description: "Ocurrió un error inesperado al enviar el progreso.",
           variant: "destructive",
         });
     }
@@ -99,10 +99,10 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
     <Card className="shadow-lg border-primary/50">
       <CardHeader>
         <CardTitle className="text-2xl text-primary flex items-center">
-          <BarChart3 className="mr-3 h-7 w-7" /> Log Your Progress
+          <BarChart3 className="mr-3 h-7 w-7" /> Registra Tu Progreso
         </CardTitle>
         <CardDescription>
-          Keep your challenge data up-to-date. Consistency is key!
+          Mantén actualizados los datos de tu desafío. ¡La constancia es la clave!
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -114,9 +114,9 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
                 name="weight"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Weight (kg)</FormLabel>
+                    <FormLabel>Peso (kg)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" placeholder="e.g., 70.5" {...field} />
+                      <Input type="number" step="0.1" placeholder="Ej: 70.5" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -127,9 +127,9 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
                 name="waist"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Waist (cm)</FormLabel>
+                    <FormLabel>Cintura (cm)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" placeholder="e.g., 80" {...field} />
+                      <Input type="number" step="0.1" placeholder="Ej: 80" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -140,9 +140,9 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
                 name="muscleMassPercentage"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Muscle Mass (%)</FormLabel>
+                    <FormLabel>Masa Muscular (%)</FormLabel>
                     <FormControl>
-                      <Input type="number" step="0.1" placeholder="e.g., 22.5" {...field} />
+                      <Input type="number" step="0.1" placeholder="Ej: 22.5" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -155,9 +155,9 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
               name="notes"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel className="flex items-center"><FileText className="mr-2 h-4 w-4"/>Optional Notes</FormLabel>
+                  <FormLabel className="flex items-center"><FileText className="mr-2 h-4 w-4"/>Notas Opcionales</FormLabel>
                   <FormControl>
-                    <Textarea placeholder="How are you feeling? Any milestones or struggles?" {...field} className="min-h-[80px]" />
+                    <Textarea placeholder="¿Cómo te sientes? ¿Algún hito o dificultad?" {...field} className="min-h-[80px]" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
@@ -165,18 +165,18 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
             />
             
             <div>
-              <FormLabel className="flex items-center mb-2"><Camera className="mr-2 h-4 w-4"/>Progress Photo</FormLabel>
+              <FormLabel className="flex items-center mb-2"><Camera className="mr-2 h-4 w-4"/>Foto de Progreso</FormLabel>
               <PhotoUpload 
                 onPhotoAuthenticated={setUploadedPhotoInfo} 
                 currentPhotoInfo={uploadedPhotoInfo}
               />
               <FormDescription className="mt-2">
-                Upload a new photo for today. Photos are watermarked and checked for authenticity.
+                Sube una nueva foto para hoy. Las fotos llevan marca de agua y se verifica su autenticidad.
               </FormDescription>
             </div>
 
             <Button type="submit" size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-              <UploadCloud className="mr-2 h-5 w-5" /> Submit Progress
+              <UploadCloud className="mr-2 h-5 w-5" /> Enviar Progreso
             </Button>
           </form>
         </Form>

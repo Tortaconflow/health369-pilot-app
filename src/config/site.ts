@@ -25,87 +25,87 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "Health369 Pilot",
-  description: "Revolutionizing health and fitness goals with personalized wellness, expert connections, and gamified social challenges.",
-  url: "https://health369.example.com", // Replace with your actual URL
-  ogImage: "https://health369.example.com/og.jpg", // Replace with your actual OG image URL
+  name: "Health369 Piloto",
+  description: "Revolucionando las metas de salud y fitness con bienestar personalizado, conexiones con expertos y desafíos sociales gamificados.",
+  url: "https://health369.example.com", // Reemplazar con tu URL real
+  ogImage: "https://health369.example.com/og.jpg", // Reemplazar con tu URL real de imagen OG
   mainNav: [
     {
-      title: "Dashboard",
+      title: "Panel de Control",
       href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Experts",
+      title: "Expertos",
       href: "/experts",
       icon: Users,
     },
     {
-      title: "Challenges",
+      title: "Desafíos",
       href: "/challenges",
       icon: Zap,
     },
     {
-      title: "Profile",
+      title: "Perfil",
       href: "/profile",
       icon: UserCircle,
     },
   ],
   sidebarNav: [
     {
-      title: "Overview",
+      title: "Resumen",
       href: "/dashboard",
       icon: LayoutDashboard,
-      description: "Your personal health and fitness hub."
+      description: "Tu centro personal de salud y fitness."
     },
     {
-      title: "My Profile",
+      title: "Mi Perfil",
       href: "/profile",
       icon: UserCircle,
-      description: "Manage your profile and settings."
+      description: "Gestiona tu perfil y configuraciones."
     },
     {
-      title: "Connect",
+      title: "Conectar",
       href: "/experts",
       icon: Users,
-      description: "Find certified trainers and nutritionists."
+      description: "Encuentra entrenadores y nutricionistas certificados."
     },
     // Placeholder for Communication Tools
     // {
-    //   title: "Messages",
+    //   title: "Mensajes",
     //   href: "/messages",
     //   icon: MessageSquare,
-    //   description: "Chat with your experts."
+    //   description: "Chatea con tus expertos."
     // },
     {
-      title: "Challenges",
+      title: "Desafíos",
       href: "/challenges",
       icon: Zap,
-      description: "Join or create fitness challenges.",
+      description: "Únete o crea desafíos de fitness.",
       items: [
-        { title: "Browse Challenges", href: "/challenges", icon: Activity },
-        { title: "Create New Challenge", href: "/challenges/create", icon: Award },
+        { title: "Explorar Desafíos", href: "/challenges", icon: Activity },
+        { title: "Crear Nuevo Desafío", href: "/challenges/create", icon: Award },
       ],
     },
     // Placeholder for Progress Registration (often part of a challenge)
     // {
-    //   title: "Log Progress",
+    //   title: "Registrar Progreso",
     //   href: "/progress/log",
     //   icon: BarChart3,
-    //   description: "Track your fitness journey."
+    //   description: "Realiza un seguimiento de tu viaje de fitness."
     // },
     // Placeholder for Photo Authentication (integrated into progress/challenges)
     // {
-    //   title: "Photo Manager",
+    //   title: "Gestor de Fotos",
     //   href: "/photos/manage",
     //   icon: UploadCloud,
-    //   description: "Manage your progress photos."
+    //   description: "Gestiona tus fotos de progreso."
     // },
      {
-      title: "AI Suggestions",
+      title: "Sugerencias IA",
       href: "/dashboard#ai-suggestions", // Or a dedicated page /ai-suggestions
       icon: SparklesIcon,
-      description: "Get personalized tips.",
+      description: "Obtén consejos personalizados.",
     },
   ],
 };

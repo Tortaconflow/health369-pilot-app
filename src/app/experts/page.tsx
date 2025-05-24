@@ -9,43 +9,43 @@ import ExpertCard from "@/components/experts/ExpertCard";
 const mockExperts: Expert[] = [
   {
     id: "expert1",
-    name: "Dr. Emily Carter",
-    specialty: "Nutritionist",
+    name: "Dra. Emilia Campos", // Translated
+    specialty: "Nutricionista",
     avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Dedicated nutritionist with 10+ years of experience in personalized diet plans and wellness coaching.",
+    bio: "Nutricionista dedicada con más de 10 años de experiencia en planes de dieta personalizados y coaching de bienestar.", // Translated
     rating: 4.9,
     experienceYears: 10,
-    certifications: ["Registered Dietitian Nutritionist (RDN)", "Certified Nutrition Specialist (CNS)"],
+    certifications: ["Dietista-Nutricionista Registrada (RDN)", "Especialista Certificada en Nutrición (CNS)"], // Translated
   },
   {
     id: "expert2",
-    name: "John Davis",
-    specialty: "Personal Trainer",
+    name: "Juan Dávila", // Translated
+    specialty: "Entrenador Personal",
     avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Certified personal trainer focused on strength training and functional fitness. Helping clients achieve their peak physical condition.",
+    bio: "Entrenador personal certificado enfocado en entrenamiento de fuerza y fitness funcional. Ayudando a clientes a alcanzar su máxima condición física.", // Translated
     rating: 4.7,
     experienceYears: 8,
-    certifications: ["ACE Certified Personal Trainer", "NSCA Certified Strength and Conditioning Specialist (CSCS)"],
+    certifications: ["Entrenador Personal Certificado ACE", "Especialista Certificado en Fuerza y Acondicionamiento (CSCS)"], // Translated
   },
   {
     id: "expert3",
-    name: "Sophia Lee",
-    specialty: "Yoga Instructor & Mindfulness Coach",
+    name: "Sofía Lara", // Translated
+    specialty: "Instructora de Yoga y Coach de Mindfulness",
     avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Experienced yoga instructor integrating mindfulness practices for holistic well-being.",
+    bio: "Instructora de yoga experimentada que integra prácticas de mindfulness para el bienestar holístico.", // Translated
     rating: 4.8,
     experienceYears: 7,
-    certifications: ["RYT 500", "Certified Mindfulness Coach"],
+    certifications: ["RYT 500", "Coach de Mindfulness Certificada"], // Translated
   },
    {
     id: "expert4",
-    name: "Marcus Chen",
-    specialty: "Sports Performance Coach",
+    name: "Marcos Chen",
+    specialty: "Coach de Rendimiento Deportivo",
     avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Specializing in enhancing athletic performance through tailored training programs and nutritional advice.",
+    bio: "Especializado en mejorar el rendimiento atlético a través de programas de entrenamiento personalizados y asesoramiento nutricional.", // Translated
     rating: 4.9,
     experienceYears: 12,
-    certifications: ["CSCS", "Certified Sports Nutritionist (CISSN)"],
+    certifications: ["CSCS", "Nutricionista Deportivo Certificado (CISSN)"], // Translated
   },
 ];
 
@@ -57,29 +57,29 @@ export default function ExpertsPage() {
     <div className="container mx-auto py-8 px-4 md:px-0">
       <Card className="mb-8 shadow-lg">
         <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">Connect with Experts</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Conecta con Expertos</CardTitle>
           <CardDescription className="text-lg text-muted-foreground">
-            Find verified trainers, nutritionists, and wellness coaches to guide you.
+            Encuentra entrenadores, nutricionistas y coaches de bienestar verificados para guiarte.
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4 mb-6">
             <div className="relative flex-grow">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="Search experts by name or specialty..." className="pl-10" />
+              <Input placeholder="Buscar expertos por nombre o especialidad..." className="pl-10" />
             </div>
             <Select>
               <SelectTrigger className="w-full md:w-[200px]">
                 <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                <SelectValue placeholder="Filter by specialty" />
+                <SelectValue placeholder="Filtrar por especialidad" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Specialties</SelectItem>
-                <SelectItem value="nutritionist">Nutritionist</SelectItem>
-                <SelectItem value="trainer">Personal Trainer</SelectItem>
-                <SelectItem value="yoga">Yoga Instructor</SelectItem>
-                <SelectItem value="mindfulness">Mindfulness Coach</SelectItem>
-                <SelectItem value="sports-performance">Sports Performance</SelectItem>
+                <SelectItem value="all">Todas las Especialidades</SelectItem>
+                <SelectItem value="nutritionist">Nutricionista</SelectItem>
+                <SelectItem value="trainer">Entrenador Personal</SelectItem>
+                <SelectItem value="yoga">Instructor de Yoga</SelectItem>
+                <SelectItem value="mindfulness">Coach de Mindfulness</SelectItem>
+                <SelectItem value="sports-performance">Rendimiento Deportivo</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -94,7 +94,7 @@ export default function ExpertsPage() {
         </div>
       ) : (
         <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground">No experts found matching your criteria.</p>
+          <p className="text-xl text-muted-foreground">No se encontraron expertos que coincidan con tus criterios.</p>
         </div>
       )}
     </div>

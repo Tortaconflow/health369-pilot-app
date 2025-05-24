@@ -10,9 +10,9 @@ export default function CreateChallengePage() {
           <div className="inline-block p-3 bg-accent/20 rounded-full mx-auto mb-4">
             <Award className="h-10 w-10 text-accent" />
           </div>
-          <CardTitle className="text-3xl font-bold text-primary">Create a New Challenge</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Crear un Nuevo Desafío</CardTitle>
           <CardDescription className="text-lg text-muted-foreground">
-            Inspire yourself and others. Define your challenge and invite friends to join!
+            Inspírate a ti mismo y a otros. ¡Define tu desafío e invita a amigos a unirse!
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -15,8 +15,8 @@ export default function ChallengeParticipants({ participants }: ChallengePartici
       <Card className="border-dashed">
         <CardHeader className="items-center text-center">
             <Users className="h-12 w-12 text-muted-foreground/50 mb-2"/>
-          <CardTitle className="text-xl">No Participants Yet</CardTitle>
-          <CardDescription>Be the first to join or invite others!</CardDescription>
+          <CardTitle className="text-xl">Aún no hay Participantes</CardTitle>
+          <CardDescription>¡Sé el primero en unirte o invita a otros!</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -26,9 +26,9 @@ export default function ChallengeParticipants({ participants }: ChallengePartici
     <Card>
       <CardHeader>
         <CardTitle className="text-xl flex items-center">
-          <Users className="mr-2 h-5 w-5 text-primary" /> Participants ({participants.length})
+          <Users className="mr-2 h-5 w-5 text-primary" /> Participantes ({participants.length})
         </CardTitle>
-        <CardDescription>See who's taking on the challenge.</CardDescription>
+        <CardDescription>Mira quién está aceptando el desafío.</CardDescription>
       </CardHeader>
       <CardContent>
         <ul className="space-y-3 max-h-96 overflow-y-auto pr-2">
@@ -43,8 +43,8 @@ export default function ChallengeParticipants({ participants }: ChallengePartici
               </div>
               {/* Placeholder for participant status or mini-progress */}
               <div className="text-xs text-muted-foreground flex items-center">
-                {Math.random() > 0.5 ? <UserCheck className="h-4 w-4 text-green-500 mr-1" title="Progress Logged Recently"/> : <ShieldQuestion className="h-4 w-4 text-orange-400 mr-1" title="Awaiting Update"/>}
-                {Math.random() > 0.5 ? 'Active' : 'Tracking'}
+                {Math.random() > 0.5 ? <UserCheck className="h-4 w-4 text-green-500 mr-1" title="Progreso Registrado Recientemente"/> : <ShieldQuestion className="h-4 w-4 text-orange-400 mr-1" title="Esperando Actualización"/>}
+                {Math.random() > 0.5 ? 'Activo' : 'Siguiendo'}
               </div>
             </li>
           ))}

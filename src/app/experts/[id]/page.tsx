@@ -11,13 +11,13 @@ import Link from "next/link";
 // Mock data - replace with actual data fetching for a single expert by ID
 const mockExpert: Expert = {
   id: "expert1",
-  name: "Dr. Emily Carter",
-  specialty: "Nutritionist",
+  name: "Dra. Emilia Campos", // Translated
+  specialty: "Nutricionista",
   avatarUrl: "https://placehold.co/200x200.png",
-  bio: "Dr. Emily Carter is a highly acclaimed Registered Dietitian Nutritionist (RDN) and Certified Nutrition Specialist (CNS) with over a decade of experience in the field of clinical nutrition and wellness coaching. She is passionate about empowering individuals to achieve their health goals through personalized, evidence-based dietary strategies. Dr. Carter specializes in weight management, sports nutrition, and dietary therapy for chronic conditions. Her holistic approach considers not just food, but also lifestyle factors to foster sustainable well-being. She actively contributes to nutrition research and is a sought-after speaker at health conferences.",
+  bio: "La Dra. Emilia Campos es una Dietista-Nutricionista Registrada (RDN) y Especialista Certificada en Nutrición (CNS) altamente aclamada con más de una década de experiencia en el campo de la nutrición clínica y el coaching de bienestar. Le apasiona empoderar a las personas para que alcancen sus metas de salud a través de estrategias dietéticas personalizadas y basadas en evidencia. La Dra. Campos se especializa en manejo de peso, nutrición deportiva y terapia dietética para condiciones crónicas. Su enfoque holístico considera no solo la comida, sino también los factores del estilo de vida para fomentar un bienestar sostenible. Contribuye activamente a la investigación en nutrición y es una ponente solicitada en conferencias de salud.", // Translated
   rating: 4.9,
   experienceYears: 10,
-  certifications: ["Registered Dietitian Nutritionist (RDN)", "Certified Nutrition Specialist (CNS)", "Board Certified Specialist in Sports Dietetics (CSSD)"],
+  certifications: ["Dietista-Nutricionista Registrada (RDN)", "Especialista Certificada en Nutrición (CNS)", "Especialista Certificada por la Junta en Dietética Deportiva (CSSD)"], // Translated
 };
 
 // This page will be dynamic based on the expert's ID
@@ -26,7 +26,7 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
   const expert = mockExpert; 
 
   if (!expert) {
-    return <div className="container mx-auto py-8 text-center">Expert not found.</div>;
+    return <div className="container mx-auto py-8 text-center">Experto no encontrado.</div>;
   }
 
   return (
@@ -35,7 +35,7 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
         <CardHeader className="p-0 relative">
           <Image 
             src="https://placehold.co/1200x300.png" 
-            alt={`${expert.name}'s cover image`} 
+            alt={`Imagen de portada de ${expert.name}`} 
             width={1200} 
             height={300}
             className="w-full h-48 md:h-60 object-cover"
@@ -60,16 +60,16 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
                 <div className="flex items-center mt-2 text-yellow-500">
                   <Star className="h-5 w-5 mr-1 fill-current" /> {expert.rating.toFixed(1)}
                   <span className="text-muted-foreground ml-2 text-sm flex items-center">
-                    <Briefcase className="h-4 w-4 mr-1.5" /> {expert.experienceYears} years of experience
+                    <Briefcase className="h-4 w-4 mr-1.5" /> {expert.experienceYears} años de experiencia
                   </span>
                 </div>
               </div>
               <div className="flex gap-2 mt-4 md:mt-0">
                 <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <MessageSquare className="mr-2 h-5 w-5" /> Chat
+                  <MessageSquare className="mr-2 h-5 w-5" /> Chatear
                 </Button>
                 <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10">
-                  <Video className="mr-2 h-5 w-5" /> Book Video Call
+                  <Video className="mr-2 h-5 w-5" /> Reservar Videollamada
                 </Button>
               </div>
             </div>
@@ -77,14 +77,14 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
             <Separator className="my-6" />
 
             <section className="mb-6">
-              <h3 className="text-2xl font-semibold text-foreground mb-3">About Me</h3>
+              <h3 className="text-2xl font-semibold text-foreground mb-3">Sobre Mí</h3>
               <p className="text-foreground/80 leading-relaxed whitespace-pre-line">{expert.bio}</p>
             </section>
 
             <Separator className="my-6" />
 
             <section>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">Certifications & Qualifications</h3>
+              <h3 className="text-2xl font-semibold text-foreground mb-4">Certificaciones y Cualificaciones</h3>
               <ul className="space-y-2">
                 {expert.certifications.map((cert) => (
                   <li key={cert} className="flex items-center text-foreground/90">
@@ -98,11 +98,11 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
             {/* Placeholder for services, schedule, reviews etc. */}
             <Separator className="my-6" />
             <section>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">Availability</h3>
-              <p className="text-muted-foreground">Availability information and booking calendar will be displayed here. (Coming Soon)</p>
+              <h3 className="text-2xl font-semibold text-foreground mb-4">Disponibilidad</h3>
+              <p className="text-muted-foreground">La información de disponibilidad y el calendario de reservas se mostrarán aquí. (Próximamente)</p>
               <div className="mt-4 p-4 bg-muted/50 rounded-lg flex items-center justify-center">
                 <CalendarDays className="h-10 w-10 text-primary mr-4" />
-                <span className="text-lg">Check My Calendar</span>
+                <span className="text-lg">Consultar Mi Calendario</span>
               </div>
             </section>
 
