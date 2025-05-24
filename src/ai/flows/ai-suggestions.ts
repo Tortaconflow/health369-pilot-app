@@ -36,7 +36,7 @@ export async function generateAISuggestions(
 const prompt = ai.definePrompt({
   name: 'aiSuggestionsPrompt',
   input: {schema: AISuggestionsInputSchema},
-  output: {schema: AISuggestionsOutputSchema},
+  output: {schema: AISuggestionsOutputSchema}, // Genkit uses this to guide the model
   prompt: `You are a personalized health and fitness assistant.
 Your task is to generate a personalized recipe suggestion and a personalized routine suggestion based on the user data provided.
 
@@ -44,7 +44,7 @@ User Data:
 {{{userData}}}
 
 You MUST produce a single, valid JSON object as your response. Do NOT include any other text, explanations, or markdown formatting (like \`\`\`json) before or after the JSON object.
-The JSON object MUST conform to the following structure:
+The JSON object MUST have the following structure:
 {
   "recipeSuggestion": "string",
   "routineSuggestion": "string"
@@ -69,13 +69,12 @@ const aiSuggestionsFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('AI model did not return an output matching the expected schema. Output was null or undefined.');
+      throw new Error('AI model did not return an output. Output was null or undefined.');
     }
-    // Double check if output truly matches the schema, though Genkit should handle this.
-    // This is more for robust error throwing if Genkit's parsing was too lenient or something unexpected happened.
+    
     const parsedOutput = AISuggestionsOutputSchema.safeParse(output);
     if (!parsedOutput.success) {
-        console.error("AISuggestionsOutputSchema parsing failed:", parsedOutput.error.flatten());
+        console.error("AISuggestionsOutputSchema parsing failed in flow:", parsedOutput.error.flatten());
         throw new Error(`AI model output did not conform to schema after Genkit processing. Issues: ${JSON.stringify(parsedOutput.error.flatten().fieldErrors)}`);
     }
     return parsedOutput.data;
