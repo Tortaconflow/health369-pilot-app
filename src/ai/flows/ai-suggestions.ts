@@ -38,17 +38,25 @@ const prompt = ai.definePrompt({
   input: {schema: AISuggestionsInputSchema},
   output: {schema: AISuggestionsOutputSchema},
   prompt: `You are a personalized health and fitness assistant.
-Based on the user data provided:
-User Data: {{{userData}}}
+Your task is to generate a personalized recipe suggestion and a personalized routine suggestion based on the user data provided.
 
-Generate a personalized recipe suggestion and a personalized routine suggestion to help the user achieve their goals.
-Your response MUST be a valid JSON object and NOTHING ELSE. Do not include any explanatory text, comments, or markdown formatting before or after the JSON.
-The JSON object must have two keys: "recipeSuggestion" and "routineSuggestion".
-Example of the exact JSON format required:
+User Data:
+{{{userData}}}
+
+You MUST produce a single, valid JSON object as your response. Do NOT include any other text, explanations, or markdown formatting (like \`\`\`json) before or after the JSON object.
+The JSON object MUST conform to the following structure:
+{
+  "recipeSuggestion": "string",
+  "routineSuggestion": "string"
+}
+
+Example of the exact JSON output required:
 {
   "recipeSuggestion": "Ensalada de Quinoa con Pollo a la Parrilla: Mezcla quinoa cocida, pollo a la parrilla en cubos, pimientos picados, pepino y un aderezo ligero de limón y aceite de oliva.",
   "routineSuggestion": "Entrenamiento de Cuerpo Completo (30 min): 10 min de cardio ligero (trote), 3 series de 12 sentadillas, 3 series de 10 flexiones, 3 series de 15 planchas (30 seg cada una)."
 }
+
+Ensure your entire response is ONLY this JSON object.
 `,
 });
 
@@ -61,9 +69,16 @@ const aiSuggestionsFlow = ai.defineFlow(
   async input => {
     const {output} = await prompt(input);
     if (!output) {
-      throw new Error('AI model did not return an output matching the expected schema.');
+      throw new Error('AI model did not return an output matching the expected schema. Output was null or undefined.');
     }
-    return output;
+    // Double check if output truly matches the schema, though Genkit should handle this.
+    // This is more for robust error throwing if Genkit's parsing was too lenient or something unexpected happened.
+    const parsedOutput = AISuggestionsOutputSchema.safeParse(output);
+    if (!parsedOutput.success) {
+        console.error("AISuggestionsOutputSchema parsing failed:", parsedOutput.error.flatten());
+        throw new Error(`AI model output did not conform to schema after Genkit processing. Issues: ${JSON.stringify(parsedOutput.error.flatten().fieldErrors)}`);
+    }
+    return parsedOutput.data;
   }
 );
 

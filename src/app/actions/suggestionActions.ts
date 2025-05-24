@@ -21,6 +21,20 @@ export async function generateAISuggestions(
     return { success: true, data: result };
   } catch (error) {
     console.error("Error generating AI suggestions:", error);
-    return { success: false, error: (error as Error).message };
+    let errorMessage = "Ocurrió un error desconocido al generar sugerencias de IA.";
+    if (error instanceof Error) {
+      errorMessage = error.message;
+    } else if (typeof error === 'string') {
+      errorMessage = error;
+    } else {
+      try {
+        // Attempt to stringify, but catch if it's circular or too complex
+        const specificError = JSON.stringify(error);
+        errorMessage = specificError === '{}' ? 'Error object could not be stringified or is empty.' : specificError;
+      } catch (e) {
+        errorMessage = "Error object could not be stringified.";
+      }
+    }
+    return { success: false, error: errorMessage };
   }
 }
