@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell } from 'lucide-react';
+import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell, Bot } from 'lucide-react'; // Added Bot
 
 export type NavItem = {
   title: string;
@@ -56,6 +56,11 @@ export const siteConfig: SiteConfig = {
       href: "/challenges",
       icon: Zap,
     },
+     {
+      title: "Chat IA",
+      href: "/ai-chat",
+      icon: Bot,
+    },
     {
       title: "Perfil",
       href: "/profile",
@@ -84,8 +89,14 @@ export const siteConfig: SiteConfig = {
     {
       title: "Entrenamientos",
       href: "/workouts",
-      icon: Dumbbell, // Using Dumbbell icon
+      icon: Dumbbell, 
       description: "Planes de ejercicio y guías."
+    },
+    {
+      title: "Chat con IA",
+      href: "/ai-chat",
+      icon: Bot,
+      description: "Consulta recetas y consejos con IA.",
     },
     {
       title: "Conectar",
@@ -93,13 +104,6 @@ export const siteConfig: SiteConfig = {
       icon: Users,
       description: "Encuentra entrenadores y nutricionistas certificados."
     },
-    // Placeholder for Communication Tools
-    // {
-    //   title: "Mensajes",
-    //   href: "/messages",
-    //   icon: MessageSquare,
-    //   description: "Chatea con tus expertos."
-    // },
     {
       title: "Desafíos",
       href: "/challenges",
@@ -110,23 +114,9 @@ export const siteConfig: SiteConfig = {
         { title: "Crear Nuevo Desafío", href: "/challenges/create", icon: Award },
       ],
     },
-    // Placeholder for Progress Registration (often part of a challenge)
-    // {
-    //   title: "Registrar Progreso",
-    //   href: "/progress/log",
-    //   icon: BarChart3,
-    //   description: "Realiza un seguimiento de tu viaje de fitness."
-    // },
-    // Placeholder for Photo Authentication (integrated into progress/challenges)
-    // {
-    //   title: "Gestor de Fotos",
-    //   href: "/photos/manage",
-    //   icon: UploadCloud,
-    //   description: "Gestiona tus fotos de progreso."
-    // },
      {
       title: "Sugerencias IA",
-      href: "/dashboard#ai-suggestions", // Or a dedicated page /ai-suggestions
+      href: "/dashboard#ai-suggestions",
       icon: SparklesIcon,
       description: "Obtén consejos personalizados.",
     },
