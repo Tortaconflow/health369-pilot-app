@@ -62,11 +62,11 @@ a {
 
     /* Standard Sidebar Vars - Light Mode (Health369 Pilot) */
     --sidebar-background: 0 0% 96%;   /* #F5F5F5 - Gris Claro (consistent) */
-    --sidebar-foreground: 195 69% 61%; /* #5BC0DE - Light Blue */
+    --sidebar-foreground: 150 49% 66%; /* #8ADAB2 - Light Green (Verde Esmeralda for icons/text) */
     --sidebar-primary: 14 100% 57%;    /* #FF5722 - Naranja Vibrante (for active/CTA in sidebar) */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --sidebar-accent: 150 49% 70%;     /* #9DE1BC - Lighter Green for hover on accent */
-    --sidebar-accent-foreground: 210 10% 23%;
+    --sidebar-accent: 14 100% 57%;     /* #FF5722 - Naranja Vibrante (for hover background) */
+    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (for hover text) */
     --sidebar-border: 0 0% 88%;       /* #E0E0E0 - Gris Claro (consistent) */
     --sidebar-ring: 14 100% 57%;       /* Naranja Vibrante for ring in sidebar context */
 
@@ -111,11 +111,11 @@ a {
 
     /* Standard Sidebar Vars - Dark Mode */
     --sidebar-background: 273 70% 15%; /* #24083E - Morado muy oscuro para sidebar */
-    --sidebar-foreground: 195 69% 75%; /* #8CD9EF - Light Blue (lighter for text/iconos) */
+    --sidebar-foreground: 150 49% 70%; /* #9DE1BC - Lighter Verde Esmeralda (for text/iconos) */
     --sidebar-primary: 14 100% 60%;    /* #FF6D3B - Naranja Vibrante (active item bg) */
     --sidebar-primary-foreground: 0 0% 98%; /* #FAFAFA - Blanco */
-    --sidebar-accent: 150 49% 60%;     /* #7FCEA3 - Light Green (hover) */
-    --sidebar-accent-foreground: 0 0% 90%; /* #E6E6E6 - Blanco hueso */
+    --sidebar-accent: 14 100% 60%;     /* #FF6D3B - Naranja Vibrante (hover bg) */
+    --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA - Blanco (for hover text) */
     --sidebar-border: 273 60% 20%;     /* #310D52 */
     --sidebar-ring: 14 100% 60%;       /* Naranja Vibrante */
   }
