@@ -44,13 +44,8 @@ Datos del Usuario:
 {{{userData}}}
 
 IMPORTANTE: Debes producir ÚNICAMENTE un objeto JSON válido como respuesta. No incluyas ningún otro texto, explicaciones o formato markdown (como \`\`\`json) antes o después del objeto JSON.
-El objeto JSON DEBE tener la siguiente estructura exacta:
-{
-  "recipeSuggestion": "string",
-  "routineSuggestion": "string"
-}
 
-Ejemplo del resultado JSON exacto requerido:
+El objeto JSON DEBE tener la siguiente estructura exacta y contener ejemplos de valores:
 {
   "recipeSuggestion": "Ensalada de Quinoa con Pollo a la Parrilla: Mezcla quinoa cocida, pollo a la parrilla en cubos, pimientos picados, pepino y un aderezo ligero de limón y aceite de oliva.",
   "routineSuggestion": "Entrenamiento de Cuerpo Completo (30 min): 10 min de cardio ligero (trote), 3 series de 12 sentadillas, 3 series de 10 flexiones, 3 series de 15 planchas (30 seg cada una)."
@@ -70,18 +65,15 @@ const aiSuggestionsFlow = ai.defineFlow(
     const {output} = await prompt(input);
     
     if (!output) {
-      console.error('AI model did not return an output. Output was null or undefined. Input:', input);
+      console.error('AI model did not return an output for aiSuggestionsFlow. Output was null or undefined. Input:', input);
       throw new Error('El modelo de IA no devolvió una salida. La salida fue nula o indefinida.');
     }
     
-    // Genkit should have already parsed according to AISuggestionsOutputSchema due to its definition in ai.definePrompt.
-    // This explicit parse is a safeguard or for cases where Genkit's parsing might be too lenient or the output object isn't directly the parsed data.
     const parsedOutput = AISuggestionsOutputSchema.safeParse(output);
     if (!parsedOutput.success) {
-        console.error("AISuggestionsOutputSchema parsing failed in flow. Input:", input, "Raw Output:", output, "Zod Errors:", parsedOutput.error.flatten());
+        console.error("AISuggestionsOutputSchema parsing failed in aiSuggestionsFlow. Input:", input, "Raw Output:", JSON.stringify(output, null, 2), "Zod Errors:", parsedOutput.error.flatten());
         throw new Error(`La salida del modelo de IA no se ajustó al esquema después del procesamiento de Genkit. Problemas: ${JSON.stringify(parsedOutput.error.flatten().fieldErrors)}`);
     }
     return parsedOutput.data;
   }
 );
-
