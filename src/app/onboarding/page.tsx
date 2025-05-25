@@ -9,7 +9,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDes
 import { Input } from "@/components/ui/input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CheckCircle, UserPlus } from "lucide-react";
+import { CheckCircle, UserPlus, Ruler } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -29,6 +29,14 @@ const onboardingFormSchema = z.object({
     .max(300, "El peso máximo es 300."),
   weightUnit: z.enum(["kg", "lb"], {
     required_error: "Selecciona la unidad de peso.",
+  }),
+  height: z.coerce
+    .number({ invalid_type_error: "La estatura debe ser un número." })
+    .positive("La estatura debe ser un número positivo.")
+    .min(50, "La estatura mínima es 50 cm / 1.64 ft.") // Assuming cm as base for min
+    .max(250, "La estatura máxima es 250 cm / 8.2 ft."), // Assuming cm as base for max
+  heightUnit: z.enum(["cm", "ft"], {
+    required_error: "Selecciona la unidad de estatura.",
   }),
   gender: z.enum(["hombre", "mujer", "no_decir"], {
     required_error: "Selecciona tu género.",
@@ -64,6 +72,7 @@ export default function OnboardingPage() {
     resolver: zodResolver(onboardingFormSchema),
     defaultValues: {
       weightUnit: "kg",
+      heightUnit: "cm",
       gender: undefined,
       activityLevel: undefined,
       fitnessGoal: undefined,
@@ -126,7 +135,7 @@ export default function OnboardingPage() {
                         render={({ field }) => (
                         <FormItem className="flex-grow">
                             <FormControl>
-                            <Input type="number" placeholder="Ej: 70" {...field} />
+                            <Input type="number" placeholder="Ej: 70" {...field} step="0.1" />
                             </FormControl>
                             <FormMessage />
                         </FormItem>
@@ -165,42 +174,91 @@ export default function OnboardingPage() {
                 </div>
               </div>
 
-              <FormField
-                control={form.control}
-                name="gender"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
-                    <FormLabel>Género</FormLabel>
-                    <FormControl>
-                      <RadioGroup
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                        className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:space-x-4"
-                      >
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="hombre" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Hombre</FormLabel>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                 <div className="space-y-2">
+                   <FormLabel>Estatura</FormLabel>
+                   <div className="flex items-start gap-3">
+                    <FormField
+                        control={form.control}
+                        name="height"
+                        render={({ field }) => (
+                        <FormItem className="flex-grow">
+                            <FormControl>
+                            <Input type="number" placeholder="Ej: 175" {...field} step="0.1" />
+                            </FormControl>
+                            <FormMessage />
                         </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="mujer" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Mujer</FormLabel>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="heightUnit"
+                        render={({ field }) => (
+                        <FormItem className="shrink-0">
+                            <FormControl>
+                            <RadioGroup
+                                onValueChange={field.onChange}
+                                defaultValue={field.value}
+                                className="flex space-x-2 pt-2"
+                            >
+                                <FormItem className="flex items-center space-x-1 space-y-0">
+                                <FormControl>
+                                    <RadioGroupItem value="cm" />
+                                </FormControl>
+                                <FormLabel className="font-normal text-xs">cm</FormLabel>
+                                </FormItem>
+                                <FormItem className="flex items-center space-x-1 space-y-0">
+                                <FormControl>
+                                    <RadioGroupItem value="ft" />
+                                </FormControl>
+                                <FormLabel className="font-normal text-xs">ft</FormLabel>
+                                </FormItem>
+                            </RadioGroup>
+                            </FormControl>
+                             <FormMessage />
                         </FormItem>
-                        <FormItem className="flex items-center space-x-3 space-y-0">
-                          <FormControl>
-                            <RadioGroupItem value="no_decir" />
-                          </FormControl>
-                          <FormLabel className="font-normal">Prefiero no decirlo</FormLabel>
-                        </FormItem>
-                      </RadioGroup>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                        )}
+                    />
+                   </div>
+                </div>
+                <FormField
+                  control={form.control}
+                  name="gender"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2 pt-2"> {/* Adjusted pt for alignment */}
+                      <FormLabel>Género</FormLabel>
+                      <FormControl>
+                        <RadioGroup
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          className="flex flex-col space-y-1 sm:flex-row sm:space-y-0 sm:items-center sm:gap-2 pt-1"
+                        >
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="hombre" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Hombre</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="mujer" />
+                            </FormControl>
+                            <FormLabel className="font-normal">Mujer</FormLabel>
+                          </FormItem>
+                          <FormItem className="flex items-center space-x-2 space-y-0">
+                            <FormControl>
+                              <RadioGroupItem value="no_decir" />
+                            </FormControl>
+                            <FormLabel className="font-normal">No decir</FormLabel>
+                          </FormItem>
+                        </RadioGroup>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
 
               <FormField
                 control={form.control}
@@ -262,5 +320,3 @@ export default function OnboardingPage() {
     </div>
   );
 }
-
-    
