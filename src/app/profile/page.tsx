@@ -42,7 +42,7 @@ export default function ProfilePage() {
       <Card className="w-full max-w-4xl mx-auto shadow-xl">
         <CardHeader className="bg-muted/30 p-6">
           <div className="flex flex-col md:flex-row items-center gap-6">
-            <Avatar className="h-32 w-32 border-4 border-primary shadow-md">
+            <Avatar className="h-32 w-32 border-4 border-primary shadow-lg">
               <AvatarImage src={mockUserProfile.avatarUrl} alt={mockUserProfile.name} data-ai-hint="profile picture" />
               <AvatarFallback className="text-4xl">{mockUserProfile.name.substring(0,1)}</AvatarFallback>
             </Avatar>
@@ -51,16 +51,20 @@ export default function ProfilePage() {
               <p className="text-lg text-muted-foreground">{mockUserProfile.email}</p>
               <div className="mt-2 flex items-center gap-4">
                 <div className="flex items-center text-yellow-500">
-                  <Star className="h-5 w-5 mr-1" /> Nivel {mockUserProfile.level}
+                  <Star className="h-5 w-5 mr-1 fill-current" /> Nivel {mockUserProfile.level}
                 </div>
                 <div className="flex items-center text-accent">
                   <Zap className="h-5 w-5 mr-1" /> {mockUserProfile.experiencePoints} XP
                 </div>
-                <div className="flex items-center text-green-500">
+                <div className="flex items-center text-emerald-500">
+                  {/* Using a specific green for currency as it's not in the theme vars directly */}
                   🪙 {mockUserProfile.virtualCurrency} Monedas
                 </div>
               </div>
             </div>
+            <Button variant="outline" size="sm" className="md:ml-auto mt-4 md:mt-0">
+                <Edit3 className="mr-2 h-4 w-4"/> Editar Perfil
+            </Button>
           </div>
         </CardHeader>
         <CardContent className="p-6">
@@ -93,7 +97,7 @@ export default function ProfilePage() {
                     <StatDisplay label="Masa Muscular" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-4">
-                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString()}
+                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString('es-ES')}
                 </p>
               </Section>
               <Separator className="my-6" />
@@ -108,6 +112,9 @@ export default function ProfilePage() {
                         <Image src="https://placehold.co/300x400.png?text=Despues" alt="Foto Después Ejemplo" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
                     </div>
                  </div>
+                 <Button className="mt-4">
+                    <Camera className="mr-2 h-4 w-4"/> Subir Nueva Foto
+                 </Button>
               </Section>
             </TabsContent>
             
@@ -115,11 +122,15 @@ export default function ProfilePage() {
               <Section title="Insignias Ganadas">
                 <div className="flex flex-wrap gap-3">
                   {mockUserProfile.badges.map(badge => (
-                    <Badge key={badge} variant="secondary" className="px-3 py-1 text-sm bg-accent/20 text-accent-foreground border-accent">
-                      <Award className="h-4 w-4 mr-1.5" />
+                    <Badge key={badge} className="px-4 py-2 text-sm bg-accent/20 text-accent-foreground border-2 border-accent hover:bg-accent/30 cursor-pointer transition-colors">
+                      <Award className="h-5 w-5 mr-2" />
                       {badge}
                     </Badge>
                   ))}
+                   <Badge variant="outline" className="px-4 py-2 text-sm border-dashed border-muted-foreground text-muted-foreground hover:border-primary hover:text-primary cursor-pointer transition-colors">
+                      <Zap className="h-5 w-5 mr-2" />
+                      Ver todas las insignias
+                    </Badge>
                 </div>
               </Section>
             </TabsContent>
@@ -158,10 +169,16 @@ export default function ProfilePage() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+interface SectionProps {
+    title: string;
+    children: React.ReactNode;
+    className?: string;
+}
+
+function Section({ title, children, className }: SectionProps) {
   return (
-    <div>
-      <h3 className="text-xl font-semibold mb-3 text-primary">{title}</h3>
+    <div className={className}>
+      <h3 className="text-xl font-semibold mb-4 text-primary">{title}</h3>
       {children}
     </div>
   );
@@ -169,9 +186,11 @@ function Section({ title, children }: { title: string; children: React.ReactNode
 
 function StatDisplay({ label, value }: { label: string; value: string }) {
     return (
-        <div className="bg-background p-4 rounded-lg shadow">
+        <div className="bg-background p-4 rounded-lg shadow border border-border hover:shadow-md transition-shadow">
             <p className="text-sm text-muted-foreground">{label}</p>
             <p className="text-2xl font-bold text-accent">{value}</p>
         </div>
     );
 }
+
+    
