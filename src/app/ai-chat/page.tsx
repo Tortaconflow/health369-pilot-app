@@ -7,10 +7,12 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Bot, Loader2, Rocket, Brain, Edit3 } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, Rocket, Brain, Edit3, Activity } from 'lucide-react';
 import { handleRecipeChat } from '@/app/actions/chatActions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
+// Asegúrate de importar el tipo PersonalizedWorkoutInput si lo vas a usar para tipar el estado
+// import type { PersonalizedWorkoutInput } from '@/ai/flows/personalized-workout-flow';
 
 interface ChatMessage {
   id: string;
@@ -22,15 +24,23 @@ interface QuestionnaireQuestion {
   id: string;
   text: string;
   options: { value: string; label: string }[];
-  key: keyof UserPreferences;
+  key: keyof UserPreferences; // Ajustado para UserPreferences
 }
 
+// Estas son las preferencias que recopilamos del cuestionario inicial
 interface UserPreferences {
-  objective?: string;
-  experience?: string;
+  objective?: string;       // Mapea a 'goals' para PersonalizedWorkoutInput
+  experience?: string;      // Mapea a 'fitnessLevel' para PersonalizedWorkoutInput
   recipePreference?: string;
   wearable?: string;
+  // Estos campos se necesitarían para PersonalizedWorkoutInput, pero no están en el cuestionario actual
+  timeAvailablePerSession?: string;
+  daysPerWeek?: number;
+  limitations?: string[];
+  preferredStyle?: string;
+  availableEquipment?: string[];
 }
+
 
 const questionnaireQuestions: QuestionnaireQuestion[] = [
   {
@@ -48,9 +58,9 @@ const questionnaireQuestions: QuestionnaireQuestion[] = [
     id: 'q2',
     text: '¿Tienes experiencia con dietas o entrenamientos?',
     options: [
-      { value: 'experto', label: 'Sí, soy experto/a' },
-      { value: 'algo_experiencia', label: 'Algo de experiencia' },
-      { value: 'ninguna', label: 'Ninguna' },
+      { value: 'avanzado', label: 'Sí, soy experto/a' }, // Ajustado a valores de fitnessLevel
+      { value: 'intermedio', label: 'Algo de experiencia' }, // Ajustado
+      { value: 'principiante', label: 'Ninguna' }, // Ajustado
     ],
     key: 'experience',
   },
@@ -83,6 +93,10 @@ const suggestedPrompts = [
     "Dame una idea para una cena saludable y rápida."
 ];
 
+// Frase clave para detectar si la IA está lista para generar una rutina
+const WORKOUT_GENERATION_PROMPT_KEYPHRASE = "¿quieres que procedamos a generar una propuesta de entrenamiento personalizada para ti?";
+
+
 export default function AIChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState('');
@@ -95,6 +109,8 @@ export default function AIChatPage() {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(false);
+  const [showGenerateWorkoutButton, setShowGenerateWorkoutButton] = useState(false);
+
 
   const scrollToBottom = () => {
     if (viewportRef.current) {
@@ -105,9 +121,8 @@ export default function AIChatPage() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
-  
+
   useEffect(() => {
-    // Mensaje inicial del bot si el cuestionario no está completo
     if (!isQuestionnaireComplete && messages.length === 0) {
          setMessages([
             { id: 'init-bot-welcome', role: 'assistant', content: '¡Hola! Soy NutriChef AI. Para ayudarte mejor, ¿te gustaría responder unas breves preguntas?' }
@@ -122,12 +137,12 @@ export default function AIChatPage() {
 
   const handleStartQuestionnaire = () => {
     setIsQuestionnaireActive(true);
+    setShowGenerateWorkoutButton(false); // Ocultar si estaba visible
     setMessages(prev => [...prev, {id: 'user-start-q', role: 'user', content: "Sí, quiero responder las preguntas."}]);
   };
-  
+
   const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: string, answerLabel: string) => {
     setUserPreferences(prev => ({ ...prev, [questionKey]: answerLabel }));
-    // Solo añadir la respuesta del usuario al historial del chat
     setMessages(prev => [...prev, {id: `user-q-ans-${questionKey}-${Date.now()}`, role: 'user', content: answerLabel}]);
 
     if (currentQuestionIndex < questionnaireQuestions.length - 1) {
@@ -144,21 +159,23 @@ export default function AIChatPage() {
     }
   };
 
-  const formatPreferencesForAI = (): string => {
+  const formatPreferencesForAIContext = (): string => {
     if (Object.keys(userPreferences).length === 0) return "";
     let context = "Contexto del usuario: ";
     const preferencesList: string[] = [];
     if (userPreferences.objective) preferencesList.push(`Objetivo principal - ${userPreferences.objective}`);
-    if (userPreferences.experience) preferencesList.push(`Experiencia - ${userPreferences.experience}`);
+    if (userPreferences.experience) preferencesList.push(`Experiencia/Nivel de fitness - ${userPreferences.experience}`); // Mapea a fitnessLevel
     if (userPreferences.recipePreference) preferencesList.push(`Preferencia de recetas - ${userPreferences.recipePreference}`);
     if (userPreferences.wearable) preferencesList.push(`Usa wearable - ${userPreferences.wearable}`);
+    // Faltan timeAvailablePerSession, daysPerWeek, etc. La IA los pedirá si es necesario.
     context += preferencesList.join(". ") + ".";
     return context;
   };
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>, promptedQuery?: string) => {
     if (e) e.preventDefault();
-    
+    setShowGenerateWorkoutButton(false); // Ocultar botón de generar rutina al enviar nuevo mensaje
+
     const query = promptedQuery || input.trim();
     if (!query || isLoading) return;
 
@@ -168,29 +185,27 @@ export default function AIChatPage() {
       content: query,
     };
     setMessages((prevMessages) => [...prevMessages, newUserMessage]);
-    
-    let currentInput = query;
-    if (!promptedQuery) setInput(''); // Clear input only if it's not from a suggested prompt
+
+    let currentInputForAPI = query;
+    if (!promptedQuery) setInput('');
     setIsLoading(true);
 
     const chatHistoryForAPI = messages
-        // Filtramos los mensajes de bienvenida/cuestionario que no deben ir al historial de la API
         .filter(msg => !['init-bot-welcome', 'init-bot-ready', 'bot-q-complete'].includes(msg.id) && !msg.id.startsWith('user-q-ans-'))
-        // Tomamos los últimos mensajes del usuario que son respuestas del cuestionario y el mensaje "Sí, quiero responder"
         .concat(messages.filter(msg => msg.id.startsWith('user-q-ans-') || msg.id === 'user-start-q'))
         .map(msg => ({ role: msg.role, content: msg.content }));
-    
+
     if (isQuestionnaireComplete && Object.keys(userPreferences).length > 0) {
-        const preferencesContext = formatPreferencesForAI();
-        // Añadimos el contexto de preferencias al inicio de la primera consulta "real" después del cuestionario
-        const userRealQueries = chatHistoryForAPI.filter(m => m.role === 'user' && m.content === query);
-        if (userRealQueries.length === 1) { 
-            currentInput = `${preferencesContext} Mi pregunta es: ${currentInput}`;
+        const preferencesContext = formatPreferencesForAIContext();
+        // Solo añadir el contexto si este es el primer mensaje "real" después del cuestionario o si no se ha añadido antes.
+        // Una forma simple es verificar si la query actual ya tiene el prefijo.
+        if (!currentInputForAPI.startsWith("Contexto del usuario:")) {
+            currentInputForAPI = `${preferencesContext} Mi pregunta es: ${currentInputForAPI}`;
         }
     }
 
     try {
-      const result = await handleRecipeChat({ userQuery: currentInput, chatHistory: chatHistoryForAPI });
+      const result = await handleRecipeChat({ userQuery: currentInputForAPI, chatHistory: chatHistoryForAPI });
       if (result.success && result.data) {
         const newAssistantMessage: ChatMessage = {
           id: `assistant-${Date.now()}`,
@@ -198,6 +213,12 @@ export default function AIChatPage() {
           content: result.data.aiResponse,
         };
         setMessages((prevMessages) => [...prevMessages, newAssistantMessage]);
+
+        // Comprobar si la IA está lista para generar la rutina
+        if (result.data.aiResponse.toLowerCase().includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE.toLowerCase())) {
+          setShowGenerateWorkoutButton(true);
+        }
+
       } else {
         toast({
           title: 'Error del Asistente',
@@ -230,8 +251,55 @@ export default function AIChatPage() {
   };
 
   const handleSuggestedPrompt = (prompt: string) => {
-    setInput(prompt); 
-    handleSubmit(undefined, prompt); 
+    setInput(prompt);
+    handleSubmit(undefined, prompt);
+  };
+
+  const handleGenerateWorkout = async () => {
+    setShowGenerateWorkoutButton(false); // Ocultar después de hacer clic
+    setIsLoading(true);
+    const userMessage: ChatMessage = {
+      id: `user-confirm-workout-${Date.now()}`,
+      role: 'user',
+      content: "Sí, por favor genera la rutina."
+    };
+    setMessages(prev => [...prev, userMessage]);
+
+    // Simular que se está llamando a la acción de generar rutina
+    // Aquí es donde construirías el PersonalizedWorkoutInput y llamarías a la acción del servidor
+    console.log("Preparando para generar rutina con preferencias:", userPreferences);
+    // TODO: Mapear userPreferences a PersonalizedWorkoutInput.
+    // Por ejemplo:
+    // const workoutInput: PersonalizedWorkoutInput = {
+    //   fitnessLevel: userPreferences.experience || 'principiante', // Asignar un default o validar
+    //   goals: userPreferences.objective ? [userPreferences.objective] : ['mejorar_salud_general'], // Asignar default o validar
+    //   // ... obtener timeAvailablePerSession y daysPerWeek (actualmente no en userPreferences)
+    //   // Por ahora, la IA debería haberlos pedido si eran necesarios.
+    //   // Si no, necesitaremos una forma de preguntarlos aquí o modificar el cuestionario.
+    //   timeAvailablePerSession: userPreferences.timeAvailablePerSession || "45 minutos", // Ejemplo, necesitaría ser recopilado
+    //   daysPerWeek: userPreferences.daysPerWeek || 3, // Ejemplo, necesitaría ser recopilado
+    //   limitations: userPreferences.limitations || [],
+    //   preferredStyle: userPreferences.preferredStyle as any || 'mixto', // 'as any' si el tipo no coincide exactamente
+    //   availableEquipment: userPreferences.availableEquipment || ['peso corporal'],
+    // };
+
+    // Aquí llamarías a la acción de servidor:
+    // const result = await handleGenerateWorkoutAction(workoutInput);
+    // Y luego mostrarías la rutina.
+
+    // Simulación por ahora:
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    const assistantMessage: ChatMessage = {
+      id: `assistant-workout-placeholder-${Date.now()}`,
+      role: 'assistant',
+      content: "¡Rutina en camino! (Este es un marcador de posición. La integración completa de la generación de rutinas es el siguiente paso)."
+    };
+    setMessages(prev => [...prev, assistantMessage]);
+    setIsLoading(false);
+     toast({
+        title: "Generación de Rutina Iniciada (Simulación)",
+        description: "La rutina completa se mostrará aquí cuando esté integrada.",
+      });
   };
 
 
@@ -248,7 +316,7 @@ export default function AIChatPage() {
           <p className="text-muted-foreground text-sm">Tu asistente personal para recetas y consejos de cocina.</p>
         </CardHeader>
 
-        {!isQuestionnaireActive && !isQuestionnaireComplete && messages.length === 1 && messages[0].id === 'init-bot-welcome' && (
+        {(!isQuestionnaireActive && !isQuestionnaireComplete && messages.length === 1 && messages[0].id === 'init-bot-welcome') && (
             <CardContent className="p-6 flex flex-col items-center justify-center">
                 <Button onClick={handleStartQuestionnaire} className="bg-accent hover:bg-accent/90 text-accent-foreground">
                     <Rocket className="mr-2 h-5 w-5" /> Comenzar Cuestionario
@@ -280,7 +348,7 @@ export default function AIChatPage() {
           </CardContent>
         )}
 
-        <CardContent className={cn("p-0 flex-1 overflow-hidden", (isQuestionnaireActive || (!isQuestionnaireComplete && messages.length === 1)) && "hidden")}>
+        <CardContent className={cn("p-0 flex-1 overflow-hidden", (isQuestionnaireActive || (!isQuestionnaireComplete && messages.length === 1 && !isQuestionnaireActive)) && "hidden")}>
           <ScrollArea className="h-full" ref={scrollAreaRef}>
             <div ref={viewportRef} className="h-full p-4 space-y-4">
               {messages.map((message) => (
@@ -333,6 +401,11 @@ export default function AIChatPage() {
           </ScrollArea>
         </CardContent>
         <CardFooter className={cn("border-t p-4 bg-background flex flex-col gap-3", (isQuestionnaireActive || (!isQuestionnaireComplete && messages.length === 1 && !isQuestionnaireActive)) && "hidden")}>
+          {showGenerateWorkoutButton && (
+            <Button onClick={handleGenerateWorkout} className="w-full mb-3 bg-green-600 hover:bg-green-700 text-white">
+              <Activity className="mr-2 h-5 w-5" /> Sí, generar mi rutina
+            </Button>
+          )}
           {isQuestionnaireComplete && (
             <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-2 text-center">¿No sabes qué preguntar? Prueba una de estas sugerencias:</p>
@@ -372,4 +445,3 @@ export default function AIChatPage() {
     </div>
   );
 }
-
