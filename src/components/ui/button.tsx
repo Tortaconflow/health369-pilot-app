@@ -1,3 +1,4 @@
+
 import * as React from "react"
 import { Slot } from "@radix-ui/react-slot"
 import { cva, type VariantProps } from "class-variance-authority"
@@ -9,18 +10,18 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        default: "bg-accent text-accent-foreground hover:bg-accent/90", // Naranja Vibrante
+        default: "bg-cta-button text-cta-button-foreground hover:bg-cta-button/90", // Uses Naranja Vibrante
         destructive:
           "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-        outline: // Verde Esmeralda claro (bg-background), texto negro (text-foreground), borde Verde Esmeralda (border-primary)
+        outline: 
           "border-2 border-primary bg-background text-foreground hover:bg-primary/10 hover:text-primary-foreground",
-        secondary: // Verde Esmeralda (bg-primary), texto blanco (text-primary-foreground)
-          "bg-primary text-primary-foreground hover:bg-primary/90",
-        ghost: "hover:bg-accent hover:text-accent-foreground",
-        link: "text-secondary underline-offset-4 hover:underline", // Azul Suave for links
+        secondary: 
+          "bg-primary text-primary-foreground hover:bg-primary/90", // Uses --primary (Light Blue in standard theme)
+        ghost: "hover:bg-accent hover:text-accent-foreground", // Uses --accent (Light Green in standard theme)
+        link: "text-secondary underline-offset-4 hover:underline", // Uses --secondary (Azul Suave in standard theme)
       },
       size: {
-        default: "h-10 px-4 py-2", // Default rounded-md (8px with 0.75rem radius)
+        default: "h-10 px-4 py-2", 
         sm: "h-9 rounded-md px-3",
         lg: "h-11 rounded-md px-8",
         icon: "h-10 w-10",
