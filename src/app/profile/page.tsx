@@ -8,7 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfile as UserProfileType } from "@/types/domain";
-import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette } from "lucide-react"; // Added Palette
+import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette, Camera } from "lucide-react"; // Added Camera
 import Image from "next/image";
 import ThemeSelector from "@/components/layout/ThemeSelector"; // Importado
 
