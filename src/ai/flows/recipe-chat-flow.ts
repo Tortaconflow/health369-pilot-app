@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview Un agente de IA para chatear sobre recetas y cocina.
@@ -10,12 +11,24 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
+// Definimos un tipo para las preferencias del usuario que podrían venir en el contexto.
+// Esto es solo para la lógica del prompt, el esquema de entrada principal sigue siendo RecipeChatInputSchema.
+const UserPreferencesSchema = z.object({
+  objective: z.string().optional().describe("El objetivo principal del usuario (ej. ganar masa muscular, perder peso)."),
+  experience: z.string().optional().describe("La experiencia del usuario con dietas/entrenamientos (ej. experto, ninguna)."),
+  recipePreference: z.string().optional().describe("La preferencia de tipo de recetas del usuario (ej. rápidas, altas en proteínas)."),
+  wearable: z.string().optional().describe("Si el usuario usa un wearable (ej. sí, no).")
+}).describe("Preferencias del usuario obtenidas del cuestionario inicial.");
+
+
 const RecipeChatInputSchema = z.object({
-  userQuery: z.string().describe('La pregunta o mensaje del usuario sobre recetas o cocina.'),
+  userQuery: z.string().describe('La pregunta o mensaje del usuario sobre recetas o cocina. Puede incluir un prefijo "Contexto del usuario: ..." con sus preferencias.'),
   chatHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).optional().describe('Historial de la conversación previa para mantener el contexto.'),
+  // Opcionalmente, podríamos añadir userPreferences como un campo estructurado aquí si quisiéramos pasarlo por separado
+  // userPreferences: UserPreferencesSchema.optional().describe("Preferencias del usuario si fueron recolectadas.")
 });
 export type RecipeChatInput = z.infer<typeof RecipeChatInputSchema>;
 
@@ -36,6 +49,19 @@ const recipeChatPrompt = ai.definePrompt({
 
 Debes responder de forma amigable, clara y concisa. Proporciona recetas, listas de ingredientes, pasos de preparación, y consejos de cocina cuando se te solicite.
 
+MUY IMPORTANTE: Al inicio de la conversación, el usuario podría proporcionar un bloque de texto que comienza con "Contexto del usuario:". Este contexto contiene sus preferencias y objetivos. DEBES utilizar esta información para personalizar profundamente tus respuestas y hacer preguntas de seguimiento relevantes.
+Por ejemplo:
+- Si el "Contexto del usuario" indica que su objetivo es "Ganar masa muscular", enfoca tus sugerencias en recetas ricas en proteínas y ofrece consejos sobre ingesta calórica para ese objetivo. Podrías preguntar: "¿Tienes alguna preferencia sobre fuentes de proteína como pollo, pescado, legumbres o tofu?"
+- Si el "Contexto del usuario" indica que su experiencia es "Ninguna", explica los conceptos de forma más sencilla y detallada. Podrías preguntar: "¿Te gustaría que te explique algunos términos básicos de cocina o nutrición?"
+- Si su preferencia de recetas es "Rápidas", prioriza recetas con pocos ingredientes y tiempos de preparación cortos.
+
+Si el usuario no proporciona un contexto explícito, intenta inferir sus necesidades a partir de su pregunta.
+
+Si el usuario parece no saber qué preguntar, puedes ofrecer proactivamente sugerencias como:
+- "¿Te gustaría una receta para ganar masa muscular?"
+- "¿Necesitas consejos para medir tu progreso?"
+- "¿Quieres saber cómo ajustar tu dieta según tu actividad?"
+
 Historial de la conversación (si existe):
 {{#if chatHistory}}
 {{#each chatHistory}}
@@ -43,11 +69,11 @@ Historial de la conversación (si existe):
 {{/each}}
 {{/if}}
 
-Consulta del Usuario:
+Consulta del Usuario (puede incluir contexto al inicio):
 {{{userQuery}}}
 
 Respuesta de NutriChef AI:
-(Proporciona aquí tu respuesta. Si das una receta, incluye ingredientes y pasos claros. Si es una pregunta general, responde de forma informativa.)
+(Proporciona aquí tu respuesta. Si das una receta, incluye ingredientes y pasos claros. Si es una pregunta general, responde de forma informativa y personalizada según el contexto del usuario si está disponible.)
 `,
 });
 
@@ -58,16 +84,13 @@ const recipeChatFlow = ai.defineFlow(
     outputSchema: RecipeChatOutputSchema,
   },
   async (input) => {
-    // Construir el prompt con el historial
-    let fullPromptContext = `Consulta del Usuario:\n${input.userQuery}`;
-    if (input.chatHistory && input.chatHistory.length > 0) {
-        const historyString = input.chatHistory.map(m => `${m.role}: ${m.content}`).join('\n');
-        fullPromptContext = `Historial de la conversación (si existe):\n${historyString}\n\nConsulta del Usuario:\n${input.userQuery}`;
-    }
+    // El contexto de las preferencias del usuario ya está siendo antepuesto a input.userQuery
+    // por la lógica del cliente en ai-chat/page.tsx.
+    // El historial también se pasa directamente.
 
     const {output} = await recipeChatPrompt({
-        userQuery: input.userQuery, // Mantener el input original para la plantilla
-        chatHistory: input.chatHistory // Pasar el historial también
+        userQuery: input.userQuery, 
+        chatHistory: input.chatHistory 
     });
 
     if (!output) {
@@ -77,3 +100,4 @@ const recipeChatFlow = ai.defineFlow(
     return output;
   }
 );
+
