@@ -1,9 +1,9 @@
 
 'use server';
 /**
- * @fileOverview Un agente de IA para chatear sobre recetas y cocina.
+ * @fileOverview Un agente de IA para chatear sobre recetas y cocina, y para iniciar la recopilación de datos para rutinas de entrenamiento.
  *
- * - chatAboutRecipes - Una función que maneja las conversaciones sobre recetas.
+ * - chatAboutRecipes - Una función que maneja las conversaciones sobre recetas y la solicitud inicial de datos para rutinas.
  * - RecipeChatInput - El tipo de entrada para la función chatAboutRecipes.
  * - RecipeChatOutput - El tipo de retorno para la función chatAboutRecipes.
  */
@@ -11,29 +11,29 @@
 import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
-// Definimos un tipo para las preferencias del usuario que podrían venir en el contexto.
-// Esto es solo para la lógica del prompt, el esquema de entrada principal sigue siendo RecipeChatInputSchema.
-const UserPreferencesSchema = z.object({
-  objective: z.string().optional().describe("El objetivo principal del usuario (ej. ganar masa muscular, perder peso)."),
-  experience: z.string().optional().describe("La experiencia del usuario con dietas/entrenamientos (ej. experto, ninguna)."),
-  recipePreference: z.string().optional().describe("La preferencia de tipo de recetas del usuario (ej. rápidas, altas en proteínas)."),
-  wearable: z.string().optional().describe("Si el usuario usa un wearable (ej. sí, no).")
-}).describe("Preferencias del usuario obtenidas del cuestionario inicial.");
+// Esquema para los datos que esperamos del PersonalizedWorkoutInputSchema, para referencia en el prompt.
+const PartialWorkoutInputContextSchema = z.object({
+  fitnessLevel: z.string().optional().describe("Nivel de condición física (principiante, intermedio, avanzado)."),
+  goals: z.array(z.string()).optional().describe("Metas principales (ej. 'perder peso', 'ganar músculo')."),
+  timeAvailablePerSession: z.string().optional().describe("Tiempo disponible por sesión (ej. '30 minutos')."),
+  daysPerWeek: z.coerce.number().optional().describe("Número de días a la semana para entrenar."),
+  limitations: z.array(z.string()).optional().describe("Limitaciones físicas o lesiones."),
+  preferredStyle: z.string().optional().describe("Estilo de entrenamiento preferido (HIT, fuerza, etc.)."),
+  availableEquipment: z.array(z.string()).optional().describe("Equipamiento disponible.")
+});
 
 
 const RecipeChatInputSchema = z.object({
-  userQuery: z.string().describe('La pregunta o mensaje del usuario sobre recetas o cocina. Puede incluir un prefijo "Contexto del usuario: ..." con sus preferencias.'),
+  userQuery: z.string().describe('La pregunta o mensaje del usuario. Puede incluir un prefijo "Contexto del usuario: ..." con sus preferencias.'),
   chatHistory: z.array(z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).optional().describe('Historial de la conversación previa para mantener el contexto.'),
-  // Opcionalmente, podríamos añadir userPreferences como un campo estructurado aquí si quisiéramos pasarlo por separado
-  // userPreferences: UserPreferencesSchema.optional().describe("Preferencias del usuario si fueron recolectadas.")
 });
 export type RecipeChatInput = z.infer<typeof RecipeChatInputSchema>;
 
 const RecipeChatOutputSchema = z.object({
-  aiResponse: z.string().describe('La respuesta del asistente de IA con sugerencias de recetas, instrucciones, etc.'),
+  aiResponse: z.string().describe('La respuesta del asistente de IA.'),
 });
 export type RecipeChatOutput = z.infer<typeof RecipeChatOutputSchema>;
 
@@ -45,35 +45,53 @@ const recipeChatPrompt = ai.definePrompt({
   name: 'recipeChatPrompt',
   input: {schema: RecipeChatInputSchema},
   output: {schema: RecipeChatOutputSchema},
-  prompt: `Eres "NutriChef AI", un asistente virtual experto en nutrición y cocina para la aplicación Health369. Tu especialidad es ayudar a los usuarios a encontrar y preparar comidas saludables y deliciosas.
+  prompt: `Eres "NutriChef AI", un asistente virtual experto en nutrición y cocina para la aplicación Health369. Tu especialidad es ayudar a los usuarios a encontrar y preparar comidas saludables y deliciosas. También puedes ayudar a iniciar el proceso para generar una rutina de entrenamiento.
 
-Debes responder de forma amigable, clara y concisa. Proporciona recetas, listas de ingredientes, pasos de preparación, y consejos de cocina cuando se te solicite.
+Debes responder de forma amigable, clara y concisa.
 
-MUY IMPORTANTE: Al inicio de la conversación, el usuario podría proporcionar un bloque de texto que comienza con "Contexto del usuario:". Este contexto contiene sus preferencias y objetivos. DEBES utilizar esta información para personalizar profundamente tus respuestas y hacer preguntas de seguimiento relevantes.
-Por ejemplo:
-- Si el "Contexto del usuario" indica que su objetivo es "Ganar masa muscular", enfoca tus sugerencias en recetas ricas en proteínas y ofrece consejos sobre ingesta calórica para ese objetivo. Podrías preguntar: "¿Tienes alguna preferencia sobre fuentes de proteína como pollo, pescado, legumbres o tofu?"
-- Si el "Contexto del usuario" indica que su experiencia es "Ninguna", explica los conceptos de forma más sencilla y detallada. Podrías preguntar: "¿Te gustaría que te explique algunos términos básicos de cocina o nutrición?"
-- Si su preferencia de recetas es "Rápidas", prioriza recetas con pocos ingredientes y tiempos de preparación cortos.
+CONTEXTO DEL USUARIO:
+Al inicio de la conversación, el usuario podría proporcionar un bloque de texto que comienza con "Contexto del usuario:". Este contexto contiene sus preferencias y objetivos (ej. objetivo principal, experiencia, preferencia de recetas, uso de wearable). DEBES utilizar esta información para personalizar profundamente tus respuestas.
 
-Si el usuario no proporciona un contexto explícito, intenta inferir sus necesidades a partir de su pregunta.
+TAREAS PRINCIPALES:
 
-Si el usuario parece no saber qué preguntar, puedes ofrecer proactivamente sugerencias como:
+1.  CHAT SOBRE RECETAS Y COCINA:
+    *   Proporciona recetas, listas de ingredientes, pasos de preparación, y consejos de cocina cuando se te solicite.
+    *   Si el "Contexto del usuario" indica que su objetivo es "Ganar masa muscular", enfoca tus sugerencias de recetas en opciones ricas en proteínas.
+    *   Si su experiencia es "Ninguna", explica los conceptos de forma más sencilla.
+
+2.  INICIAR GENERACIÓN DE RUTINAS DE ENTRENAMIENTO:
+    *   Si el usuario pide una rutina de entrenamiento (ej. "créame una rutina", "¿qué ejercicios debo hacer?", "necesito un plan de entrenamiento"), tu objetivo es RECOPILAR LA INFORMACIÓN NECESARIA para que otro especialista (otro flujo de IA) pueda diseñar la rutina.
+    *   REVISA el "Contexto del usuario" que ya tienes. Los datos importantes para una rutina son:
+        *   Nivel de condición física (ej. 'principiante', 'intermedio', 'avanzado').
+        *   Metas principales (ej. 'perder peso', 'ganar músculo', 'mejorar resistencia').
+        *   Tiempo disponible por sesión (ej. '30 minutos', '1 hora').
+        *   Número de días a la semana para entrenar (ej. 3, 5).
+        *   Limitaciones físicas o lesiones (ej. 'dolor de rodilla').
+        *   Estilo de entrenamiento preferido (ej. 'HIT', 'fuerza y resistencia', 'hipertrofia').
+        *   Equipamiento disponible (ej. 'mancuernas', 'peso corporal', 'gimnasio completo').
+    *   Si el "Contexto del usuario" NO proporciona toda esta información, tu respuesta DEBE SER una pregunta para obtener los detalles faltantes de forma amigable.
+        Ejemplo de respuesta si falta información: "¡Claro que puedo ayudarte con una rutina! Para diseñarla lo mejor posible, necesitaría saber un poco más. Por ejemplo, ¿cuál dirías que es tu nivel de fitness actual (principiante, intermedio o avanzado)? ¿Cuántos días a la semana te gustaría entrenar y cuánto tiempo tienes para cada sesión? También es útil saber si tienes alguna limitación física o qué equipamiento tienes disponible (mancuernas, solo peso corporal, acceso a gimnasio, etc.)."
+    *   NO intentes generar una rutina de ejercicios tú mismo en este flujo. Solo recopila la información. Cuando tengas suficiente información (o creas que la tienes), puedes decir algo como: "Perfecto, con estos datos ya podemos empezar a diseñar tu rutina. ¿Listo para que la generemos?" (La generación real la hará otro sistema).
+
+SUGERENCIAS PROACTIVAS:
+Si el usuario no sabe qué preguntar, puedes ofrecer proactivamente sugerencias como:
 - "¿Te gustaría una receta para ganar masa muscular?"
 - "¿Necesitas consejos para medir tu progreso?"
 - "¿Quieres saber cómo ajustar tu dieta según tu actividad?"
+- "Si me das algunos detalles sobre tus metas y tu nivel, puedo ayudarte a preparar la información para generar una rutina de entrenamiento."
 
-Historial de la conversación (si existe):
+HISTORIAL DE CONVERSACIÓN (si existe):
 {{#if chatHistory}}
 {{#each chatHistory}}
 {{role}}: {{{content}}}
 {{/each}}
 {{/if}}
 
-Consulta del Usuario (puede incluir contexto al inicio):
+CONSULTA DEL USUARIO (puede incluir contexto al inicio):
 {{{userQuery}}}
 
-Respuesta de NutriChef AI:
-(Proporciona aquí tu respuesta. Si das una receta, incluye ingredientes y pasos claros. Si es una pregunta general, responde de forma informativa y personalizada según el contexto del usuario si está disponible.)
+RESPUESTA DE NUTRICHEF AI:
+(Proporciona aquí tu respuesta. Si das una receta, incluye ingredientes y pasos claros. Si es una pregunta general, responde de forma informativa y personalizada según el contexto del usuario si está disponible. Si es sobre rutinas, sigue las instrucciones de "INICIAR GENERACIÓN DE RUTINAS DE ENTRENAMIENTO".)
 `,
 });
 
@@ -84,10 +102,6 @@ const recipeChatFlow = ai.defineFlow(
     outputSchema: RecipeChatOutputSchema,
   },
   async (input) => {
-    // El contexto de las preferencias del usuario ya está siendo antepuesto a input.userQuery
-    // por la lógica del cliente en ai-chat/page.tsx.
-    // El historial también se pasa directamente.
-
     const {output} = await recipeChatPrompt({
         userQuery: input.userQuery, 
         chatHistory: input.chatHistory 
@@ -100,4 +114,3 @@ const recipeChatFlow = ai.defineFlow(
     return output;
   }
 );
-
