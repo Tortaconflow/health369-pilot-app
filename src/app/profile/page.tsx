@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -7,8 +8,9 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfile as UserProfileType } from "@/types/domain";
-import { Award, BarChart3, Edit3, Shield, Star, User, Zap } from "lucide-react";
+import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette } from "lucide-react"; // Added Palette
 import Image from "next/image";
+import ThemeSelector from "@/components/layout/ThemeSelector"; // Importado
 
 // Mock data - replace with actual data fetching
 const mockUserProfile: UserProfileType = {
@@ -123,20 +125,28 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="settings">
-              <Section title="Información de la Cuenta">
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="name">Nombre Completo</Label>
-                    <Input id="name" defaultValue={mockUserProfile.name} />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <Section title="Información de la Cuenta">
+                  <div className="space-y-4">
+                    <div>
+                      <Label htmlFor="name">Nombre Completo</Label>
+                      <Input id="name" defaultValue={mockUserProfile.name} />
+                    </div>
+                    <div>
+                      <Label htmlFor="email">Correo Electrónico</Label>
+                      <Input id="email" type="email" defaultValue={mockUserProfile.email} disabled />
+                    </div>
+                    <Button><Edit3 className="h-4 w-4 mr-2" />Guardar Cambios</Button>
                   </div>
-                  <div>
-                    <Label htmlFor="email">Correo Electrónico</Label>
-                    <Input id="email" type="email" defaultValue={mockUserProfile.email} disabled />
-                  </div>
-                  <Button><Edit3 className="h-4 w-4 mr-2" />Guardar Cambios</Button>
-                </div>
-              </Section>
-              <Separator className="my-6" />
+                </Section>
+
+                <Section title="Apariencia">
+                  <ThemeSelector />
+                </Section>
+              </div>
+              
+              <Separator className="my-8" />
+
               <Section title="Seguridad">
                  <Button variant="outline"><Shield className="h-4 w-4 mr-2" />Cambiar Contraseña</Button>
               </Section>
