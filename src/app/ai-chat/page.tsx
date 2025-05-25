@@ -7,11 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Bot, Loader2, Rocket, Activity, Mic, Volume2, AlertTriangle } from 'lucide-react'; // Added Mic, Volume2, AlertTriangle
+import { Send, Sparkles, User, Bot, Loader2, Rocket, Activity, Mic, Volume2, AlertTriangle } from 'lucide-react';
 import { handleRecipeChat } from '@/app/actions/chatActions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-import { Alert, AlertTitle, AlertDescription as AlertDescriptionComponent } from '@/components/ui/alert'; // Renamed AlertDescription to avoid conflict
+import { Alert, AlertTitle, AlertDescription as AlertDescriptionComponent } from '@/components/ui/alert';
 
 interface ChatMessage {
   id: string;
@@ -36,6 +36,11 @@ interface UserPreferences {
   limitations?: string[];
   preferredStyle?: string;
   availableEquipment?: string[];
+  // Campos añadidos para datos biométricos
+  averageSleepHours?: number;
+  restingHeartRate?: number;
+  recentActivitySummary?: string;
+  stressLevel?: 'bajo' | 'medio' | 'alto';
 }
 
 const questionnaireQuestions: QuestionnaireQuestion[] = [
@@ -89,7 +94,9 @@ const suggestedPrompts = [
     "Dame una idea para una cena saludable y rápida."
 ];
 
-const WORKOUT_GENERATION_PROMPT_KEYPHRASE = "¿quieres que procedamos a generar una propuesta de entrenamiento personalizada para ti?";
+const WORKOUT_GENERATION_PROMPT_KEYPHRASE_ES = "¿quieres que procedamos a generar una propuesta de entrenamiento personalizada para ti?";
+const WORKOUT_GENERATION_PROMPT_KEYPHRASE_EN = "would you like us to proceed with generating a personalized training proposal for you?";
+
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -105,15 +112,12 @@ export default function AIChatPage() {
   const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(false);
   const [showGenerateWorkoutButton, setShowGenerateWorkoutButton] = useState(false);
 
-  // --- Voice Interaction State ---
   const [isListening, setIsListening] = useState(false);
   const [browserSupportsSpeech, setBrowserSupportsSpeech] = useState(true);
   const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
-  // --- End Voice Interaction State ---
 
   useEffect(() => {
-    // Check for browser support
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!SpeechRecognition || !window.speechSynthesis) {
       setBrowserSupportsSpeech(false);
@@ -125,10 +129,9 @@ export default function AIChatPage() {
       return;
     }
 
-    // Initialize SpeechRecognition
     const recognition = new SpeechRecognition();
     recognition.continuous = false;
-    recognition.lang = 'es-ES'; // Set language to Spanish
+    recognition.lang = 'es-ES';
     recognition.interimResults = false;
 
     recognition.onresult = (event) => {
@@ -140,23 +143,16 @@ export default function AIChatPage() {
       console.error('Error de reconocimiento de voz:', event.error);
       setIsListening(false);
       let errorMessage = "Ocurrió un error durante el reconocimiento de voz.";
-      if (event.error === 'no-speech') {
-        errorMessage = "No se detectó voz. Inténtalo de nuevo.";
-      } else if (event.error === 'audio-capture') {
-        errorMessage = "No se pudo capturar el audio. Revisa tu micrófono.";
-      } else if (event.error === 'not-allowed') {
-        errorMessage = "Permiso para usar el micrófono denegado.";
-      }
+      if (event.error === 'no-speech') errorMessage = "No se detectó voz. Inténtalo de nuevo.";
+      else if (event.error === 'audio-capture') errorMessage = "No se pudo capturar el audio. Revisa tu micrófono.";
+      else if (event.error === 'not-allowed') errorMessage = "Permiso para usar el micrófono denegado.";
       toast({ title: "Error de Voz", description: errorMessage, variant: "destructive" });
     };
-    recognition.onend = () => {
-      setIsListening(false);
-    };
+    recognition.onend = () => setIsListening(false);
     speechRecognitionRef.current = recognition;
 
-    // Initialize SpeechSynthesisUtterance
     utteranceRef.current = new SpeechSynthesisUtterance();
-    utteranceRef.current.lang = 'es-ES'; // Set language for TTS
+    utteranceRef.current.lang = 'es-ES';
     utteranceRef.current.rate = 0.9;
 
     return () => {
@@ -165,38 +161,35 @@ export default function AIChatPage() {
     };
   }, [toast]);
 
-
   const scrollToBottom = () => {
     if (viewportRef.current) {
       viewportRef.current.scrollTop = viewportRef.current.scrollHeight;
     }
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+  useEffect(scrollToBottom, [messages]);
 
   useEffect(() => {
     if (!isQuestionnaireComplete && messages.length === 0) {
          setMessages([
-            { id: 'init-bot-welcome', role: 'assistant', content: '¡Hola! Soy NutriChef AI. Para ayudarte mejor, ¿te gustaría responder unas breves preguntas?' }
+            { id: 'init-bot-welcome', role: 'assistant', content: '¡Hola! Soy NutriChef AI, tu coach de fitness entusiasta. Para ayudarte mejor, ¿te gustaría responder unas breves preguntas?' }
          ]);
     } else if (isQuestionnaireComplete && messages.length === 0) {
          setMessages([
-            { id: 'init-bot-ready', role: 'assistant', content: '¡Hola de nuevo! Gracias por tus respuestas. ¿En qué receta o idea de comida saludable puedo ayudarte hoy?' }
+            { id: 'init-bot-ready', role: 'assistant', content: '¡Hola de nuevo! Gracias por tus respuestas. ¿En qué receta, idea de comida saludable o plan de entrenamiento puedo ayudarte hoy? 💪' }
          ]);
     }
   }, [isQuestionnaireComplete, messages.length]);
 
-
   const handleStartQuestionnaire = () => {
     setIsQuestionnaireActive(true);
     setShowGenerateWorkoutButton(false);
-    setMessages(prev => [...prev, {id: 'user-start-q', role: 'user', content: "Sí, quiero responder las preguntas."}]);
+    // No añadir "Sí, quiero responder las preguntas" al historial.
+    // Simplemente avanzar al cuestionario.
   };
 
   const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: string, answerLabel: string) => {
-    setUserPreferences(prev => ({ ...prev, [questionKey]: answerValue })); // Store value, not label for programmatic use
+    setUserPreferences(prev => ({ ...prev, [questionKey]: answerValue }));
     setMessages(prev => [...prev, {id: `user-q-ans-${questionKey}-${Date.now()}`, role: 'user', content: answerLabel}]);
 
     if (currentQuestionIndex < questionnaireQuestions.length - 1) {
@@ -204,12 +197,12 @@ export default function AIChatPage() {
     } else {
       setIsQuestionnaireActive(false);
       setIsQuestionnaireComplete(true);
-      const completeMessage = '¡Gracias por tus respuestas! Ahora puedo personalizar mejor mis sugerencias. ¿En qué te puedo ayudar hoy?';
+      const completeMessage = '¡Genial! Tus preferencias han sido guardadas para esta sesión. ¿Listo/a para planificar algo increíble juntos? 🚀';
       setMessages(prev => [...prev, {id: 'bot-q-complete', role: 'assistant', content: completeMessage}]);
       speakText(completeMessage);
       toast({
         title: "Cuestionario Completo",
-        description: "Tus preferencias han sido guardadas para esta sesión.",
+        description: "Tus preferencias están listas. ¡Vamos a ello!",
         className: "bg-green-500 text-white",
       });
     }
@@ -223,10 +216,13 @@ export default function AIChatPage() {
     if (userPreferences.experience) preferencesList.push(`Experiencia/Nivel de fitness - ${userPreferences.experience}`);
     if (userPreferences.recipePreference) preferencesList.push(`Preferencia de recetas - ${userPreferences.recipePreference}`);
     if (userPreferences.wearable) preferencesList.push(`Usa wearable - ${userPreferences.wearable}`);
-    // Add other preferences as they are collected
     if (userPreferences.timeAvailablePerSession) preferencesList.push(`Tiempo por sesión - ${userPreferences.timeAvailablePerSession}`);
     if (userPreferences.daysPerWeek) preferencesList.push(`Días por semana - ${userPreferences.daysPerWeek}`);
     if (userPreferences.preferredStyle) preferencesList.push(`Estilo preferido - ${userPreferences.preferredStyle}`);
+    if (userPreferences.averageSleepHours) preferencesList.push(`Horas de sueño promedio - ${userPreferences.averageSleepHours}`);
+    if (userPreferences.restingHeartRate) preferencesList.push(`Frecuencia cardíaca en reposo - ${userPreferences.restingHeartRate}`);
+    if (userPreferences.recentActivitySummary) preferencesList.push(`Resumen de actividad reciente - ${userPreferences.recentActivitySummary}`);
+    if (userPreferences.stressLevel) preferencesList.push(`Nivel de estrés - ${userPreferences.stressLevel}`);
 
     context += preferencesList.join(". ") + ".";
     return context;
@@ -234,7 +230,7 @@ export default function AIChatPage() {
 
   const speakText = (text: string) => {
     if (!browserSupportsSpeech || !utteranceRef.current || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel(); // Cancel any ongoing speech
+    window.speechSynthesis.cancel();
     utteranceRef.current.text = text;
     window.speechSynthesis.speak(utteranceRef.current);
   };
@@ -259,16 +255,17 @@ export default function AIChatPage() {
 
     const chatHistoryForAPI = messages
         .filter(msg => !['init-bot-welcome', 'init-bot-ready', 'bot-q-complete'].includes(msg.id) && !msg.id.startsWith('user-q-ans-'))
-        .concat(messages.filter(msg => msg.id.startsWith('user-q-ans-') || msg.id === 'user-start-q'))
         .map(msg => ({ role: msg.role, content: msg.content }));
 
     if (isQuestionnaireComplete && Object.keys(userPreferences).length > 0) {
         const preferencesContext = formatPreferencesForAIContext();
-        if (!currentInputForAPI.startsWith("Contexto del usuario:")) {
-            currentInputForAPI = `${preferencesContext} Mi pregunta es: ${currentInputForAPI}`;
+        // Solo añadir contexto si no se está enviando una respuesta a una pregunta específica de la IA
+        // y si el input actual no empieza ya con el contexto.
+        if (!currentInputForAPI.toLowerCase().includes("contexto del usuario:")) {
+             currentInputForAPI = `${preferencesContext} Mi pregunta es: ${currentInputForAPI}`;
         }
     }
-
+    
     try {
       const result = await handleRecipeChat({ userQuery: currentInputForAPI, chatHistory: chatHistoryForAPI });
       if (result.success && result.data) {
@@ -280,37 +277,22 @@ export default function AIChatPage() {
         setMessages((prevMessages) => [...prevMessages, newAssistantMessage]);
         speakText(result.data.aiResponse);
 
-        if (result.data.aiResponse.toLowerCase().includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE.toLowerCase())) {
+        const aiResponseLower = result.data.aiResponse.toLowerCase();
+        if (aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_ES) || aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_EN)) {
           setShowGenerateWorkoutButton(true);
         }
 
       } else {
         const errorText = result.error || 'No se pudo obtener una respuesta.';
-        toast({
-          title: 'Error del Asistente',
-          description: errorText,
-          variant: 'destructive',
-        });
-         const errorAssistantMessage: ChatMessage = {
-          id: `assistant-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorText,
-        };
+        toast({ title: 'Error del Asistente', description: errorText, variant: 'destructive' });
+        const errorAssistantMessage: ChatMessage = { id: `assistant-error-${Date.now()}`, role: 'assistant', content: errorText };
         setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
         speakText(errorText);
       }
     } catch (error) {
       const errorText = 'No se pudo conectar con el asistente de IA.';
-      toast({
-        title: 'Error de Conexión',
-        description: errorText,
-        variant: 'destructive',
-      });
-      const errorAssistantMessage: ChatMessage = {
-          id: `assistant-error-${Date.now()}`,
-          role: 'assistant',
-          content: errorText,
-        };
+      toast({ title: 'Error de Conexión', description: errorText, variant: 'destructive' });
+      const errorAssistantMessage: ChatMessage = { id: `assistant-error-${Date.now()}`, role: 'assistant', content: errorText };
       setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
       speakText(errorText);
     } finally {
@@ -320,7 +302,7 @@ export default function AIChatPage() {
   };
 
   const handleSuggestedPrompt = (promptText: string) => {
-    setInput(promptText);
+    setInput(promptText); // No es necesario setInput si vamos a enviar directamente
     handleSubmit(undefined, promptText);
   };
   
@@ -328,7 +310,6 @@ export default function AIChatPage() {
     if (!browserSupportsSpeech || !speechRecognitionRef.current) return;
     if (isListening) {
       speechRecognitionRef.current.stop();
-      setIsListening(false);
     } else {
       try {
         speechRecognitionRef.current.start();
@@ -345,36 +326,37 @@ export default function AIChatPage() {
   const handleGenerateWorkout = async () => {
     setShowGenerateWorkoutButton(false);
     setIsLoading(true);
-    const userMessageContent = "Sí, por favor genera la rutina.";
-    const userMessage: ChatMessage = {
-      id: `user-confirm-workout-${Date.now()}`,
-      role: 'user',
-      content: userMessageContent
-    };
+    const userMessageContent = "¡Sí, por favor genera la rutina!";
+    const userMessage: ChatMessage = { id: `user-confirm-workout-${Date.now()}`, role: 'user', content: userMessageContent };
     setMessages(prev => [...prev, userMessage]);
 
     console.log("Preparando para generar rutina con preferencias:", userPreferences);
     
-    // TODO: Llamar a la acción de servidor para generar la rutina.
-    // const workoutInput: PersonalizedWorkoutInput = { ... }
-    // const result = await handleGenerateWorkoutAction(workoutInput);
+    // TODO: Construir workoutInput con todos los datos (de userPreferences y si es necesario, pedir más)
+    // const workoutInput: PersonalizedWorkoutInput = { 
+    //   fitnessLevel: userPreferences.experience as any, // Asegúrate de mapear correctamente
+    //   goals: userPreferences.objective ? [userPreferences.objective] : [], // Adaptar
+    //   timeAvailablePerSession: userPreferences.timeAvailablePerSession || "No especificado",
+    //   daysPerWeek: userPreferences.daysPerWeek || 3, // Valor por defecto o pedir
+    //   limitations: userPreferences.limitations,
+    //   preferredStyle: userPreferences.preferredStyle as any,
+    //   availableEquipment: userPreferences.availableEquipment,
+    //   averageSleepHours: userPreferences.averageSleepHours,
+    //   restingHeartRate: userPreferences.restingHeartRate,
+    //   recentActivitySummary: userPreferences.recentActivitySummary,
+    //   stressLevel: userPreferences.stressLevel
+    // };
+    // const result = await handleGenerateWorkoutAction(workoutInput); 
+    // Y luego mostrar el resultado
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    const assistantMessageContent = "¡Rutina en camino! (Este es un marcador de posición. La integración completa de la generación de rutinas es el siguiente paso).";
-    const assistantMessage: ChatMessage = {
-      id: `assistant-workout-placeholder-${Date.now()}`,
-      role: 'assistant',
-      content: assistantMessageContent
-    };
+    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulación
+    const assistantMessageContent = "¡Rutina en camino! 🏋️‍♀️ (Esto es un marcador de posición. La integración completa es el siguiente paso, ¡y va a ser épica!). ¿Algo más en lo que pueda ayudarte mientras tanto?";
+    const assistantMessage: ChatMessage = { id: `assistant-workout-placeholder-${Date.now()}`, role: 'assistant', content: assistantMessageContent };
     setMessages(prev => [...prev, assistantMessage]);
     speakText(assistantMessageContent);
     setIsLoading(false);
-     toast({
-        title: "Generación de Rutina Iniciada (Simulación)",
-        description: "La rutina completa se mostrará aquí cuando esté integrada.",
-      });
+    toast({ title: "Generación de Rutina Iniciada (Simulación)", description: "La rutina completa se mostrará aquí cuando esté integrada." });
   };
-
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-0 flex flex-col h-[calc(100vh-8rem)] max-h-[800px] items-center">
@@ -395,21 +377,21 @@ export default function AIChatPage() {
           <CardTitle className="text-2xl font-bold text-primary">
             Chat con NutriChef AI
           </CardTitle>
-          <p className="text-muted-foreground text-sm">Tu asistente personal para recetas y consejos de cocina. ¡Ahora con voz!</p>
+          <p className="text-muted-foreground text-sm">Tu coach de fitness y nutrición. ¡Pregúntame lo que sea!</p>
         </CardHeader>
 
         {(!isQuestionnaireActive && !isQuestionnaireComplete && messages.length === 1 && messages[0].id === 'init-bot-welcome') && (
             <CardContent className="p-6 flex flex-col items-center justify-center">
-                <Button onClick={handleStartQuestionnaire} className="bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <Rocket className="mr-2 h-5 w-5" /> Comenzar Cuestionario
+                <Button onClick={handleStartQuestionnaire} className="bg-accent hover:bg-accent/90 text-accent-foreground text-base py-3 px-6">
+                    <Rocket className="mr-2 h-5 w-5" /> ¡Empecemos!
                 </Button>
-                <p className="text-xs text-muted-foreground mt-2">Ayúdame a entenderte mejor.</p>
+                <p className="text-xs text-muted-foreground mt-2">Responde unas preguntas para personalizar tu experiencia.</p>
             </CardContent>
         )}
 
         {isQuestionnaireActive && currentQuestionIndex < questionnaireQuestions.length && (
           <CardContent className="p-6 space-y-4">
-            <p className="text-lg font-semibold text-center text-primary">
+            <p className="text-lg font-semibold text-center text-primary mb-4">
               {questionnaireQuestions[currentQuestionIndex].text}
             </p>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -417,14 +399,14 @@ export default function AIChatPage() {
                 <Button
                   key={opt.value}
                   variant="outline"
-                  className="h-auto py-3 justify-center text-center"
+                  className="h-auto py-3 justify-center text-center text-sm hover:bg-primary/10 hover:border-primary"
                   onClick={() => handleQuestionnaireResponse(questionnaireQuestions[currentQuestionIndex].key, opt.value, opt.label)}
                 >
                   {opt.label}
                 </Button>
               ))}
             </div>
-             <p className="text-xs text-muted-foreground text-center mt-2">
+             <p className="text-xs text-muted-foreground text-center mt-3">
                 Pregunta {currentQuestionIndex + 1} de {questionnaireQuestions.length}
             </p>
           </CardContent>
@@ -491,16 +473,15 @@ export default function AIChatPage() {
           {isQuestionnaireComplete && (
             <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-2 text-center">¿No sabes qué preguntar? Prueba una de estas sugerencias:</p>
-                <div className="grid grid-cols-2 gap-2 mb-3">
-                    {suggestedPrompts.slice(0,2).map(promptText => (
-                        <Button key={promptText} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(promptText)} className="text-xs h-auto py-1.5">
-                            {promptText}
-                        </Button>
-                    ))}
-                </div>
-                 <div className="grid grid-cols-2 gap-2">
-                    {suggestedPrompts.slice(2,4).map(promptText => (
-                        <Button key={promptText} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(promptText)} className="text-xs h-auto py-1.5">
+                <div className="flex flex-wrap gap-2 justify-center mb-3">
+                    {suggestedPrompts.map(promptText => (
+                        <Button 
+                          key={promptText} 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => handleSuggestedPrompt(promptText)} 
+                          className="text-xs h-auto py-1.5 px-3 rounded-full border-primary/50 text-primary hover:bg-primary/10"
+                        >
                             {promptText}
                         </Button>
                     ))}
@@ -524,10 +505,10 @@ export default function AIChatPage() {
                 disabled={isLoading || isQuestionnaireActive} 
                 size="icon" 
                 variant={isListening ? "destructive" : "outline"}
-                className="shrink-0"
+                className={cn("shrink-0", isListening && "bg-destructive/20 border-destructive text-destructive animate-pulse")}
                 title={isListening ? "Detener grabación" : "Grabar voz"}
               >
-                <Mic className={cn("h-5 w-5", isListening && "animate-pulse")} />
+                <Mic className="h-5 w-5" />
                 <span className="sr-only">{isListening ? "Detener grabación" : "Grabar voz"}</span>
               </Button>
             )}
@@ -542,3 +523,5 @@ export default function AIChatPage() {
   );
 }
 
+
+    
