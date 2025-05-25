@@ -62,11 +62,24 @@ const aiSuggestionsFlow = ai.defineFlow(
     outputSchema: AISuggestionsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
+    let promptCallResult;
+    try {
+      promptCallResult = await prompt(input);
+    } catch (e: any) {
+      console.error('Error directly from prompt() call in aiSuggestionsFlow:', e);
+      let message = 'Error al llamar al modelo de IA base para sugerencias.';
+      if (e && e.message) {
+        message += ` Detalles: ${e.message}`;
+      }
+      // Re-throw as a standard error to be caught by the action
+      throw new Error(message);
+    }
+
+    const {output} = promptCallResult; // output is AISuggestionsOutput | undefined
     
     if (!output) {
       console.error('AI model did not return an output for aiSuggestionsFlow. Output was null or undefined. Input:', input);
-      throw new Error('El modelo de IA no devolvió una salida. La salida fue nula o indefinida.');
+      throw new Error('El modelo de IA no devolvió una salida (output fue nulo o indefinido).');
     }
     
     const parsedOutput = AISuggestionsOutputSchema.safeParse(output);
@@ -77,3 +90,4 @@ const aiSuggestionsFlow = ai.defineFlow(
     return parsedOutput.data;
   }
 );
+
