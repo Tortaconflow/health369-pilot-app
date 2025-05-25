@@ -32,7 +32,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${roboto.variable} ${montserrat.variable} antialiased`}>
+      <body className={`${roboto.variable} ${montserrat.variable} antialiased`} suppressHydrationWarning={true}>
         <QueryProvider>
           <SidebarProvider defaultOpen={true}>
             <AppShell>
