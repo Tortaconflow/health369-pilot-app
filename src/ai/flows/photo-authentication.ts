@@ -43,6 +43,8 @@ export async function authenticatePhoto(input: AuthenticatePhotoInput): Promise<
   return authenticatePhotoFlow(input);
 }
 
+// This prompt describes the overall capability, but the actual image generation
+// within the flow uses a more direct prompt to the image model.
 const authenticatePhotoPrompt = ai.definePrompt({
   name: 'authenticatePhotoPrompt',
   input: {schema: AuthenticatePhotoInputSchema},
@@ -64,9 +66,9 @@ const authenticatePhotoPrompt = ai.definePrompt({
   Ensure the watermarkedPhotoDataUri is correctly formatted. If checkManipulation is false, return the original photo with just the watermark.
 
   Output format:
-  \"watermarkedPhotoDataUri\": \"data:<mimetype>;base64,<encoded_data>\",
-  \"manipulationDetected\": <true|false>,
-  \"detectionDetails\": \"<details about manipulation>\"
+  "watermarkedPhotoDataUri": "data:<mimetype>;base64,<encoded_data>",
+  "manipulationDetected": <true|false>,
+  "detectionDetails": "<details about manipulation>"
   `,
 });
 
@@ -77,14 +79,22 @@ const authenticatePhotoFlow = ai.defineFlow(
     outputSchema: AuthenticatePhotoOutputSchema,
   },
   async input => {
+    const now = new Date();
+    // Using Spanish locale as the app is in Spanish
+    const formattedDateTime = now.toLocaleString('es-ES', {
+      year: 'numeric', month: '2-digit', day: '2-digit',
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const watermarkText = `Health369 - ${formattedDateTime}`;
+
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-exp',
+      model: 'googleai/gemini-2.0-flash-exp', // This model supports image generation/editing
       prompt: [
         {media: {url: input.photoDataUri}},
-        {text: 'Add a watermark with the current date and time.'},
+        {text: `Add a visible watermark to this image with the text: "${watermarkText}". Place it in a standard watermark position (e.g., bottom right), ensuring it's legible but not too obstructive.`},
       ],
       config: {
-        responseModalities: ['TEXT', 'IMAGE'],
+        responseModalities: ['TEXT', 'IMAGE'], // Gemini requires TEXT even if only IMAGE is primary
       },
     });
 
@@ -92,15 +102,34 @@ const authenticatePhotoFlow = ai.defineFlow(
     let detectionDetails = '';
 
     if (input.checkManipulation) {
-      // Simulate manipulation detection (replace with actual AI model call later)
-      manipulationDetected = Math.random() < 0.5; // 50% chance of detecting manipulation
-      if (manipulationDetected) {
-        detectionDetails = 'Possible inconsistencies in lighting and shadows detected.';
+      // Simulate manipulation detection (replace with actual AI model call later if needed)
+      // For a real check, you might use a different AI model or service here.
+      const { output: manipulationCheckOutput } = await ai.generate({
+        model: ai.registry.getModel('googleai/gemini-2.0-flash'), // Using a text model for analysis
+        prompt: [
+          {media: {url: input.photoDataUri}},
+          {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with a JSON object: {"manipulationDetected": boolean, "detectionDetails": "string describing findings or "No obvious manipulation detected."}'}
+        ],
+        output: {
+          schema: z.object({
+            manipulationDetected: z.boolean(),
+            detectionDetails: z.string()
+          })
+        }
+      });
+      
+      if (manipulationCheckOutput) {
+        manipulationDetected = manipulationCheckOutput.manipulationDetected;
+        detectionDetails = manipulationCheckOutput.detectionDetails;
+      } else {
+        // Fallback if the manipulation check model doesn't respond as expected
+        manipulationDetected = false; // Or true, depending on desired default
+        detectionDetails = 'La verificación de manipulación no pudo completarse.';
       }
     }
 
     return {
-      watermarkedPhotoDataUri: media.url,
+      watermarkedPhotoDataUri: media.url, // This is the data URI of the generated (watermarked) image
       manipulationDetected: manipulationDetected,
       detectionDetails: detectionDetails,
     };
