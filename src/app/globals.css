@@ -25,8 +25,8 @@ a {
 
 @layer base {
   :root {
-    --background: 130 77% 85%; /* #B9F6CA - Verde Esmeralda claro */
-    --foreground: 0 0% 13%; /* #212121 - Negro */
+    --background: 130 77% 85%; /* #B9F6CA - Verde Esmeralda claro (Light mode background) */
+    --foreground: 0 0% 13%; /* #212121 - Negro (Light mode text) */
 
     --card: 0 0% 100%; /* #FFFFFF - Blanco */
     --card-foreground: 0 0% 13%; /* #212121 - Negro */
@@ -34,16 +34,16 @@ a {
     --popover: 0 0% 100%; /* #FFFFFF - Blanco */
     --popover-foreground: 0 0% 13%; /* #212121 - Negro */
 
-    --primary: 122 47% 34%; /* #2E7D32 - Verde Esmeralda */
+    --primary: 122 47% 34%; /* #2E7D32 - Verde Esmeralda (Light mode primary) */
     --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
-    --secondary: 199 98% 48%; /* #03A9F4 - Azul Suave */
+    --secondary: 199 98% 48%; /* #03A9F4 - Azul Suave (Light mode secondary) */
     --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
     --muted: 0 0% 88%; /* #E0E0E0 - Gris Claro */
     --muted-foreground: 0 0% 30%; /* Darker gray for contrast on muted */
 
-    --accent: 14 100% 57%; /* #FF5722 - Naranja Vibrante */
+    --accent: 14 100% 57%; /* #FF5722 - Naranja Vibrante (Light mode accent) */
     --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
     --destructive: 0 84.2% 60.2%;
@@ -55,18 +55,18 @@ a {
 
     --radius: 0.75rem; /* 12px */
 
-    /* Custom Sidebar Vars - Light Mode */
-    --sidebar-background: 0 0% 88%; /* #E0E0E0 - Gris Claro */
+    /* Custom Sidebar Vars - Light Mode (Matches general light theme) */
+    --sidebar-background: 0 0% 96%; /* #F5F5F5 - Gris Claro (Similar to input bg) */
     --sidebar-foreground: 122 47% 34%; /* #2E7D32 - Verde Esmeralda (icons, text) */
     --sidebar-primary: 14 100% 57%; /* #FF5722 - Naranja Vibrante (active item background) */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco (active item text) */
     --sidebar-accent: 14 100% 60%; /* #FF6D3B - Lighter Naranja (hover item background) */
     --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (hover item text) */
-    --sidebar-border: 0 0% 80%; /* Darker gray for sidebar border */
+    --sidebar-border: 0 0% 88%; /* #E0E0E0 - Gris Claro (Muted color) */
     --sidebar-ring: 14 100% 57%; /* Naranja */
 
 
-    --chart-1: 12 76% 61%; /* Default, can be updated if specific chart colors are in PRD */
+    --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
     --chart-4: 43 74% 66%;
@@ -74,43 +74,43 @@ a {
   }
 
   .dark {
-    --background: 0 0% 13%; /* #212121 - Negro */
-    --foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --background: 273 73% 31%; /* #4A148C - Morado Oscuro (Dark mode background) */
+    --foreground: 0 0% 100%; /* #FFFFFF - Blanco (Dark mode text) */
 
-    --card: 0 0% 18%; /* Darker gray for cards */
+    --card: 273 60% 25%; /* Darker purple/gray for cards, e.g. #3A0F6B */
     --card-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
-    --popover: 0 0% 18%; /* Darker gray for popovers */
+    --popover: 273 60% 22%; /* Even darker for popovers, e.g. #310D5A */
     --popover-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
-    --primary: 122 47% 40%; /* #388E3C - Lighter Verde Esmeralda */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --primary: 122 47% 55%; /* Lighter Verde Esmeralda for primary actions in dark, e.g., #5CB85C */
+    --primary-foreground: 0 0% 13%; /* #212121 - Negro (for contrast on lighter green) */
 
-    --secondary: 199 98% 55%; /* #29B6F6 - Lighter Azul Suave */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --secondary: 199 98% 60%; /* Lighter Azul Suave for dark, e.g., #4FC3F7 */
+    --secondary-foreground: 0 0% 13%; /* #212121 - Negro */
 
-    --muted: 0 0% 25%; /* Slightly lighter gray than card */
-    --muted-foreground: 0 0% 70%; /* Lighter gray for muted text */
+    --muted: 273 50% 38%; /* Muted purple, e.g., #5C2E8C */
+    --muted-foreground: 0 0% 80%; /* Lighter gray/purple for text on muted */
 
-    --accent: 122 47% 40%; /* #388E3C - Verde Esmeralda (for accents in dark mode) */
+    --accent: 122 47% 45%; /* #4CAF50 - Verde Esmeralda (Dark mode accent) */
     --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
     --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 22%; /* Gray between card and background */
-    --input: 0 0% 20%; /* Similar to card background, or slightly lighter */
-    --ring: 122 47% 40%; /* Verde Esmeralda for focus rings */
+    --border: 273 50% 45%; /* Subtle border color against dark purple, e.g., #7E4ABF */
+    --input: 273 60% 35%; /* Input background, e.g., #531CA6 */
+    --ring: 122 47% 45%; /* Verde Esmeralda for focus rings (#4CAF50) */
 
     /* Custom Sidebar Dark Vars */
-    --sidebar-background: 0 0% 10%; /* Very dark gray */
-    --sidebar-foreground: 122 47% 50%; /* Lighter Verde Esmeralda for text/icons */
-    --sidebar-primary: 122 47% 40%; /* Verde Esmeralda (active item background - same as dark accent) */
+    --sidebar-background: 273 70% 25%; /* Darker shade of main bg, e.g. #310D5A */
+    --sidebar-foreground: 122 47% 70%; /* Lighter Verde Esmeralda for text/icons, e.g., #81C784 */
+    --sidebar-primary: 122 47% 45%; /* Verde Esmeralda (active item background - same as dark accent) */
     --sidebar-primary-foreground: 0 0% 100%; /* White (active item text) */
-    --sidebar-accent: 122 47% 30%; /* Darker Verde Esmeralda (hover item background) */
+    --sidebar-accent: 122 47% 35%; /* Darker Verde Esmeralda (hover item background), e.g., #388E3C */
     --sidebar-accent-foreground: 0 0% 90%; /* Off-white (hover item text) */
-    --sidebar-border: 0 0% 15%;
-    --sidebar-ring: 122 47% 40%; /* Verde Esmeralda */
+    --sidebar-border: 273 60% 30%; /* e.g. #451282 */
+    --sidebar-ring: 122 47% 45%; /* Verde Esmeralda */
   }
 }
 
