@@ -11,9 +11,9 @@ import MachineInfoCard from "@/components/workouts/MachineInfoCard";
 const mockWorkouts: Workout[] = [
   {
     id: "gym_routine_001",
-    name: "Pectoral + Espalda + Glúteos",
-    dayDescription: "1 día de entrenamiento",
-    estimatedTime: "~1h. 42 min.",
+    name: "Enfoque Torso y Core (Gimnasio)",
+    dayDescription: "Fuerza para la parte superior y estabilidad del core",
+    estimatedTime: "~1h. 30 min.",
     targetAudience: "para hombres y mujeres",
     type: "gym",
     progress: 0,
@@ -219,3 +219,4 @@ export default function WorkoutsPage() {
     </div>
   );
 }
+
