@@ -21,7 +21,11 @@ const RequiredWorkoutDataContextSchema = z.object({
   // Campos opcionales que también pueden estar en el contexto del usuario:
   limitations: z.array(z.string()).optional().describe("Limitaciones físicas o lesiones."),
   preferredStyle: z.string().optional().describe("Estilo de entrenamiento preferido (HIT, fuerza, etc.)."),
-  availableEquipment: z.array(z.string()).optional().describe("Equipamiento disponible.")
+  availableEquipment: z.array(z.string()).optional().describe("Equipamiento disponible."),
+  averageSleepHours: z.number().optional().describe("Horas de sueño promedio."),
+  restingHeartRate: z.number().optional().describe("Frecuencia cardíaca en reposo."),
+  recentActivitySummary: z.string().optional().describe("Resumen de actividad reciente."),
+  stressLevel: z.enum(['bajo', 'medio', 'alto']).optional().describe("Nivel de estrés percibido.")
 });
 export type RequiredWorkoutData = z.infer<typeof RequiredWorkoutDataContextSchema>;
 
@@ -31,8 +35,6 @@ const RecipeChatInputSchema = z.object({
     role: z.enum(['user', 'assistant']),
     content: z.string(),
   })).optional().describe('Historial de la conversación previa para mantener el contexto.'),
-  // Podríamos pasar el contexto del usuario ya parseado si lo tenemos en el frontend.
-  // Por ahora, el prompt lo extraerá de userQuery si está presente.
 });
 export type RecipeChatInput = z.infer<typeof RecipeChatInputSchema>;
 
@@ -54,7 +56,7 @@ const recipeChatPrompt = ai.definePrompt({
 Debes responder de forma amigable, clara y concisa.
 
 CONTEXTO DEL USUARIO:
-Al inicio de la conversación, el usuario podría proporcionar un bloque de texto que comienza con "Contexto del usuario:". Este contexto contiene sus preferencias y objetivos (ej. objetivo principal, experiencia, preferencia de recetas, uso de wearable, nivel de fitness, días de entreno, tiempo por sesión, etc.). DEBES utilizar esta información para personalizar profundamente tus respuestas.
+Al inicio de la conversación, el usuario podría proporcionar un bloque de texto que comienza con "Contexto del usuario:". Este contexto contiene sus preferencias y objetivos (ej. objetivo principal, experiencia, preferencia de recetas, uso de wearable, nivel de fitness, días de entreno, tiempo por sesión, horas de sueño, RHR, actividad reciente, estrés, etc.). DEBES utilizar esta información para personalizar profundamente tus respuestas.
 
 TAREAS PRINCIPALES:
 
@@ -70,14 +72,14 @@ TAREAS PRINCIPALES:
         *   Metas principales (goals - ej. ['perder peso', 'ganar músculo']).
         *   Tiempo disponible por sesión (timeAvailablePerSession - ej. '30 minutos', '1 hora').
         *   Número de días a la semana para entrenar (daysPerWeek - ej. 3, 5).
-    *   Datos opcionales pero útiles son: limitaciones, estilo de entrenamiento preferido, equipamiento disponible.
+    *   Datos opcionales pero útiles son: limitaciones, estilo de entrenamiento preferido, equipamiento disponible, horas de sueño promedio, frecuencia cardíaca en reposo, resumen de actividad reciente, nivel de estrés.
     *   Si el "Contexto del usuario" NO proporciona alguno de los datos **requeridos**, tu respuesta DEBE SER una pregunta para obtener los detalles faltantes de forma amigable. Sé específico sobre lo que falta.
         Ejemplo si falta tiempo y días: "¡Claro que puedo ayudarte con una rutina! Para diseñarla lo mejor posible, necesitaría saber un poco más. Por ejemplo, ¿cuántos días a la semana te gustaría entrenar y cuánto tiempo tienes para cada sesión?"
         Ejemplo si falta el nivel: "Entendido. Para crear una rutina efectiva, ¿podrías indicarme cuál consideras que es tu nivel de fitness actual (principiante, intermedio o avanzado)?"
     *   NO intentes generar una rutina de ejercicios tú mismo en este flujo. Solo recopila la información.
     *   Una vez que tengas TODOS los datos **requeridos** (fitnessLevel, goals, timeAvailablePerSession, daysPerWeek), DEBES preguntar al usuario si desea proceder. Responde con la siguiente frase EXACTA o una muy similar para que el sistema pueda detectarla:
         "¡Excelente! Con la información que me has proporcionado, ya tenemos una buena base para diseñar tu rutina. ¿Quieres que procedamos a generar una propuesta de entrenamiento personalizada para ti?"
-        (Si también tienes datos opcionales, puedes mencionarlos brevemente: "Teniendo en cuenta tu nivel {fitnessLevel}, tus metas {goals}, que entrenarás {daysPerWeek} días por {timeAvailablePerSession} y tu preferencia por {preferredStyle}, podemos diseñar algo genial.")
+        (Si también tienes datos opcionales, puedes mencionarlos brevemente: "Teniendo en cuenta tu nivel {fitnessLevel}, tus metas {goals}, que entrenarás {daysPerWeek} días por {timeAvailablePerSession}, tu preferencia por {preferredStyle} y tus datos de sueño ({averageSleepHours} horas) y actividad reciente ({recentActivitySummary}), podemos diseñar algo genial.")
 
 SUGERENCIAS PROACTIVAS:
 Si el usuario no sabe qué preguntar, puedes ofrecer proactivamente sugerencias como:
@@ -120,3 +122,4 @@ const recipeChatFlow = ai.defineFlow(
     return output;
   }
 );
+

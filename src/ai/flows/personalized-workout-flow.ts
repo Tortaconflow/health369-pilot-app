@@ -19,7 +19,11 @@ const PersonalizedWorkoutInputSchema = z.object({
   daysPerWeek: z.coerce.number().min(1).max(7).describe("Número de días a la semana disponibles para entrenar."),
   limitations: z.array(z.string()).optional().describe("Limitaciones físicas o lesiones (ej. 'dolor de rodilla', 'problemas de espalda'). Si no hay, puede ser un array vacío o no incluirse."),
   preferredStyle: z.enum(['hit', 'fuerza_resistencia', 'mixto', 'hipertrofia', 'funcional']).optional().describe("Estilo de entrenamiento preferido: Alta Intensidad (HIT), Fuerza y Resistencia, Hipertrofia (construcción muscular), Funcional o Mixto."),
-  availableEquipment: z.array(z.string()).optional().describe("Equipamiento disponible (ej. 'mancuernas', 'bandas de resistencia', 'acceso completo a gimnasio'). Si es solo peso corporal, indicarlo.")
+  availableEquipment: z.array(z.string()).optional().describe("Equipamiento disponible (ej. 'mancuernas', 'bandas de resistencia', 'acceso completo a gimnasio'). Si es solo peso corporal, indicarlo."),
+  averageSleepHours: z.number().optional().describe("Horas de sueño promedio por noche durante la última semana."),
+  restingHeartRate: z.number().optional().describe("Frecuencia cardíaca en reposo (pulsaciones por minuto)."),
+  recentActivitySummary: z.string().optional().describe("Breve resumen de la actividad física reciente, ej. '3 sesiones de cardio ligero, 2 de fuerza moderada en los últimos 7 días', 'sedentario esta semana'."),
+  stressLevel: z.enum(['bajo', 'medio', 'alto']).optional().describe("Nivel de estrés percibido por el usuario (bajo, medio, alto).")
 });
 export type PersonalizedWorkoutInput = z.infer<typeof PersonalizedWorkoutInputSchema>;
 
@@ -85,6 +89,20 @@ Considera los siguientes datos del usuario:
 - Equipamiento Disponible: Asume acceso a un gimnasio estándar si no se especifica, o prioriza peso corporal si es más coherente con el perfil.
 {{/if}}
 
+Datos Biométricos y de Estilo de Vida (si se proporcionan):
+{{#if averageSleepHours~}}
+- Horas de Sueño Promedio: {{{averageSleepHours}}} horas/noche (Considera esto para la intensidad y recuperación).
+{{/if}}
+{{#if restingHeartRate~}}
+- Frecuencia Cardíaca en Reposo: {{{restingHeartRate}}} ppm (Puede indicar nivel de fitness o sobreentrenamiento).
+{{/if}}
+{{#if recentActivitySummary~}}
+- Resumen de Actividad Reciente: {{{recentActivitySummary}}} (Ajusta el volumen y la intensidad según la actividad previa).
+{{/if}}
+{{#if stressLevel~}}
+- Nivel de Estrés Percibido: {{{stressLevel}}} (Niveles altos de estrés pueden requerir menor volumen/intensidad o más enfoque en la recuperación).
+{{/if}}
+
 La rutina debe:
 1.  Ser realista y ejecutable según el tiempo disponible y los días por semana.
 2.  Incluir ejercicios fundamentales que trabajen los principales grupos musculares de forma equilibrada.
@@ -92,8 +110,9 @@ La rutina debe:
 4.  Detallar claramente series, repeticiones (o duración), y tiempos de descanso para cada ejercicio.
 5.  Incluir sugerencias para el calentamiento y enfriamiento para cada día de entrenamiento.
 6.  Proporcionar una estrategia clara para la progresión gradual (cómo el usuario puede seguir mejorando con el tiempo).
-7.  Ofrecer consejos prácticos sobre recuperación (sueño, descanso activo, etc.).
+7.  Ofrecer consejos prácticos sobre recuperación (sueño, descanso activo, etc.), especialmente si se proporcionan datos biométricos.
 8.  Brindar pautas generales de nutrición que complementen la rutina y los objetivos del usuario.
+9.  Si se proporcionan datos biométricos o de estilo de vida (sueño, estrés, actividad reciente, RHR), AJUSTA la intensidad, el volumen, la frecuencia o las recomendaciones de recuperación de la rutina. Por ejemplo, si el sueño es bajo o el estrés es alto, la rutina podría ser más corta, menos intensa, o tener más días de descanso o recuperación activa. Si la actividad reciente fue muy alta, considera una sesión más ligera o de recuperación.
 
 MUY IMPORTANTE: Debes producir ÚNICAMENTE un objeto JSON válido como respuesta, sin ningún otro texto, explicaciones o formato markdown (como \`\`\`json) antes o después del objeto JSON.
 El objeto JSON DEBE seguir estrictamente la estructura definida por el esquema de salida. Asegúrate de que todos los campos requeridos estén presentes.
@@ -101,8 +120,8 @@ El objeto JSON DEBE seguir estrictamente la estructura definida por el esquema d
 Ejemplo de estructura de salida JSON (los valores son solo ejemplos ilustrativos, genera el contenido real basado en la entrada del usuario):
 {
   "workoutName": "Plan de Hipertrofia Intermedio - 4 Días",
-  "description": "Rutina enfocada en la ganancia de masa muscular para usuarios con experiencia intermedia.",
-  "trainingPrinciplesApplied": ["Sobrecarga progresiva", "Volumen de entrenamiento moderado-alto", "Enfoque en tiempo bajo tensión"],
+  "description": "Rutina enfocada en la ganancia de masa muscular para usuarios con experiencia intermedia, ajustada por datos de sueño.",
+  "trainingPrinciplesApplied": ["Sobrecarga progresiva", "Volumen de entrenamiento moderado-alto", "Enfoque en tiempo bajo tensión", "Adaptación por recuperación"],
   "routineStructure": {
     "daysPerWeek": 4,
     "splitDescription": "Torso/Pierna (Upper/Lower)",
@@ -122,7 +141,7 @@ Ejemplo de estructura de salida JSON (los valores son solo ejemplos ilustrativos
     ]
   },
   "progressionStrategy": "Intenta añadir 2.5kg o 1-2 repeticiones a tus levantamientos principales cada semana. Para ejercicios de aislamiento, enfócate en mejorar la conexión mente-músculo y alcanzar el rango alto de repeticiones antes de subir peso.",
-  "recoveryRecommendations": "Duerme entre 7-9 horas. Mantén una hidratación adecuada. Considera el foam rolling o masajes ligeros en días de descanso. No entrenes si sientes dolor agudo.",
+  "recoveryRecommendations": "Duerme entre 7-9 horas. Si reportaste menos sueño, considera una siesta o prioriza el descanso. Mantén una hidratación adecuada. Considera el foam rolling o masajes ligeros en días de descanso. No entrenes si sientes dolor agudo.",
   "nutritionGuidelines": "Asegura una ingesta de proteínas de al menos 1.8g/kg de peso corporal. Consume un ligero superávit calórico si el objetivo principal es la hipertrofia. Prioriza alimentos integrales y minimiza procesados."
 }
 
@@ -137,7 +156,7 @@ const personalizedWorkoutFlow = ai.defineFlow(
     outputSchema: PersonalizedWorkoutOutputSchema,
   },
   async (input) => {
-    console.log("Generando rutina personalizada para:", input.userId || 'usuario desconocido', "Nivel:", input.fitnessLevel, "Metas:", input.goals.join(', '));
+    console.log("Generando rutina personalizada para:", input.userId || 'usuario desconocido', "Nivel:", input.fitnessLevel, "Metas:", input.goals.join(', '), "Sueño (avg):", input.averageSleepHours);
     
     const {output} = await workoutPrompt(input);
 
@@ -146,8 +165,6 @@ const personalizedWorkoutFlow = ai.defineFlow(
       throw new Error('El modelo de IA no pudo generar una rutina en este momento. La salida fue nula o indefinida.');
     }
     
-    // Genkit debería haber parseado según PersonalizedWorkoutOutputSchema.
-    // Esta validación explícita es una salvaguarda.
     const parsedOutput = PersonalizedWorkoutOutputSchema.safeParse(output);
     if (!parsedOutput.success) {
         console.error("PersonalizedWorkoutOutputSchema parsing failed in flow. Input:", input, "Raw Output:", JSON.stringify(output, null, 2), "Zod Errors:", parsedOutput.error.flatten());
