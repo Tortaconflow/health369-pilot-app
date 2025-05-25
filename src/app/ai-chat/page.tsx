@@ -127,8 +127,8 @@ export default function AIChatPage() {
   
   const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: string, answerLabel: string) => {
     setUserPreferences(prev => ({ ...prev, [questionKey]: answerLabel }));
-    setMessages(prev => [...prev, {id: `user-q-${questionKey}`, role: 'user', content: `${questionnaireQuestions[currentQuestionIndex].text}\nMi respuesta: ${answerLabel}`}]);
-
+    // Solo añadir la respuesta del usuario al historial del chat
+    setMessages(prev => [...prev, {id: `user-q-ans-${questionKey}-${Date.now()}`, role: 'user', content: answerLabel}]);
 
     if (currentQuestionIndex < questionnaireQuestions.length - 1) {
       setCurrentQuestionIndex(prev => prev + 1);
@@ -174,14 +174,17 @@ export default function AIChatPage() {
     setIsLoading(true);
 
     const chatHistoryForAPI = messages
-        .filter(msg => !(msg.id === 'init-bot-welcome' || msg.id === 'init-bot-ready' || msg.id === 'bot-q-complete' || msg.id.startsWith('user-q-')))
+        // Filtramos los mensajes de bienvenida/cuestionario que no deben ir al historial de la API
+        .filter(msg => !['init-bot-welcome', 'init-bot-ready', 'bot-q-complete'].includes(msg.id) && !msg.id.startsWith('user-q-ans-'))
+        // Tomamos los últimos mensajes del usuario que son respuestas del cuestionario y el mensaje "Sí, quiero responder"
+        .concat(messages.filter(msg => msg.id.startsWith('user-q-ans-') || msg.id === 'user-start-q'))
         .map(msg => ({ role: msg.role, content: msg.content }));
     
     if (isQuestionnaireComplete && Object.keys(userPreferences).length > 0) {
         const preferencesContext = formatPreferencesForAI();
-        // Add context at the beginning of history for the AI, or prepend to the query
-        // For this example, we'll prepend to the current query if it's the first "real" query after questionnaire
-        if (chatHistoryForAPI.filter(m => m.role === 'user').length <= 1) { // if this is the first or second user message (first being "start questionnaire")
+        // Añadimos el contexto de preferencias al inicio de la primera consulta "real" después del cuestionario
+        const userRealQueries = chatHistoryForAPI.filter(m => m.role === 'user' && m.content === query);
+        if (userRealQueries.length === 1) { 
             currentInput = `${preferencesContext} Mi pregunta es: ${currentInput}`;
         }
     }
@@ -227,8 +230,8 @@ export default function AIChatPage() {
   };
 
   const handleSuggestedPrompt = (prompt: string) => {
-    setInput(prompt); // Set input field with the prompt
-    handleSubmit(undefined, prompt); // Directly submit
+    setInput(prompt); 
+    handleSubmit(undefined, prompt); 
   };
 
 
@@ -369,3 +372,4 @@ export default function AIChatPage() {
     </div>
   );
 }
+
