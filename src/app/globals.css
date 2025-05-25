@@ -25,28 +25,28 @@ a {
 
 
 @layer base {
-  /* --- ESTÁNDAR THEME (HEALTH369 PILOT DEFAULT) --- */
+  /* --- ESTÁNDAR THEME (HEALTH369 PILOT - REVISED VIBRANT) --- */
   :root {
-    --background: 192 75% 92.9%; /* #E0F7FA - Very Light Blue */
-    --foreground: 210 10% 23%;    /* #2F3B4C - Dark Slate Blue/Gray (for text) */
+    --background: 0 0% 96%; /* #F5F5F5 - Gris Claro */
+    --foreground: 0 0% 13%;    /* #212121 - Negro */
 
     --card: 0 0% 100%;             /* #FFFFFF - Blanco */
-    --card-foreground: 210 10% 23%; /* #2F3B4C */
+    --card-foreground: 0 0% 13%; /* #212121 - Negro */
 
     --popover: 0 0% 100%;          /* #FFFFFF - Blanco */
-    --popover-foreground: 210 10% 23%; /* #2F3B4C */
+    --popover-foreground: 0 0% 13%; /* #212121 - Negro */
 
-    --primary: 195 69% 61%;       /* #5BC0DE - Light Blue */
+    --primary: 122 49% 34%;       /* #2E7D32 - Verde Esmeralda */
     --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
-    --secondary: 199 98% 48%;     /* #03A9F4 - Azul Suave (original, consistent for links) */
+    --secondary: 199 98% 48%;     /* #03A9F4 - Azul Suave */
     --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
-    --muted: 195 30% 90%;         /* #DCE7EA - Lighter version of background/border for muted states */
-    --muted-foreground: 210 10% 45%;  /* #647083 - Muted text */
+    --muted: 0 0% 94%;         /* #F0F0F0 - Gris más claro */
+    --muted-foreground: 0 0% 40%;  /* #666666 - Gris Oscuro para texto muted */
 
-    --accent: 150 49% 66%;        /* #8ADAB2 - Light Green */
-    --accent-foreground: 210 10% 23%;  /* Dark text for good contrast on light green */
+    --accent: 14 100% 57%;        /* #FF5722 - Naranja Vibrante */
+    --accent-foreground: 0 0% 100%;  /* #FFFFFF - Blanco (para Naranja Vibrante) */
     
     --cta-button: 14 100% 57%;      /* #FF5722 - Naranja Vibrante (for primary buttons) */
     --cta-button-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
@@ -54,70 +54,70 @@ a {
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 195 30% 85%;         /* #C9DDE3 - Slightly darker blue-gray for borders */
-    --input: 195 30% 97%;          /* #F0F5F7 - Very light blue-gray for input backgrounds */
-    --ring: 195 69% 61%;          /* #5BC0DE - Light Blue for focus rings */
+    --border: 0 0% 88%;         /* #E0E0E0 - Gris Claro */
+    --input: 0 0% 92%;          /* #EBEDF0 - Gris muy claro para input backgrounds */
+    --ring: 122 49% 34%;          /* #2E7D32 - Verde Esmeralda para focus rings */
 
     --radius: 0.75rem; /* 12px */
 
-    /* Standard Sidebar Vars - Light Mode (Health369 Pilot) */
-    --sidebar-background: 0 0% 96%;   /* #F5F5F5 - Gris Claro (consistent) */
-    --sidebar-foreground: 150 49% 66%; /* #8ADAB2 - Light Green (Verde Esmeralda for icons/text) */
-    --sidebar-primary: 14 100% 57%;    /* #FF5722 - Naranja Vibrante (for active/CTA in sidebar) */
+    /* Standard Sidebar Vars - Light Mode (Health369 Pilot - Revised Vibrant) */
+    --sidebar-background: 0 0% 96%;   /* #F5F5F5 - Gris Claro */
+    --sidebar-foreground: 122 49% 34%; /* #2E7D32 - Verde Esmeralda (for icons/text) */
+    --sidebar-primary: 14 100% 57%;    /* #FF5722 - Naranja Vibrante (for active in sidebar) */
     --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
     --sidebar-accent: 14 100% 57%;     /* #FF5722 - Naranja Vibrante (for hover background) */
     --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (for hover text) */
-    --sidebar-border: 0 0% 88%;       /* #E0E0E0 - Gris Claro (consistent) */
+    --sidebar-border: 0 0% 88%;       /* #E0E0E0 - Gris Claro */
     --sidebar-ring: 14 100% 57%;       /* Naranja Vibrante for ring in sidebar context */
 
-    --chart-1: 195 50% 50%; /* Shades of Light Blue */
-    --chart-2: 150 40% 55%; /* Shades of Light Green */
-    --chart-3: 199 70% 50%; /* Shades of Azul Suave */
-    --chart-4: 210 30% 60%; /* Neutral blue-gray */
-    --chart-5: 14 80% 60%;  /* Shades of Naranja */
+    --chart-1: 122 49% 45%; /* Shades of Verde Esmeralda */
+    --chart-2: 14 100% 65%; /* Shades of Naranja Vibrante */
+    --chart-3: 199 98% 55%; /* Shades of Azul Suave */
+    --chart-4: 0 0% 50%; /* Neutral Gray */
+    --chart-5: 45 100% 57%;  /* Amarillo Suave #FFCA28 (from vibrante theme, could be used) */
   }
 
-  .dark { /* ESTÁNDAR THEME - DARK (Morado Oscuro + Light Blue/Light Green Accents) */
-    --background: 273 73% 17%; /* #2B0B50 - Morado Oscuro más profundo */
-    --foreground: 0 0% 95%;    /* #F2F2F2 - Blanco */
+  .dark { /* ESTÁNDAR THEME - DARK (REVISED VIBRANT) */
+    --background: 0 0% 10%; /* #1A1A1A - Very Dark Gray */
+    --foreground: 0 0% 95%;    /* #F2F2F2 - Blanco Hueso */
 
-    --card: 273 60% 22%;       /* #36105A - Morado más oscuro para tarjetas */
+    --card: 0 0% 13%;       /* #212121 - Dark Gray for cards */
     --card-foreground: 0 0% 95%; /* #F2F2F2 - Blanco */
 
-    --popover: 273 60% 18%;    /* #2C0D4A - Aún más oscuro para popovers */
+    --popover: 0 0% 8%;    /* #141414 - Even darker for popovers */
     --popover-foreground: 0 0% 95%; /* #F2F2F2 - Blanco */
 
-    --primary: 195 69% 70%;    /* #7CCEE8 - Light Blue (lighter for dark mode) */
-    --primary-foreground: 273 73% 10%; /* Dark purple for contrast */
+    --primary: 122 49% 55%;    /* #4CAF50 - Verde Esmeralda (lighter for dark mode) */
+    --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco para contraste */
 
-    --secondary: 199 98% 65%;  /* #66CFFF - Azul Suave (lighter) */
-    --secondary-foreground: 273 73% 10%;
+    --secondary: 199 98% 60%;  /* #29B6F6 - Azul Suave (lighter) */
+    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco para contraste */
 
-    --muted: 273 50% 25%;      /* #3D1F5C - Morado apagado */
-    --muted-foreground: 0 0% 75%; /* #BFBFBF - Gris claro para texto */
+    --muted: 0 0% 18%;      /* #2E2E2E - Dark muted gray */
+    --muted-foreground: 0 0% 70%; /* #B3B3B3 - Gris claro para texto */
 
-    --accent: 150 49% 70%;     /* #9DE1BC - Light Green (lighter for dark mode) */
-    --accent-foreground: 273 73% 10%;
+    --accent: 14 100% 65%;     /* #FF8A65 - Naranja Vibrante (lighter for dark mode) */
+    --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
     
-    --cta-button: 14 100% 60%; /* #FF6D3B - Naranja Vibrante (lighter for dark mode) */
-    --cta-button-foreground: 0 0% 100%;
+    --cta-button: 14 100% 65%; /* #FF8A65 - Naranja Vibrante (lighter for dark mode) */
+    --cta-button-foreground: 0 0% 100%; /* #FFFFFF */
 
     --destructive: 0 70% 55%; /* Slightly adjusted red for dark */
     --destructive-foreground: 0 0% 98%;
 
-    --border: 273 50% 30%;     /* #4A2473 - Borde morado sutil */
-    --input: 273 60% 25%;      /* #3C1363 - Fondo de input morado */
-    --ring: 195 69% 70%;       /* Light Blue for focus rings */
+    --border: 0 0% 25%;     /* #404040 - Borde gris oscuro sutil */
+    --input: 0 0% 15%;      /* #262626 - Fondo de input gris oscuro */
+    --ring: 122 49% 55%;       /* Lighter Verde Esmeralda for focus rings */
 
-    /* Standard Sidebar Vars - Dark Mode */
-    --sidebar-background: 273 70% 15%; /* #24083E - Morado muy oscuro para sidebar */
-    --sidebar-foreground: 150 49% 70%; /* #9DE1BC - Lighter Verde Esmeralda (for text/iconos) */
-    --sidebar-primary: 14 100% 60%;    /* #FF6D3B - Naranja Vibrante (active item bg) */
-    --sidebar-primary-foreground: 0 0% 98%; /* #FAFAFA - Blanco */
-    --sidebar-accent: 14 100% 60%;     /* #FF6D3B - Naranja Vibrante (hover bg) */
-    --sidebar-accent-foreground: 0 0% 98%; /* #FAFAFA - Blanco (for hover text) */
-    --sidebar-border: 273 60% 20%;     /* #310D52 */
-    --sidebar-ring: 14 100% 60%;       /* Naranja Vibrante */
+    /* Standard Sidebar Vars - Dark Mode (Revised Vibrant) */
+    --sidebar-background: 0 0% 12%; /* #1F1F1F - Dark Gray */
+    --sidebar-foreground: 122 49% 65%; /* #66BB6A - Lighter Verde Esmeralda */
+    --sidebar-primary: 14 100% 65%;    /* #FF8A65 - Naranja Vibrante (active item bg) */
+    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --sidebar-accent: 14 100% 65%;     /* #FF8A65 - Naranja Vibrante (hover bg) */
+    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (for hover text) */
+    --sidebar-border: 0 0% 20%;     /* #333333 */
+    --sidebar-ring: 14 100% 65%;       /* Lighter Naranja Vibrante */
   }
 
   /* --- MINIMALISTA THEME --- */
