@@ -1,6 +1,6 @@
 
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell, Bot } from 'lucide-react'; // Added Bot
+import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell, Bot, Youtube } from 'lucide-react'; // Added Bot, Youtube
 
 export type NavItem = {
   title: string;
@@ -62,6 +62,11 @@ export const siteConfig: SiteConfig = {
       icon: Bot,
     },
     {
+      title: "Buscar Videos",
+      href: "/youtube-search",
+      icon: Youtube,
+    },
+    {
       title: "Perfil",
       href: "/profile",
       icon: UserCircle,
@@ -97,6 +102,12 @@ export const siteConfig: SiteConfig = {
       href: "/ai-chat",
       icon: Bot,
       description: "Consulta recetas y consejos con IA.",
+    },
+    {
+      title: "Buscar Videos",
+      href: "/youtube-search",
+      icon: Youtube,
+      description: "Encuentra videos de salud y fitness."
     },
     {
       title: "Conectar",

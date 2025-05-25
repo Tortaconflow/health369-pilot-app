@@ -118,3 +118,10 @@ export type MachineInfo = {
   affectedMuscleGroups: string[];
   commonExercises?: { name: string; id: string }[];
 };
+
+export type YoutubeVideo = {
+  id: string;
+  title: string;
+  thumbnailUrl: string;
+  description?: string;
+};

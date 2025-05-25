@@ -7,12 +7,11 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Bot, Loader2, Rocket, Brain, Edit3, Activity } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, Rocket, Activity, Mic, Volume2, AlertTriangle } from 'lucide-react'; // Added Mic, Volume2, AlertTriangle
 import { handleRecipeChat } from '@/app/actions/chatActions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
-// Asegúrate de importar el tipo PersonalizedWorkoutInput si lo vas a usar para tipar el estado
-// import type { PersonalizedWorkoutInput } from '@/ai/flows/personalized-workout-flow';
+import { Alert, AlertTitle, AlertDescription as AlertDescriptionComponent } from '@/components/ui/alert'; // Renamed AlertDescription to avoid conflict
 
 interface ChatMessage {
   id: string;
@@ -21,26 +20,23 @@ interface ChatMessage {
 }
 
 interface QuestionnaireQuestion {
-  id: string;
+  id:string;
   text: string;
   options: { value: string; label: string }[];
-  key: keyof UserPreferences; // Ajustado para UserPreferences
+  key: keyof UserPreferences;
 }
 
-// Estas son las preferencias que recopilamos del cuestionario inicial
 interface UserPreferences {
-  objective?: string;       // Mapea a 'goals' para PersonalizedWorkoutInput
-  experience?: string;      // Mapea a 'fitnessLevel' para PersonalizedWorkoutInput
+  objective?: string;
+  experience?: string;
   recipePreference?: string;
   wearable?: string;
-  // Estos campos se necesitarían para PersonalizedWorkoutInput, pero no están en el cuestionario actual
   timeAvailablePerSession?: string;
   daysPerWeek?: number;
   limitations?: string[];
   preferredStyle?: string;
   availableEquipment?: string[];
 }
-
 
 const questionnaireQuestions: QuestionnaireQuestion[] = [
   {
@@ -58,9 +54,9 @@ const questionnaireQuestions: QuestionnaireQuestion[] = [
     id: 'q2',
     text: '¿Tienes experiencia con dietas o entrenamientos?',
     options: [
-      { value: 'avanzado', label: 'Sí, soy experto/a' }, // Ajustado a valores de fitnessLevel
-      { value: 'intermedio', label: 'Algo de experiencia' }, // Ajustado
-      { value: 'principiante', label: 'Ninguna' }, // Ajustado
+      { value: 'avanzado', label: 'Sí, soy experto/a' },
+      { value: 'intermedio', label: 'Algo de experiencia' },
+      { value: 'principiante', label: 'Ninguna' },
     ],
     key: 'experience',
   },
@@ -93,9 +89,7 @@ const suggestedPrompts = [
     "Dame una idea para una cena saludable y rápida."
 ];
 
-// Frase clave para detectar si la IA está lista para generar una rutina
 const WORKOUT_GENERATION_PROMPT_KEYPHRASE = "¿quieres que procedamos a generar una propuesta de entrenamiento personalizada para ti?";
-
 
 export default function AIChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -110,6 +104,66 @@ export default function AIChatPage() {
   const [userPreferences, setUserPreferences] = useState<UserPreferences>({});
   const [isQuestionnaireComplete, setIsQuestionnaireComplete] = useState(false);
   const [showGenerateWorkoutButton, setShowGenerateWorkoutButton] = useState(false);
+
+  // --- Voice Interaction State ---
+  const [isListening, setIsListening] = useState(false);
+  const [browserSupportsSpeech, setBrowserSupportsSpeech] = useState(true);
+  const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  // --- End Voice Interaction State ---
+
+  useEffect(() => {
+    // Check for browser support
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition || !window.speechSynthesis) {
+      setBrowserSupportsSpeech(false);
+      toast({
+        title: "Navegador no compatible",
+        description: "Tu navegador no es compatible con el reconocimiento o síntesis de voz.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    // Initialize SpeechRecognition
+    const recognition = new SpeechRecognition();
+    recognition.continuous = false;
+    recognition.lang = 'es-ES'; // Set language to Spanish
+    recognition.interimResults = false;
+
+    recognition.onresult = (event) => {
+      const spokenText = event.results[0][0].transcript;
+      setInput(spokenText);
+      setIsListening(false);
+    };
+    recognition.onerror = (event) => {
+      console.error('Error de reconocimiento de voz:', event.error);
+      setIsListening(false);
+      let errorMessage = "Ocurrió un error durante el reconocimiento de voz.";
+      if (event.error === 'no-speech') {
+        errorMessage = "No se detectó voz. Inténtalo de nuevo.";
+      } else if (event.error === 'audio-capture') {
+        errorMessage = "No se pudo capturar el audio. Revisa tu micrófono.";
+      } else if (event.error === 'not-allowed') {
+        errorMessage = "Permiso para usar el micrófono denegado.";
+      }
+      toast({ title: "Error de Voz", description: errorMessage, variant: "destructive" });
+    };
+    recognition.onend = () => {
+      setIsListening(false);
+    };
+    speechRecognitionRef.current = recognition;
+
+    // Initialize SpeechSynthesisUtterance
+    utteranceRef.current = new SpeechSynthesisUtterance();
+    utteranceRef.current.lang = 'es-ES'; // Set language for TTS
+    utteranceRef.current.rate = 0.9;
+
+    return () => {
+      recognition.stop();
+      window.speechSynthesis.cancel();
+    };
+  }, [toast]);
 
 
   const scrollToBottom = () => {
@@ -137,12 +191,12 @@ export default function AIChatPage() {
 
   const handleStartQuestionnaire = () => {
     setIsQuestionnaireActive(true);
-    setShowGenerateWorkoutButton(false); // Ocultar si estaba visible
+    setShowGenerateWorkoutButton(false);
     setMessages(prev => [...prev, {id: 'user-start-q', role: 'user', content: "Sí, quiero responder las preguntas."}]);
   };
 
   const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: string, answerLabel: string) => {
-    setUserPreferences(prev => ({ ...prev, [questionKey]: answerLabel }));
+    setUserPreferences(prev => ({ ...prev, [questionKey]: answerValue })); // Store value, not label for programmatic use
     setMessages(prev => [...prev, {id: `user-q-ans-${questionKey}-${Date.now()}`, role: 'user', content: answerLabel}]);
 
     if (currentQuestionIndex < questionnaireQuestions.length - 1) {
@@ -150,7 +204,9 @@ export default function AIChatPage() {
     } else {
       setIsQuestionnaireActive(false);
       setIsQuestionnaireComplete(true);
-      setMessages(prev => [...prev, {id: 'bot-q-complete', role: 'assistant', content: '¡Gracias por tus respuestas! Ahora puedo personalizar mejor mis sugerencias. ¿En qué te puedo ayudar hoy?'}]);
+      const completeMessage = '¡Gracias por tus respuestas! Ahora puedo personalizar mejor mis sugerencias. ¿En qué te puedo ayudar hoy?';
+      setMessages(prev => [...prev, {id: 'bot-q-complete', role: 'assistant', content: completeMessage}]);
+      speakText(completeMessage);
       toast({
         title: "Cuestionario Completo",
         description: "Tus preferencias han sido guardadas para esta sesión.",
@@ -164,17 +220,28 @@ export default function AIChatPage() {
     let context = "Contexto del usuario: ";
     const preferencesList: string[] = [];
     if (userPreferences.objective) preferencesList.push(`Objetivo principal - ${userPreferences.objective}`);
-    if (userPreferences.experience) preferencesList.push(`Experiencia/Nivel de fitness - ${userPreferences.experience}`); // Mapea a fitnessLevel
+    if (userPreferences.experience) preferencesList.push(`Experiencia/Nivel de fitness - ${userPreferences.experience}`);
     if (userPreferences.recipePreference) preferencesList.push(`Preferencia de recetas - ${userPreferences.recipePreference}`);
     if (userPreferences.wearable) preferencesList.push(`Usa wearable - ${userPreferences.wearable}`);
-    // Faltan timeAvailablePerSession, daysPerWeek, etc. La IA los pedirá si es necesario.
+    // Add other preferences as they are collected
+    if (userPreferences.timeAvailablePerSession) preferencesList.push(`Tiempo por sesión - ${userPreferences.timeAvailablePerSession}`);
+    if (userPreferences.daysPerWeek) preferencesList.push(`Días por semana - ${userPreferences.daysPerWeek}`);
+    if (userPreferences.preferredStyle) preferencesList.push(`Estilo preferido - ${userPreferences.preferredStyle}`);
+
     context += preferencesList.join(". ") + ".";
     return context;
   };
 
+  const speakText = (text: string) => {
+    if (!browserSupportsSpeech || !utteranceRef.current || !window.speechSynthesis) return;
+    window.speechSynthesis.cancel(); // Cancel any ongoing speech
+    utteranceRef.current.text = text;
+    window.speechSynthesis.speak(utteranceRef.current);
+  };
+
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>, promptedQuery?: string) => {
     if (e) e.preventDefault();
-    setShowGenerateWorkoutButton(false); // Ocultar botón de generar rutina al enviar nuevo mensaje
+    setShowGenerateWorkoutButton(false);
 
     const query = promptedQuery || input.trim();
     if (!query || isLoading) return;
@@ -197,8 +264,6 @@ export default function AIChatPage() {
 
     if (isQuestionnaireComplete && Object.keys(userPreferences).length > 0) {
         const preferencesContext = formatPreferencesForAIContext();
-        // Solo añadir el contexto si este es el primer mensaje "real" después del cuestionario o si no se ha añadido antes.
-        // Una forma simple es verificar si la query actual ya tiene el prefijo.
         if (!currentInputForAPI.startsWith("Contexto del usuario:")) {
             currentInputForAPI = `${preferencesContext} Mi pregunta es: ${currentInputForAPI}`;
         }
@@ -213,88 +278,96 @@ export default function AIChatPage() {
           content: result.data.aiResponse,
         };
         setMessages((prevMessages) => [...prevMessages, newAssistantMessage]);
+        speakText(result.data.aiResponse);
 
-        // Comprobar si la IA está lista para generar la rutina
         if (result.data.aiResponse.toLowerCase().includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE.toLowerCase())) {
           setShowGenerateWorkoutButton(true);
         }
 
       } else {
+        const errorText = result.error || 'No se pudo obtener una respuesta.';
         toast({
           title: 'Error del Asistente',
-          description: result.error || 'No se pudo obtener una respuesta.',
+          description: errorText,
           variant: 'destructive',
         });
          const errorAssistantMessage: ChatMessage = {
           id: `assistant-error-${Date.now()}`,
           role: 'assistant',
-          content: result.error || "Lo siento, no pude procesar tu solicitud en este momento.",
+          content: errorText,
         };
         setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
+        speakText(errorText);
       }
     } catch (error) {
+      const errorText = 'No se pudo conectar con el asistente de IA.';
       toast({
         title: 'Error de Conexión',
-        description: 'No se pudo conectar con el asistente de IA.',
+        description: errorText,
         variant: 'destructive',
       });
       const errorAssistantMessage: ChatMessage = {
           id: `assistant-error-${Date.now()}`,
           role: 'assistant',
-          content: "Hubo un problema de conexión. Por favor, intenta de nuevo.",
+          content: errorText,
         };
       setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
+      speakText(errorText);
     } finally {
       setIsLoading(false);
       setTimeout(scrollToBottom, 0);
     }
   };
 
-  const handleSuggestedPrompt = (prompt: string) => {
-    setInput(prompt);
-    handleSubmit(undefined, prompt);
+  const handleSuggestedPrompt = (promptText: string) => {
+    setInput(promptText);
+    handleSubmit(undefined, promptText);
+  };
+  
+  const handleToggleListen = () => {
+    if (!browserSupportsSpeech || !speechRecognitionRef.current) return;
+    if (isListening) {
+      speechRecognitionRef.current.stop();
+      setIsListening(false);
+    } else {
+      try {
+        speechRecognitionRef.current.start();
+        setIsListening(true);
+        toast({ title: "Escuchando...", description: "Habla ahora."});
+      } catch (error) {
+        console.error("Error al iniciar reconocimiento:", error);
+        setIsListening(false);
+        toast({ title: "Error de Micrófono", description: "No se pudo iniciar el reconocimiento de voz.", variant: "destructive" });
+      }
+    }
   };
 
   const handleGenerateWorkout = async () => {
-    setShowGenerateWorkoutButton(false); // Ocultar después de hacer clic
+    setShowGenerateWorkoutButton(false);
     setIsLoading(true);
+    const userMessageContent = "Sí, por favor genera la rutina.";
     const userMessage: ChatMessage = {
       id: `user-confirm-workout-${Date.now()}`,
       role: 'user',
-      content: "Sí, por favor genera la rutina."
+      content: userMessageContent
     };
     setMessages(prev => [...prev, userMessage]);
 
-    // Simular que se está llamando a la acción de generar rutina
-    // Aquí es donde construirías el PersonalizedWorkoutInput y llamarías a la acción del servidor
     console.log("Preparando para generar rutina con preferencias:", userPreferences);
-    // TODO: Mapear userPreferences a PersonalizedWorkoutInput.
-    // Por ejemplo:
-    // const workoutInput: PersonalizedWorkoutInput = {
-    //   fitnessLevel: userPreferences.experience || 'principiante', // Asignar un default o validar
-    //   goals: userPreferences.objective ? [userPreferences.objective] : ['mejorar_salud_general'], // Asignar default o validar
-    //   // ... obtener timeAvailablePerSession y daysPerWeek (actualmente no en userPreferences)
-    //   // Por ahora, la IA debería haberlos pedido si eran necesarios.
-    //   // Si no, necesitaremos una forma de preguntarlos aquí o modificar el cuestionario.
-    //   timeAvailablePerSession: userPreferences.timeAvailablePerSession || "45 minutos", // Ejemplo, necesitaría ser recopilado
-    //   daysPerWeek: userPreferences.daysPerWeek || 3, // Ejemplo, necesitaría ser recopilado
-    //   limitations: userPreferences.limitations || [],
-    //   preferredStyle: userPreferences.preferredStyle as any || 'mixto', // 'as any' si el tipo no coincide exactamente
-    //   availableEquipment: userPreferences.availableEquipment || ['peso corporal'],
-    // };
-
-    // Aquí llamarías a la acción de servidor:
+    
+    // TODO: Llamar a la acción de servidor para generar la rutina.
+    // const workoutInput: PersonalizedWorkoutInput = { ... }
     // const result = await handleGenerateWorkoutAction(workoutInput);
-    // Y luego mostrarías la rutina.
 
-    // Simulación por ahora:
     await new Promise(resolve => setTimeout(resolve, 1500));
+    const assistantMessageContent = "¡Rutina en camino! (Este es un marcador de posición. La integración completa de la generación de rutinas es el siguiente paso).";
     const assistantMessage: ChatMessage = {
       id: `assistant-workout-placeholder-${Date.now()}`,
       role: 'assistant',
-      content: "¡Rutina en camino! (Este es un marcador de posición. La integración completa de la generación de rutinas es el siguiente paso)."
+      content: assistantMessageContent
     };
     setMessages(prev => [...prev, assistantMessage]);
+    speakText(assistantMessageContent);
     setIsLoading(false);
      toast({
         title: "Generación de Rutina Iniciada (Simulación)",
@@ -305,6 +378,15 @@ export default function AIChatPage() {
 
   return (
     <div className="container mx-auto py-8 px-4 md:px-0 flex flex-col h-[calc(100vh-8rem)] max-h-[800px] items-center">
+      {!browserSupportsSpeech && (
+         <Alert variant="destructive" className="mb-4 max-w-2xl w-full">
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle>Funcionalidad de Voz no Soportada</AlertTitle>
+            <AlertDescriptionComponent>
+              Tu navegador actual no es compatible con las funciones de reconocimiento o síntesis de voz. Algunas características del chat pueden no estar disponibles.
+            </AlertDescriptionComponent>
+        </Alert>
+      )}
       <Card className="w-full max-w-2xl shadow-xl flex flex-col flex-1 rounded-lg">
         <CardHeader className="text-center border-b pb-4">
           <div className="inline-block p-2.5 bg-primary/10 rounded-full mx-auto mb-2">
@@ -313,7 +395,7 @@ export default function AIChatPage() {
           <CardTitle className="text-2xl font-bold text-primary">
             Chat con NutriChef AI
           </CardTitle>
-          <p className="text-muted-foreground text-sm">Tu asistente personal para recetas y consejos de cocina.</p>
+          <p className="text-muted-foreground text-sm">Tu asistente personal para recetas y consejos de cocina. ¡Ahora con voz!</p>
         </CardHeader>
 
         {(!isQuestionnaireActive && !isQuestionnaireComplete && messages.length === 1 && messages[0].id === 'init-bot-welcome') && (
@@ -410,16 +492,16 @@ export default function AIChatPage() {
             <div className="w-full">
                 <p className="text-xs text-muted-foreground mb-2 text-center">¿No sabes qué preguntar? Prueba una de estas sugerencias:</p>
                 <div className="grid grid-cols-2 gap-2 mb-3">
-                    {suggestedPrompts.slice(0,2).map(prompt => (
-                        <Button key={prompt} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(prompt)} className="text-xs h-auto py-1.5">
-                            {prompt}
+                    {suggestedPrompts.slice(0,2).map(promptText => (
+                        <Button key={promptText} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(promptText)} className="text-xs h-auto py-1.5">
+                            {promptText}
                         </Button>
                     ))}
                 </div>
                  <div className="grid grid-cols-2 gap-2">
-                    {suggestedPrompts.slice(2,4).map(prompt => (
-                        <Button key={prompt} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(prompt)} className="text-xs h-auto py-1.5">
-                            {prompt}
+                    {suggestedPrompts.slice(2,4).map(promptText => (
+                        <Button key={promptText} variant="outline" size="sm" onClick={() => handleSuggestedPrompt(promptText)} className="text-xs h-auto py-1.5">
+                            {promptText}
                         </Button>
                     ))}
                 </div>
@@ -428,14 +510,28 @@ export default function AIChatPage() {
           <form onSubmit={handleSubmit} className="flex items-center gap-2 w-full">
             <Input
               type="text"
-              placeholder="Escribe tu pregunta sobre recetas..."
+              placeholder="Escribe tu pregunta o usa el micrófono..."
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              disabled={isLoading || isQuestionnaireActive}
+              disabled={isLoading || isQuestionnaireActive || isListening}
               className="flex-1"
               autoComplete="off"
             />
-            <Button type="submit" disabled={isLoading || !input.trim() || isQuestionnaireActive} size="icon" className="bg-accent hover:bg-accent/90 text-accent-foreground shrink-0">
+            {browserSupportsSpeech && (
+              <Button 
+                type="button" 
+                onClick={handleToggleListen} 
+                disabled={isLoading || isQuestionnaireActive} 
+                size="icon" 
+                variant={isListening ? "destructive" : "outline"}
+                className="shrink-0"
+                title={isListening ? "Detener grabación" : "Grabar voz"}
+              >
+                <Mic className={cn("h-5 w-5", isListening && "animate-pulse")} />
+                <span className="sr-only">{isListening ? "Detener grabación" : "Grabar voz"}</span>
+              </Button>
+            )}
+            <Button type="submit" disabled={isLoading || !input.trim() || isQuestionnaireActive || isListening} size="icon" className="bg-accent hover:bg-accent/90 text-accent-foreground shrink-0">
               <Send className="h-5 w-5" />
               <span className="sr-only">Enviar</span>
             </Button>
@@ -445,3 +541,4 @@ export default function AIChatPage() {
     </div>
   );
 }
+
