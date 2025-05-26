@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview AI-powered photo authentication flow for watermarking and manipulation detection.
@@ -108,7 +109,7 @@ const authenticatePhotoFlow = ai.defineFlow(
         model: ai.registry.getModel('googleai/gemini-2.0-flash'), // Using a text model for analysis
         prompt: [
           {media: {url: input.photoDataUri}},
-          {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with a JSON object: {"manipulationDetected": boolean, "detectionDetails": "string describing findings or "No obvious manipulation detected."}'}
+          {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}
         ],
         output: {
           schema: z.object({
@@ -123,7 +124,7 @@ const authenticatePhotoFlow = ai.defineFlow(
         detectionDetails = manipulationCheckOutput.detectionDetails;
       } else {
         // Fallback if the manipulation check model doesn't respond as expected
-        manipulationDetected = false; // Or true, depending on desired default
+        manipulationDetected = false; 
         detectionDetails = 'La verificación de manipulación no pudo completarse.';
       }
     }
@@ -135,3 +136,4 @@ const authenticatePhotoFlow = ai.defineFlow(
     };
   }
 );
+
