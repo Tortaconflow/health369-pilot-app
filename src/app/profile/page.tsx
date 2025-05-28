@@ -5,38 +5,50 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Progress } from "@/components/ui/progress"; // Importado Progress
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { UserProfile as UserProfileType } from "@/types/domain";
-import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette, Camera } from "lucide-react"; // Added Camera
+import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette, Camera } from "lucide-react";
 import Image from "next/image";
-import ThemeSelector from "@/components/layout/ThemeSelector"; // Importado
+import ThemeSelector from "@/components/layout/ThemeSelector";
 
 // Mock data - replace with actual data fetching
 const mockUserProfile: UserProfileType = {
   id: "user123",
-  name: "Alex García", // Translated
+  name: "Alex García",
   email: "alex.g@example.com",
   avatarUrl: "https://placehold.co/200x200.png",
   level: 5,
-  experiencePoints: 450,
-  badges: ["Madrugador", "Iniciador de Desafíos", "Maestro de Rachas"], // Translated
+  experiencePoints: 450, // XP acumulado DENTRO del nivel actual
+  badges: ["Madrugador", "Iniciador de Desafíos", "Maestro de Rachas"],
   virtualCurrency: 1500,
-  healthGoals: ["Perder 5kg para julio", "Correr 5k tres veces por semana", "Comer más verduras"], // Translated
+  healthGoals: ["Perder 5kg para julio", "Correr 5k tres veces por semana", "Comer más verduras"],
   preferences: {
-    notifications: "enabled", // Consider translating "enabled" if shown in UI
-    theme: "light", // "claro" / "oscuro"
+    notifications: "enabled",
+    theme: "light",
   },
   progress: {
     weight: 75,
     waist: 80,
     muscleMassPercentage: 20,
-    lastUpdated: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
+    lastUpdated: new Date(Date.now() - 86400000 * 5).toISOString(),
   }
 };
 
 
 export default function ProfilePage() {
+  // Lógica para la barra de progreso de XP
+  const xpForNextLevel = (currentLevel: number) => {
+    // Fórmula de ejemplo: cada nivel requiere más XP que el anterior
+    // Nivel 1 -> Nivel 2 necesita (1*100 + 50) = 150 XP
+    // Nivel 5 -> Nivel 6 necesita (5*100 + 50) = 550 XP
+    return (currentLevel * 100) + 50;
+  };
+
+  const totalXpNeededForThisLevel = xpForNextLevel(mockUserProfile.level);
+  const xpProgressPercentage = Math.min(100, (mockUserProfile.experiencePoints / totalXpNeededForThisLevel) * 100);
+
   return (
     <div className="container mx-auto py-8 px-4 md:px-0">
       <Card className="w-full max-w-4xl mx-auto shadow-xl">
@@ -46,23 +58,28 @@ export default function ProfilePage() {
               <AvatarImage src={mockUserProfile.avatarUrl} alt={mockUserProfile.name} data-ai-hint="profile picture" />
               <AvatarFallback className="text-4xl">{mockUserProfile.name.substring(0,1)}</AvatarFallback>
             </Avatar>
-            <div>
+            <div className="flex-1">
               <h1 className="text-4xl font-bold text-primary">{mockUserProfile.name}</h1>
               <p className="text-lg text-muted-foreground">{mockUserProfile.email}</p>
-              <div className="mt-2 flex items-center gap-4">
+              <div className="mt-2 flex items-center gap-4 flex-wrap">
                 <div className="flex items-center text-yellow-500">
                   <Star className="h-5 w-5 mr-1 fill-current" /> Nivel {mockUserProfile.level}
                 </div>
                 <div className="flex items-center text-accent">
                   <Zap className="h-5 w-5 mr-1" /> {mockUserProfile.experiencePoints} XP
                 </div>
-                <div className="flex items-center text-emerald-500">
-                  {/* Using a specific green for currency as it's not in the theme vars directly */}
+                <div className="flex items-center text-primary"> {/* Ajustado para usar color primario (Verde Esmeralda) */}
                   🪙 {mockUserProfile.virtualCurrency} Monedas
                 </div>
               </div>
+              <div className="mt-3">
+                <Progress value={xpProgressPercentage} className="w-full h-2.5" />
+                <p className="text-xs text-muted-foreground text-right mt-1">
+                  Progreso al Nivel {mockUserProfile.level + 1}: {mockUserProfile.experiencePoints} / {totalXpNeededForThisLevel} XP
+                </p>
+              </div>
             </div>
-            <Button variant="outline" size="sm" className="md:ml-auto mt-4 md:mt-0">
+            <Button variant="outline" size="sm" className="md:ml-auto mt-4 md:mt-0 self-start md:self-center">
                 <Edit3 className="mr-2 h-4 w-4"/> Editar Perfil
             </Button>
           </div>
@@ -97,7 +114,7 @@ export default function ProfilePage() {
                     <StatDisplay label="Masa Muscular" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
                 </div>
                 <p className="text-sm text-muted-foreground mt-4">
-                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString('es-ES')}
+                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
                 </p>
               </Section>
               <Separator className="my-6" />
@@ -192,5 +209,3 @@ function StatDisplay({ label, value }: { label: string; value: string }) {
         </div>
     );
 }
-
-    
