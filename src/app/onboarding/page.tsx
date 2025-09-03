@@ -103,7 +103,6 @@ export default function OnboardingPage() {
     toast({
       title: "¡Perfil Completado!",
       description: "Tu información ha sido guardada. ¡Bienvenido/a a Health369!",
-      icon: <CheckCircle className="h-5 w-5" />,
       className: "bg-green-500 text-white",
     });
     router.push("/dashboard");

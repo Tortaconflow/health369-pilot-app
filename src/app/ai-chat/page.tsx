@@ -188,7 +188,7 @@ export default function AIChatPage() {
     // Simplemente avanzar al cuestionario.
   };
 
-  const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: string, answerLabel: string) => {
+  const handleQuestionnaireResponse = (questionKey: keyof UserPreferences, answerValue: any, answerLabel: string) => {
     setUserPreferences(prev => ({ ...prev, [questionKey]: answerValue }));
     setMessages(prev => [...prev, {id: `user-q-ans-${questionKey}-${Date.now()}`, role: 'user', content: answerLabel}]);
 
@@ -279,7 +279,15 @@ export default function AIChatPage() {
 
         const aiResponseLower = result.data.aiResponse.toLowerCase();
         if (aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_ES) || aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_EN)) {
-          setShowGenerateWorkoutButton(true);
+          // Additional check: Do we have the minimum required data to generate a workout?
+          const { objective, experience, timeAvailablePerSession, daysPerWeek } = userPreferences;
+          if(objective && experience && timeAvailablePerSession && daysPerWeek) {
+            setShowGenerateWorkoutButton(true);
+          } else {
+             // This case is handled by the prompt, which should ask for missing info.
+             // But as a fallback, we don't show the button if data is missing.
+             console.warn("AI asked to generate workout, but user preferences are incomplete.", userPreferences);
+          }
         }
 
       } else {
@@ -522,6 +530,3 @@ export default function AIChatPage() {
     </div>
   );
 }
-
-
-    

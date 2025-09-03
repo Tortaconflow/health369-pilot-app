@@ -51,8 +51,8 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
         </CardHeader>
         
         {/* Spacer for translated avatar */}
-        <div className="pt-20 md:pt-24"> 
-          <CardContent className="p-6">
+        <div className="p-6 pt-20 md:pt-24"> 
+        <CardContent className="p-6">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
               <div>
                 <CardTitle className="text-3xl md:text-4xl font-bold text-primary">{expert.name}</CardTitle>
@@ -107,7 +107,6 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
             </section>
 
           </CardContent>
-        </CardHeader> {/* This closes the CardHeader that was misused for content placement for avatar effect */}
       </Card>
     </div>
   );

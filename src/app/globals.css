@@ -1,4 +1,3 @@
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -36,7 +35,7 @@ a {
     --popover: 0 0% 100%;          /* #FFFFFF - Blanco */
     --popover-foreground: 0 0% 13%; /* #212121 - Negro */
 
-    --primary: 122 49% 34%;       /* #2E7D32 - Verde Esmeralda */
+    --primary: 124 46% 24%;       /* #2E7D32 - Verde Esmeralda */
     --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
 
     --secondary: 199 98% 48%;     /* #03A9F4 - Azul Suave */

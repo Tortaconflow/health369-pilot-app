@@ -12,10 +12,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function ThemeSelector() {
   const { theme, setTheme, themeVariant, setThemeVariant } = useTheme();
 
-  // Note: True system theme preference requires more complex logic to detect OS preference
-  // For now, 'light' and 'dark' are direct choices.
-  // We can add a "System" option later if needed, which would involve listening to `(prefers-color-scheme: dark)`.
-
   return (
     <Card className="w-full max-w-md">
       <CardHeader>

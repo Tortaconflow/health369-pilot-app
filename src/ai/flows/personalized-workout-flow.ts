@@ -156,8 +156,6 @@ const personalizedWorkoutFlow = ai.defineFlow(
     outputSchema: PersonalizedWorkoutOutputSchema,
   },
   async (input) => {
-    console.log("Generando rutina personalizada para:", input.userId || 'usuario desconocido', "Nivel:", input.fitnessLevel, "Metas:", input.goals.join(', '), "Sueño (avg):", input.averageSleepHours);
-    
     const {output} = await workoutPrompt(input);
 
     if (!output) {
