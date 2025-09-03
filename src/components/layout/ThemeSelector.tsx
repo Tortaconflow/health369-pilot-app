@@ -43,6 +43,7 @@ export default function ThemeSelector() {
             className="grid grid-cols-1 gap-2"
           >
             {[
+              { value: "pilot", label: "Health Pilot" },
               { value: "standard", label: "Estándar" },
               { value: "minimalist", label: "Minimalista" },
               { value: "vibrante", label: "Vibrante" },

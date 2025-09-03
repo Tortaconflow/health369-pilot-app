@@ -249,6 +249,89 @@ a {
     --sidebar-ring: 14 100% 60%;
   }
 
+  /* --- HEALTH PILOT THEME --- */
+  html[data-theme-variant="pilot"] :root {
+    --background: 188 78% 93%; /* #E0F7FA - Very Light Blue */
+    --foreground: 195 20% 15%; /* Dark, slightly blueish gray */
+
+    --card: 188 60% 98%;       /* #F9FEFF - Almost white with a hint of blue */
+    --card-foreground: 195 20% 15%;
+
+    --popover: 188 60% 98%;
+    --popover-foreground: 195 20% 15%;
+
+    --primary: 195 69% 61%;     /* #5BC0DE - Light Blue */
+    --primary-foreground: 195 30% 10%; /* Dark blue for contrast */
+
+    --secondary: 158 48% 66%;   /* #8ADAB2 - Light Green */
+    --secondary-foreground: 158 30% 15%; /* Dark green for contrast */
+
+    --muted: 188 50% 88%;       /* #D2EBEF - Muted version of background */
+    --muted-foreground: 195 15% 40%;
+
+    --accent: 158 48% 66%;      /* #8ADAB2 - Light Green */
+    --accent-foreground: 158 30% 15%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 188 40% 80%;      /* #B9DDE2 */
+    --input: 188 50% 90%;       /* #DCEFF2 */
+    --ring: 195 69% 61%;        /* #5BC0DE - Light Blue */
+
+    --radius: 0.75rem;
+
+    /* Health Pilot Sidebar Vars - Light Mode */
+    --sidebar-background: 188 60% 96%; /* #EEFAFC */
+    --sidebar-foreground: 195 50% 30%; /* Darker blue for text/icons */
+    --sidebar-primary: 195 69% 61%;    /* #5BC0DE - Light Blue */
+    --sidebar-primary-foreground: 195 30% 10%;
+    --sidebar-accent: 188 50% 90%;     /* #DCEFF2 - for hover background */
+    --sidebar-accent-foreground: 195 50% 30%;
+    --sidebar-border: 188 40% 80%;
+    --sidebar-ring: 195 69% 61%;
+  }
+
+  html[data-theme-variant="pilot"].dark :root {
+    --background: 195 20% 8%;   /* #12171A - Very dark blue */
+    --foreground: 188 60% 90%; /* #D9F5F8 - Very light blue */
+
+    --card: 195 20% 12%;       /* #182023 */
+    --card-foreground: 188 60% 90%;
+
+    --popover: 195 20% 10%;      /* #151B1E */
+    --popover-foreground: 188 60% 90%;
+
+    --primary: 195 69% 70%;     /* #7CCEE6 - Lighter blue for dark mode */
+    --primary-foreground: 195 30% 10%;
+
+    --secondary: 158 48% 75%;   /* #A9E4C7 - Lighter green for dark mode */
+    --secondary-foreground: 158 30% 15%;
+
+    --muted: 195 20% 15%;      /* #1E262A */
+    --muted-foreground: 188 30% 60%; /* #82B3B9 */
+
+    --accent: 158 48% 75%;      /* #A9E4C7 - Lighter green */
+    --accent-foreground: 158 30% 15%;
+
+    --destructive: 0 70% 55%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 195 20% 20%;     /* #2A3438 */
+    --input: 195 20% 14%;      /* #1C2427 */
+    --ring: 195 69% 70%;       /* #7CCEE6 - Lighter blue */
+
+    /* Health Pilot Sidebar Vars - Dark Mode */
+    --sidebar-background: 195 20% 10%; /* #151B1E */
+    --sidebar-foreground: 188 60% 80%; /* #B2EAF0 */
+    --sidebar-primary: 195 69% 70%;    /* #7CCEE6 - Lighter blue */
+    --sidebar-primary-foreground: 195 30% 10%;
+    --sidebar-accent: 195 20% 15%;     /* #1E262A - for hover background */
+    --sidebar-accent-foreground: 188 60% 90%;
+    --sidebar-border: 195 20% 20%;
+    --sidebar-ring: 195 69% 70%;
+  }
+
 }
 
 @layer base {

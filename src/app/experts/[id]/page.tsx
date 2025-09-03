@@ -107,6 +107,7 @@ export default function ExpertProfilePage({ params }: { params: { id: string } }
             </section>
 
           </CardContent>
+        </div>
       </Card>
     </div>
   );

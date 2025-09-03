@@ -99,6 +99,10 @@ const authenticatePhotoFlow = ai.defineFlow(
       },
     });
 
+    if (!media?.url) {
+      throw new Error('Failed to generate watermarked image. The AI model did not return a valid media object.');
+    }
+
     let manipulationDetected = false;
     let detectionDetails = '';
 
@@ -106,7 +110,7 @@ const authenticatePhotoFlow = ai.defineFlow(
       // Simulate manipulation detection (replace with actual AI model call later if needed)
       // For a real check, you might use a different AI model or service here.
       const { output: manipulationCheckOutput } = await ai.generate({
-        model: ai.registry.getModel('googleai/gemini-2.0-flash'), // Using a text model for analysis
+        model: 'googleai/gemini-2.0-flash', // Using a text model for analysis
         prompt: [
           {media: {url: input.photoDataUri}},
           {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}

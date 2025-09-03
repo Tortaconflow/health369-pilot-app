@@ -92,7 +92,9 @@ export default function ChallengeDetailsPage({ params }: { params: { id: string 
                 <InfoPill icon={<CalendarDays className="text-accent" />} label="Inicia" value={new Date(challenge.startDate).toLocaleDateString()} />
                 <InfoPill icon={<CalendarDays className="text-accent" />} label="Finaliza" value={new Date(challenge.endDate).toLocaleDateString()} />
                 <InfoPill icon={<Users className="text-accent" />} label="Participantes" value={`${challenge.participants.length}`} />
-                <InfoPill icon={<Zap className="text-accent" />} label="Cuota de Entrada" value={`🪙 ${challenge.entryFee} monedas`} />
+                {challenge.entryFee && (
+                  <InfoPill icon={<Zap className="text-accent" />} label="Cuota de Entrada" value={`🪙 ${challenge.entryFee} monedas`} />
+                )}
               </div>
               
               {challenge.status === 'active' && (
@@ -133,14 +135,14 @@ export default function ChallengeDetailsPage({ params }: { params: { id: string 
                   <CardTitle className="text-xl">Bote de Premios</CardTitle>
                 </CardHeader>
                 <CardContent className="text-center">
-                  <p className="text-4xl font-bold text-accent">🪙 {challenge.prizePool || challenge.entryFee * challenge.participants.length}</p>
+                  <p className="text-4xl font-bold text-accent">🪙 {challenge.prizePool || (challenge.entryFee || 0) * challenge.participants.length}</p>
                   <p className="text-sm text-muted-foreground">El ganador se lleva todo (o se distribuye según las reglas)</p>
                 </CardContent>
               </Card>
 
               {!isParticipant && challenge.status === 'upcoming' && (
                 <Button size="lg" className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-                  Unirse al Desafío (🪙 {challenge.entryFee})
+                  Unirse al Desafío {challenge.entryFee ? `(🪙 ${challenge.entryFee})` : '(Gratis)'}
                 </Button>
               )}
               {challenge.status === 'completed' && challenge.winnerId && (

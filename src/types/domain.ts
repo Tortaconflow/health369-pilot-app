@@ -24,7 +24,7 @@ export type Challenge = {
   description: string;
   duration: string; // e.g., "7 days", "4 weeks"
   objective: string; // e.g., "Lose 5kg", "Gain 2% muscle mass"
-  entryFee: number; // Virtual currency
+  entryFee?: number; // Virtual currency
   creatorId: string;
   participants: ChallengeParticipant[];
   status: 'upcoming' | 'active' | 'completed';

@@ -4,7 +4,7 @@
  * - greetGemini - A function that sends a name to Gemini and gets a greeting.
  */
 import {ai} from '@/ai/genkit';
-import {z} from 'genkit/zod'; // Using Zod from Genkit
+import {z} from 'zod';
 
 const GreetInputSchema = z.string().describe("The name to include in the greeting.");
 export type GreetInput = z.infer<typeof GreetInputSchema>;

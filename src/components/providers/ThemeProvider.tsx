@@ -4,7 +4,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 
 type Theme = 'light' | 'dark';
-type ThemeVariant = 'standard' | 'minimalist' | 'vibrante';
+type ThemeVariant = 'standard' | 'minimalist' | 'vibrante' | 'pilot';
 
 interface ThemeProviderProps {
   children: ReactNode;
@@ -33,7 +33,7 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 export function ThemeProvider({
   children,
   defaultTheme = 'light',
-  defaultThemeVariant = 'standard',
+  defaultThemeVariant = 'pilot',
   storageKey = 'ui-theme',
   variantStorageKey = 'ui-theme-variant',
   ...props

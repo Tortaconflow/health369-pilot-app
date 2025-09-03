@@ -73,9 +73,8 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
       if (result.success) {
         toast({
           title: "¡Progreso Enviado!",
-          description: "Tu progreso ha sido registrado exitosamente.",
+          description: <div className="flex items-center"><CheckCircle className="mr-2 h-5 w-5" /><span>Tu progreso ha sido registrado exitosamente.</span></div>,
           className: "bg-green-500 text-white",
-          icon: <CheckCircle className="h-5 w-5" />,
         });
         form.reset();
         setUploadedPhotoInfo(null); 
