@@ -45,9 +45,16 @@ const EvaluateChallengeInputSchema = z.object({
 });
 export type EvaluateChallengeInput = z.infer<typeof EvaluateChallengeInputSchema>;
 
+const ParticipantEvaluationSchema = z.object({
+  participantId: z.string().describe("The ID of the participant being evaluated."),
+  score: z.number().min(1).max(10).describe("A numerical score from 1 (little change) to 10 (amazing transformation) evaluating the participant's progress."),
+  reasoning: z.string().describe("A detailed, objective explanation for the score, referencing both numerical data and visual changes in photos."),
+});
+
 const EvaluateChallengeOutputSchema = z.object({
-  winnerId: z.string().describe('The ID of the participant with the best physical change.'),
-  evaluationSummary: z.string().describe('A summary of the evaluation process and why the winner was chosen.'),
+  evaluations: z.array(ParticipantEvaluationSchema).describe("An array containing the evaluation for each participant."),
+  finalWinnerId: z.string().describe('The ID of the participant with the highest overall score.'),
+  summary: z.string().describe('A comprehensive summary of the challenge results, highlighting the winner and notable achievements of other participants.'),
 });
 export type EvaluateChallengeOutput = z.infer<typeof EvaluateChallengeOutputSchema>;
 
@@ -55,50 +62,62 @@ export async function evaluateChallenge(input: EvaluateChallengeInput): Promise<
   return evaluateChallengeFlow(input);
 }
 
-const prompt = ai.definePrompt({
-  name: 'evaluateChallengePrompt',
-  input: {schema: EvaluateChallengeInputSchema},
-  output: {schema: EvaluateChallengeOutputSchema},
-  prompt: `You are an AI expert in evaluating physical transformations in fitness challenges.
-
-  You will receive numerical data (weight, waist measurement, muscle mass percentage) and "before" and "after" photos for each participant.
-
-  Your task is to evaluate the "best physical change" and determine a winner based on the provided data.
-
-  Consider both the numerical data and the visual evidence in the photos.
-
-  Provide a detailed evaluation summary explaining why the winner was chosen.
-
-  Numerical Data:
-  {{#each numericalData}}
-  Participant ID: {{{participantId}}}
-  Weight: {{{weight}}}
-  Waist: {{{waist}}}
-  Muscle Mass Percentage: {{{muscleMassPercentage}}}
-  {{/each}}
-
-  Before Photos:
-  {{#each beforePhotos}}
-  Participant ID: {{{participantId}}}
-  Photo: {{media url=photoDataUri}}
-  {{/each}}
-
-  After Photos:
-  {{#each afterPhotos}}
-  Participant ID: {{{participantId}}}
-  Photo: {{media url=photoDataUri}}
-  {{/each}}
-  `,
-});
-
 const evaluateChallengeFlow = ai.defineFlow(
   {
     name: 'evaluateChallengeFlow',
     inputSchema: EvaluateChallengeInputSchema,
     outputSchema: EvaluateChallengeOutputSchema,
   },
-  async input => {
-    const {output} = await prompt(input);
-    return output!;
+  async (input) => {
+    const instructionPrompt = `You are an expert AI fitness judge. Your task is to evaluate the results of a fitness challenge based on data provided for multiple participants. You must determine a winner by assigning a score to each participant and providing a clear rationale.
+
+    **Instructions:**
+
+    1.  **Analyze Each Participant:** For each participant, carefully review their numerical data (weight, waist, muscle mass) and visually compare their "before" and "after" photos.
+    2.  **Score Each Participant:** Assign a score from 1 to 10, where 1 represents minimal change and 10 represents an outstanding transformation. The score should be based on a holistic view of all provided data. For example, significant fat loss (reduced weight and waist) combined with muscle gain (increased muscle mass percentage) is highly valuable. Visual confirmation in the photos is crucial.
+    3.  **Provide Reasoning:** For each participant, write a concise but detailed reasoning for the score. Mention specific data points (e.g., "lost 5kg," "reduced waist by 3cm") and visual observations from the photos (e.g., "increased muscle definition in the arms," "visible reduction in abdominal fat").
+    4.  **Determine the Winner:** Based on your calculated scores, identify the participant with the highest score as the winner.
+    5.  **Write a Summary:** Provide an overall summary of the challenge results. Congratulate the winner and briefly mention the commendable efforts of other participants.
+    6.  **Respond in JSON:** Your final output must be a single, valid JSON object that adheres to the specified output schema. Do not include any text or formatting outside of the JSON object.`;
+
+    const promptParts: any[] = [{ text: instructionPrompt }];
+
+    promptParts.push({ text: "\n\n**Participant Data:**\n" });
+
+    input.numericalData.forEach(pData => {
+        const beforePhoto = input.beforePhotos.find(p => p.participantId === pData.participantId);
+        const afterPhoto = input.afterPhotos.find(p => p.participantId === pData.participantId);
+
+        promptParts.push({ text: `\n- **Participant ID:** ${pData.participantId}`});
+        promptParts.push({ text: `  - **Weight:** ${pData.weight} kg` });
+        promptParts.push({ text: `  - **Waist:** ${pData.waist} cm` });
+        promptParts.push({ text: `  - **Muscle Mass %:** ${pData.muscleMassPercentage}%` });
+
+        if (beforePhoto) {
+            promptParts.push({ text: "  - **Before Photo:**" });
+            promptParts.push({ media: { url: beforePhoto.photoDataUri } });
+        }
+        if (afterPhoto) {
+            promptParts.push({ text: "  - **After Photo:**" });
+            promptParts.push({ media: { url: afterPhoto.photoDataUri } });
+        }
+    });
+
+    const { output } = await ai.generate({
+      model: 'googleai/gemini-1.5-pro-latest', // Use a powerful multimodal model
+      prompt: promptParts,
+      output: {
+        schema: EvaluateChallengeOutputSchema,
+      },
+    });
+
+    if (!output) {
+      throw new Error("The AI model did not return any output.");
+    }
+
+    // Optional: Add logic here to verify the winnerId matches the highest score
+    // For now, we trust the model to be consistent.
+
+    return output;
   }
 );

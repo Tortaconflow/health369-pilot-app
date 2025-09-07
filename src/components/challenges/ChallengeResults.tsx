@@ -52,7 +52,7 @@ export default function ChallengeResults({ challenge }: ChallengeResultsProps) {
       const result = await evaluateChallengeCompletion(input);
       if (result.success && result.data) {
         setEvaluationResult(result.data);
-        const winnerName = challenge.participants.find(p=>p.id === result.data?.winnerId)?.name || result.data?.winnerId;
+        const winnerName = challenge.participants.find(p=>p.id === result.data?.finalWinnerId)?.name || result.data?.finalWinnerId;
         toast({ title: "¡Evaluación Completa!", description: `Ganador: ${winnerName}. Resumen disponible.`, className: "bg-green-500 text-white" });
       } else {
         toast({ title: "Evaluación Fallida", description: result.error || "No se pudo evaluar el desafío.", variant: "destructive" });
@@ -65,7 +65,7 @@ export default function ChallengeResults({ challenge }: ChallengeResultsProps) {
     }
   };
   
-  const winner = challenge.participants.find(p => p.userId === (evaluationResult?.winnerId || challenge.winnerId));
+  const winner = challenge.participants.find(p => p.id === (evaluationResult?.finalWinnerId || challenge.winnerId));
 
   if (challenge.status !== 'completed' && !evaluationResult) {
     return (
@@ -124,16 +124,49 @@ export default function ChallengeResults({ challenge }: ChallengeResultsProps) {
         )}
         
         {evaluationResult && (
+          <div className="space-y-4">
             <Card className="bg-muted/20">
                 <CardHeader>
-                    <CardTitle className="text-lg flex items-center"><Brain className="mr-2 h-5 w-5 text-primary"/> Resumen de Evaluación IA</CardTitle>
+                    <CardTitle className="text-lg flex items-center"><Brain className="mr-2 h-5 w-5 text-primary"/> Resumen General de IA</CardTitle>
                 </CardHeader>
                 <CardContent>
                     <p className="text-sm text-foreground/90 whitespace-pre-line">
-                        {evaluationResult.evaluationSummary || "La evaluación de IA determinó al ganador basándose en el progreso general de los datos numéricos y la transformación visual en las fotos."}
+                        {evaluationResult.summary || "La evaluación de IA determinó al ganador basándose en el progreso general."}
                     </p>
                 </CardContent>
             </Card>
+
+            <div>
+              <h3 className="text-lg font-semibold mb-2">Evaluaciones Detalladas</h3>
+              <ul className="space-y-3">
+                {evaluationResult.evaluations.map(evaluation => {
+                  const participant = challenge.participants.find(p => p.id === evaluation.participantId);
+                  return (
+                    <li key={evaluation.participantId}>
+                      <Card>
+                        <CardHeader className="flex flex-row items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <Avatar>
+                              <AvatarImage src={participant?.avatarUrl} alt={participant?.name}/>
+                              <AvatarFallback>{participant?.name.substring(0,2).toUpperCase()}</AvatarFallback>
+                            </Avatar>
+                            <CardTitle className="text-md">{participant?.name}</CardTitle>
+                          </div>
+                          <div className="text-right">
+                              <p className="text-2xl font-bold text-primary">{evaluation.score.toFixed(1)}<span className="text-sm text-muted-foreground">/10</span></p>
+                              <p className="text-xs text-muted-foreground">Puntuación IA</p>
+                          </div>
+                        </CardHeader>
+                        <CardContent>
+                          <p className="text-sm text-foreground/80 pl-2 border-l-2 border-primary/50">{evaluation.reasoning}</p>
+                        </CardContent>
+                      </Card>
+                    </li>
+                  );
+                })}
+              </ul>
+            </div>
+          </div>
         )}
 
         {!isLoading && !evaluationResult && challenge.status === 'completed' && (
