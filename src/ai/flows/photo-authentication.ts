@@ -89,14 +89,11 @@ const authenticatePhotoFlow = ai.defineFlow(
     const watermarkText = `Health369 - ${formattedDateTime}`;
 
     const {media} = await ai.generate({
-      model: 'googleai/gemini-2.0-flash-exp', // This model supports image generation/editing
+      model: 'googleai/gemini-pro-vision', // This model supports image generation/editing
       prompt: [
         {media: {url: input.photoDataUri}},
         {text: `Add a visible watermark to this image with the text: "${watermarkText}". Place it in a standard watermark position (e.g., bottom right), ensuring it's legible but not too obstructive.`},
       ],
-      config: {
-        responseModalities: ['TEXT', 'IMAGE'], // Gemini requires TEXT even if only IMAGE is primary
-      },
     });
 
     let manipulationDetected = false;
@@ -106,7 +103,7 @@ const authenticatePhotoFlow = ai.defineFlow(
       // Simulate manipulation detection (replace with actual AI model call later if needed)
       // For a real check, you might use a different AI model or service here.
       const { output: manipulationCheckOutput } = await ai.generate({
-        model: ai.registry.getModel('googleai/gemini-2.0-flash'), // Using a text model for analysis
+        model: ai.registry.getModel('googleai/gemini-pro'), // Using a text model for analysis
         prompt: [
           {media: {url: input.photoDataUri}},
           {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}
@@ -136,4 +133,5 @@ const authenticatePhotoFlow = ai.defineFlow(
     };
   }
 );
+
 
