@@ -17,12 +17,18 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon, PlusCircle } from "lucide-react";
-import { Calendar } from "@/components/ui/calendar";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { es } from "date-fns/locale"; // Import Spanish locale for date-fns
 import { useToast } from "@/hooks/use-toast";
 import { createChallenge } from "@/app/actions/challengeActions"; // Server Action
+import React from "react";
+import { Skeleton } from "../ui/skeleton";
+
+// Lazy-load the Calendar component
+const Calendar = React.lazy(() =>
+  import("@/components/ui/calendar").then((mod) => ({ default: mod.Calendar }))
+);
 
 const challengeFormSchema = z.object({
   name: z.string().min(5, "El nombre del desafío debe tener al menos 5 caracteres.").max(100),
@@ -198,14 +204,16 @@ export default function ChallengeCreationForm() {
                     </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                        mode="single"
-                        selected={field.value}
-                        onSelect={field.onChange}
-                        disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) } // Disable past dates
-                        initialFocus
-                        locale={es} // Set Spanish locale for Calendar
-                    />
+                      <React.Suspense fallback={<Skeleton className="h-[290px] w-[250px]" />}>
+                        <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0)) } // Disable past dates
+                            initialFocus
+                            locale={es} // Set Spanish locale for Calendar
+                        />
+                      </React.Suspense>
                     </PopoverContent>
                 </Popover>
                 <FormMessage />
