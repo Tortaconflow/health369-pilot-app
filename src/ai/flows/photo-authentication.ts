@@ -103,7 +103,7 @@ const authenticatePhotoFlow = ai.defineFlow(
       // Simulate manipulation detection (replace with actual AI model call later if needed)
       // For a real check, you might use a different AI model or service here.
       const { output: manipulationCheckOutput } = await ai.generate({
-        model: 'gemini-pro', // Using a text model for analysis
+        model: 'googleai/gemini-pro', // Using a text model for analysis
         prompt: [
           {media: {url: input.photoDataUri}},
           {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}
@@ -133,6 +133,3 @@ const authenticatePhotoFlow = ai.defineFlow(
     };
   }
 );
-
-
-
