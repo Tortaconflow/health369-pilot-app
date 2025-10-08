@@ -60,7 +60,7 @@ const authenticatePhotoFlow = ai.defineFlow(
     const watermarkText = `Health369 - ${formattedDateTime}`;
 
     const {media} = await ai.generate({
-      model: 'googleai/gemini-1.5-pro', // Use the default vision model from genkit config
+      model: 'googleai/gemini-pro-vision', // Use a vision model for image tasks
       prompt: [
         {media: {url: input.photoDataUri}},
         {text: `Add a visible watermark to this image with the text: "${watermarkText}". Place it in a standard watermark position (e.g., bottom right), ensuring it's legible but not too obstructive.`},
@@ -72,7 +72,7 @@ const authenticatePhotoFlow = ai.defineFlow(
 
     if (input.checkManipulation) {
       const { output: manipulationCheckOutput } = await ai.generate({
-        model: 'googleai/gemini-1.5-pro', // Using a vision model for analysis
+        model: 'googleai/gemini-pro-vision', // Using a vision model for analysis
         prompt: [
           {media: {url: input.photoDataUri}},
           {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}

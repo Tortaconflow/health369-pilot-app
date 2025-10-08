@@ -37,6 +37,7 @@ const prompt = ai.definePrompt({
   name: 'aiSuggestionsPrompt',
   input: {schema: AISuggestionsInputSchema},
   output: {schema: AISuggestionsOutputSchema},
+  model: 'googleai/gemini-pro',
   prompt: `Eres un asistente personalizado de salud y fitness. Tu tarea es generar una sugerencia de receta y una sugerencia de rutina basadas en los datos del usuario.
 
 Datos del Usuario:
@@ -53,33 +54,14 @@ const aiSuggestionsFlow = ai.defineFlow(
   },
   async input => {
     const llmResponse = await prompt(input);
-    const rawOutput = llmResponse.text;
+    const output = llmResponse.output();
 
-    if (!rawOutput) {
+    if (!output) {
       throw new Error('El modelo de IA no devolvió una salida válida.');
     }
-
-    try {
-      // Find the start and end of the JSON object
-      const jsonStart = rawOutput.indexOf('{');
-      const jsonEnd = rawOutput.lastIndexOf('}');
-      if (jsonStart === -1 || jsonEnd === -1) {
-        throw new Error('No se encontró un objeto JSON en la respuesta de la IA.');
-      }
-      
-      const jsonString = rawOutput.substring(jsonStart, jsonEnd + 1);
-      const parsedOutput = JSON.parse(jsonString);
-
-      // Validate the parsed object against the Zod schema
-      const validation = AISuggestionsOutputSchema.safeParse(parsedOutput);
-      if (!validation.success) {
-        throw new Error(`La salida de la IA no se ajusta al esquema esperado: ${validation.error.message}`);
-      }
-
-      return validation.data;
-    } catch (e: any) {
-      console.error("Error al analizar la salida de la IA:", e.message, "Salida recibida:", rawOutput);
-      throw new Error(`Error al procesar la respuesta de la IA. Detalles: ${e.message}`);
-    }
+    
+    // Genkit, when an output schema is defined, automatically parses the JSON.
+    // The complex parsing logic is no longer needed.
+    return output;
   }
 );
