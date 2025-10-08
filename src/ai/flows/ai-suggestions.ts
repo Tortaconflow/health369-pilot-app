@@ -52,10 +52,34 @@ const aiSuggestionsFlow = ai.defineFlow(
     outputSchema: AISuggestionsOutputSchema,
   },
   async input => {
-    const {output} = await prompt(input);
-    if (!output) {
+    const llmResponse = await prompt(input);
+    const rawOutput = llmResponse.text;
+
+    if (!rawOutput) {
       throw new Error('El modelo de IA no devolvió una salida válida.');
     }
-    return output;
+
+    try {
+      // Find the start and end of the JSON object
+      const jsonStart = rawOutput.indexOf('{');
+      const jsonEnd = rawOutput.lastIndexOf('}');
+      if (jsonStart === -1 || jsonEnd === -1) {
+        throw new Error('No se encontró un objeto JSON en la respuesta de la IA.');
+      }
+      
+      const jsonString = rawOutput.substring(jsonStart, jsonEnd + 1);
+      const parsedOutput = JSON.parse(jsonString);
+
+      // Validate the parsed object against the Zod schema
+      const validation = AISuggestionsOutputSchema.safeParse(parsedOutput);
+      if (!validation.success) {
+        throw new Error(`La salida de la IA no se ajusta al esquema esperado: ${validation.error.message}`);
+      }
+
+      return validation.data;
+    } catch (e: any) {
+      console.error("Error al analizar la salida de la IA:", e.message, "Salida recibida:", rawOutput);
+      throw new Error(`Error al procesar la respuesta de la IA. Detalles: ${e.message}`);
+    }
   }
 );
