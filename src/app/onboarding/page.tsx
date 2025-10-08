@@ -156,19 +156,20 @@ export default function OnboardingPage() {
           </Form>
         </CardContent>
         <CardFooter className="flex justify-between pt-6">
-          {currentStep > 0 && (
+          {currentStep > 0 ? (
             <Button type="button" variant="outline" onClick={handleBack} size="lg" className="text-base">
               <ArrowLeft className="mr-2 h-5 w-5" />
               Atrás
             </Button>
+          ) : (
+            <div /> // Placeholder to keep the 'Next' button on the right
           )}
-          {currentStep < totalSteps - 1 && (
+          {currentStep < totalSteps - 1 ? (
             <Button type="button" onClick={handleNext} size="lg" className="ml-auto text-base bg-primary hover:bg-primary/90 text-primary-foreground">
               Siguiente
               <ArrowRight className="ml-2 h-5 w-5" />
             </Button>
-          )}
-          {currentStep === totalSteps - 1 && (
+          ) : (
             <Button
               type="button"
               onClick={form.handleSubmit(onSubmit)}

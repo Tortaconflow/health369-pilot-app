@@ -44,35 +44,6 @@ export async function authenticatePhoto(input: AuthenticatePhotoInput): Promise<
   return authenticatePhotoFlow(input);
 }
 
-// This prompt describes the overall capability, but the actual image generation
-// within the flow uses a more direct prompt to the image model.
-const authenticatePhotoPrompt = ai.definePrompt({
-  name: 'authenticatePhotoPrompt',
-  input: {schema: AuthenticatePhotoInputSchema},
-  output: {schema: AuthenticatePhotoOutputSchema},
-  prompt: `You are an AI expert in processing images.
-
-  The user has provided a photo that needs to be watermarked with the current date and time.
-  If checkManipulation is true, you should also analyze the image to detect any signs of manipulation.
-
-  Return the watermarked photo as a data URI. If manipulation is detected, set manipulationDetected to true and provide details in detectionDetails.
-
-  Photo: {{media url=photoDataUri}}
-  Check Manipulation: {{{checkManipulation}}}
-
-  Here's how to construct the data URI for the watermarked image:
-  1.  Encode the image data using Base64.
-  2.  Prepend the appropriate MIME type (e.g., "data:image/png;base64,") to the Base64 encoded data.
-
-  Ensure the watermarkedPhotoDataUri is correctly formatted. If checkManipulation is false, return the original photo with just the watermark.
-
-  Output format:
-  "watermarkedPhotoDataUri": "data:<mimetype>;base64,<encoded_data>",
-  "manipulationDetected": <true|false>,
-  "detectionDetails": "<details about manipulation>"
-  `,
-});
-
 const authenticatePhotoFlow = ai.defineFlow(
   {
     name: 'authenticatePhotoFlow',
@@ -89,7 +60,7 @@ const authenticatePhotoFlow = ai.defineFlow(
     const watermarkText = `Health369 - ${formattedDateTime}`;
 
     const {media} = await ai.generate({
-      model: 'googleai/gemini-pro-vision', // This model supports image generation/editing
+      model: 'googleai/gemini-pro-vision', // Use the default vision model from genkit config
       prompt: [
         {media: {url: input.photoDataUri}},
         {text: `Add a visible watermark to this image with the text: "${watermarkText}". Place it in a standard watermark position (e.g., bottom right), ensuring it's legible but not too obstructive.`},
@@ -100,8 +71,6 @@ const authenticatePhotoFlow = ai.defineFlow(
     let detectionDetails = '';
 
     if (input.checkManipulation) {
-      // Simulate manipulation detection (replace with actual AI model call later if needed)
-      // For a real check, you might use a different AI model or service here.
       const { output: manipulationCheckOutput } = await ai.generate({
         model: 'googleai/gemini-pro-vision', // Using a vision model for analysis
         prompt: [
@@ -120,14 +89,17 @@ const authenticatePhotoFlow = ai.defineFlow(
         manipulationDetected = manipulationCheckOutput.manipulationDetected;
         detectionDetails = manipulationCheckOutput.detectionDetails;
       } else {
-        // Fallback if the manipulation check model doesn't respond as expected
         manipulationDetected = false; 
         detectionDetails = 'La verificación de manipulación no pudo completarse.';
       }
     }
 
+    if (!media?.url) {
+        throw new Error('La IA no pudo generar la imagen con marca de agua.');
+    }
+
     return {
-      watermarkedPhotoDataUri: media.url, // This is the data URI of the generated (watermarked) image
+      watermarkedPhotoDataUri: media.url,
       manipulationDetected: manipulationDetected,
       detectionDetails: detectionDetails,
     };
