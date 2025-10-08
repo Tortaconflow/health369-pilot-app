@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Card, CardContent, CardHeader, CardTitle, CardFooter, CardDescription } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Send, Sparkles, User, Bot, Loader2, Rocket, Activity, Mic, Volume2, AlertTriangle } from 'lucide-react';
+import { Send, Sparkles, User, Bot, Loader2, Rocket, Activity, Mic, AlertTriangle } from 'lucide-react';
 import { handleRecipeChat } from '@/app/actions/chatActions';
 import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
@@ -115,15 +115,14 @@ export default function AIChatPage() {
   const [isListening, setIsListening] = useState(false);
   const [browserSupportsSpeech, setBrowserSupportsSpeech] = useState(true);
   const speechRecognitionRef = useRef<SpeechRecognition | null>(null);
-  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
   useEffect(() => {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition || !window.speechSynthesis) {
+    if (!SpeechRecognition) {
       setBrowserSupportsSpeech(false);
       toast({
         title: "Navegador no compatible",
-        description: "Tu navegador no es compatible con el reconocimiento o síntesis de voz.",
+        description: "Tu navegador no es compatible con el reconocimiento de voz.",
         variant: "destructive"
       });
       return;
@@ -151,13 +150,9 @@ export default function AIChatPage() {
     recognition.onend = () => setIsListening(false);
     speechRecognitionRef.current = recognition;
 
-    utteranceRef.current = new SpeechSynthesisUtterance();
-    utteranceRef.current.lang = 'es-ES';
-    utteranceRef.current.rate = 0.9;
 
     return () => {
       recognition.stop();
-      window.speechSynthesis.cancel();
     };
   }, [toast]);
 
@@ -199,7 +194,6 @@ export default function AIChatPage() {
       setIsQuestionnaireComplete(true);
       const completeMessage = '¡Genial! Tus preferencias han sido guardadas para esta sesión. ¿Listo/a para planificar algo increíble juntos? 🚀';
       setMessages(prev => [...prev, {id: 'bot-q-complete', role: 'assistant', content: completeMessage}]);
-      speakText(completeMessage);
       toast({
         title: "Cuestionario Completo",
         description: "Tus preferencias están listas. ¡Vamos a ello!",
@@ -226,13 +220,6 @@ export default function AIChatPage() {
 
     context += preferencesList.join(". ") + ".";
     return context;
-  };
-
-  const speakText = (text: string) => {
-    if (!browserSupportsSpeech || !utteranceRef.current || !window.speechSynthesis) return;
-    window.speechSynthesis.cancel();
-    utteranceRef.current.text = text;
-    window.speechSynthesis.speak(utteranceRef.current);
   };
 
   const handleSubmit = async (e?: FormEvent<HTMLFormElement>, promptedQuery?: string) => {
@@ -275,7 +262,6 @@ export default function AIChatPage() {
           content: result.data.aiResponse,
         };
         setMessages((prevMessages) => [...prevMessages, newAssistantMessage]);
-        speakText(result.data.aiResponse);
 
         const aiResponseLower = result.data.aiResponse.toLowerCase();
         if (aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_ES) || aiResponseLower.includes(WORKOUT_GENERATION_PROMPT_KEYPHRASE_EN)) {
@@ -295,14 +281,12 @@ export default function AIChatPage() {
         toast({ title: 'Error del Asistente', description: errorText, variant: 'destructive' });
         const errorAssistantMessage: ChatMessage = { id: `assistant-error-${Date.now()}`, role: 'assistant', content: errorText };
         setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
-        speakText(errorText);
       }
     } catch (error) {
       const errorText = 'No se pudo conectar con el asistente de IA.';
       toast({ title: 'Error de Conexión', description: errorText, variant: 'destructive' });
       const errorAssistantMessage: ChatMessage = { id: `assistant-error-${Date.now()}`, role: 'assistant', content: errorText };
       setMessages((prevMessages) => [...prevMessages, errorAssistantMessage]);
-      speakText(errorText);
     } finally {
       setIsLoading(false);
       setTimeout(scrollToBottom, 0);
@@ -361,7 +345,6 @@ export default function AIChatPage() {
     const assistantMessageContent = "¡Rutina en camino! 🏋️‍♀️ (Esto es un marcador de posición. La integración completa es el siguiente paso, ¡y va a ser épica!). ¿Algo más en lo que pueda ayudarte mientras tanto?";
     const assistantMessage: ChatMessage = { id: `assistant-workout-placeholder-${Date.now()}`, role: 'assistant', content: assistantMessageContent };
     setMessages(prev => [...prev, assistantMessage]);
-    speakText(assistantMessageContent);
     setIsLoading(false);
     toast({ title: "Generación de Rutina Iniciada (Simulación)", description: "La rutina completa se mostrará aquí cuando esté integrada." });
   };
@@ -373,7 +356,7 @@ export default function AIChatPage() {
             <AlertTriangle className="h-5 w-5" />
             <AlertTitle>Funcionalidad de Voz no Soportada</AlertTitle>
             <AlertDescriptionComponent>
-              Tu navegador actual no es compatible con las funciones de reconocimiento o síntesis de voz. Algunas características del chat pueden no estar disponibles.
+              Tu navegador actual no es compatible con las funciones de reconocimiento de voz.
             </AlertDescriptionComponent>
         </Alert>
       )}
@@ -530,3 +513,5 @@ export default function AIChatPage() {
     </div>
   );
 }
+
+    
