@@ -12,6 +12,8 @@ import { UserProfile as UserProfileType } from "@/types/domain";
 import { Award, BarChart3, Edit3, Shield, Star, User, Zap, Palette, Camera } from "lucide-react";
 import Image from "next/image";
 import ThemeSelector from "@/components/layout/ThemeSelector";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
 // Mock data - replace with actual data fetching
 const mockUserProfile: UserProfileType = {
@@ -36,6 +38,23 @@ const mockUserProfile: UserProfileType = {
   }
 };
 
+const LoadingSkeleton = () => (
+  <div className="space-y-6">
+    <Skeleton className="h-24 w-full" />
+    <Skeleton className="h-40 w-full" />
+  </div>
+);
+
+// Lazy-loaded Tab Contents
+const ProgressTabContent = dynamic(() => Promise.resolve(ProgressTab), {
+  loading: () => <LoadingSkeleton />,
+});
+const BadgesTabContent = dynamic(() => Promise.resolve(BadgesTab), {
+  loading: () => <LoadingSkeleton />,
+});
+const SettingsTabContent = dynamic(() => Promise.resolve(SettingsTab), {
+  loading: () => <LoadingSkeleton />,
+});
 
 export default function ProfilePage() {
   // Lógica para la barra de progreso de XP
@@ -107,77 +126,15 @@ export default function ProfilePage() {
             </TabsContent>
 
             <TabsContent value="progress">
-              <Section title="Estadísticas Actuales">
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-                    <StatDisplay label="Peso" value={`${mockUserProfile.progress?.weight || 'N/A'} kg`} />
-                    <StatDisplay label="Cintura" value={`${mockUserProfile.progress?.waist || 'N/A'} cm`} />
-                    <StatDisplay label="Masa Muscular" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
-                </div>
-                <p className="text-sm text-muted-foreground mt-4">
-                    Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
-                </p>
-              </Section>
-              <Separator className="my-6" />
-              <Section title="Fotos de Progreso">
-                 <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <h4 className="font-semibold mb-2">Antes</h4>
-                        <Image src="https://placehold.co/300x400.png?text=Antes" alt="Foto Antes" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
-                    </div>
-                    <div>
-                        <h4 className="font-semibold mb-2">Después (Ejemplo)</h4>
-                        <Image src="https://placehold.co/300x400.png?text=Despues" alt="Foto Después Ejemplo" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
-                    </div>
-                 </div>
-                 <Button className="mt-4">
-                    <Camera className="mr-2 h-4 w-4"/> Subir Nueva Foto
-                 </Button>
-              </Section>
+              <ProgressTabContent />
             </TabsContent>
             
             <TabsContent value="badges">
-              <Section title="Insignias Ganadas">
-                <div className="flex flex-wrap gap-3">
-                  {mockUserProfile.badges.map(badge => (
-                    <Badge key={badge} className="px-4 py-2 text-sm bg-accent/20 text-accent-foreground border-2 border-accent hover:bg-accent/30 cursor-pointer transition-colors">
-                      <Award className="h-5 w-5 mr-2" />
-                      {badge}
-                    </Badge>
-                  ))}
-                   <Badge variant="outline" className="px-4 py-2 text-sm border-dashed border-muted-foreground text-muted-foreground hover:border-primary hover:text-primary cursor-pointer transition-colors">
-                      <Zap className="h-5 w-5 mr-2" />
-                      Ver todas las insignias
-                    </Badge>
-                </div>
-              </Section>
+              <BadgesTabContent />
             </TabsContent>
 
             <TabsContent value="settings">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <Section title="Información de la Cuenta">
-                  <div className="space-y-4">
-                    <div>
-                      <Label htmlFor="name">Nombre Completo</Label>
-                      <Input id="name" defaultValue={mockUserProfile.name} />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Correo Electrónico</Label>
-                      <Input id="email" type="email" defaultValue={mockUserProfile.email} disabled />
-                    </div>
-                    <Button><Edit3 className="h-4 w-4 mr-2" />Guardar Cambios</Button>
-                  </div>
-                </Section>
-
-                <Section title="Apariencia">
-                  <ThemeSelector />
-                </Section>
-              </div>
-              
-              <Separator className="my-8" />
-
-              <Section title="Seguridad">
-                 <Button variant="outline"><Shield className="h-4 w-4 mr-2" />Cambiar Contraseña</Button>
-              </Section>
+              <SettingsTabContent />
             </TabsContent>
           </Tabs>
         </CardContent>
@@ -185,6 +142,86 @@ export default function ProfilePage() {
     </div>
   );
 }
+
+// Extracted Tab Content into separate components for lazy loading
+const ProgressTab = () => (
+  <>
+    <Section title="Estadísticas Actuales">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+          <StatDisplay label="Peso" value={`${mockUserProfile.progress?.weight || 'N/A'} kg`} />
+          <StatDisplay label="Cintura" value={`${mockUserProfile.progress?.waist || 'N/A'} cm`} />
+          <StatDisplay label="Masa Muscular" value={`${mockUserProfile.progress?.muscleMassPercentage || 'N/A'} %`} />
+      </div>
+      <p className="text-sm text-muted-foreground mt-4">
+          Última actualización: {new Date(mockUserProfile.progress?.lastUpdated || Date.now()).toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' })}
+      </p>
+    </Section>
+    <Separator className="my-6" />
+    <Section title="Fotos de Progreso">
+       <div className="grid grid-cols-2 gap-4">
+          <div>
+              <h4 className="font-semibold mb-2">Antes</h4>
+              <Image src="https://placehold.co/300x400.png?text=Antes" alt="Foto Antes" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
+          </div>
+          <div>
+              <h4 className="font-semibold mb-2">Después (Ejemplo)</h4>
+              <Image src="https://placehold.co/300x400.png?text=Despues" alt="Foto Después Ejemplo" width={300} height={400} className="rounded-lg shadow-md" data-ai-hint="progress photo" />
+          </div>
+       </div>
+       <Button className="mt-4">
+          <Camera className="mr-2 h-4 w-4"/> Subir Nueva Foto
+       </Button>
+    </Section>
+  </>
+);
+
+const BadgesTab = () => (
+  <Section title="Insignias Ganadas">
+    <div className="flex flex-wrap gap-3">
+      {mockUserProfile.badges.map(badge => (
+        <Badge key={badge} className="px-4 py-2 text-sm bg-accent/20 text-accent-foreground border-2 border-accent hover:bg-accent/30 cursor-pointer transition-colors">
+          <Award className="h-5 w-5 mr-2" />
+          {badge}
+        </Badge>
+      ))}
+       <Badge variant="outline" className="px-4 py-2 text-sm border-dashed border-muted-foreground text-muted-foreground hover:border-primary hover:text-primary cursor-pointer transition-colors">
+          <Zap className="h-5 w-5 mr-2" />
+          Ver todas las insignias
+        </Badge>
+    </div>
+  </Section>
+);
+
+const SettingsTab = () => (
+  <>
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <Section title="Información de la Cuenta">
+        <div className="space-y-4">
+          <div>
+            <Label htmlFor="name">Nombre Completo</Label>
+            <Input id="name" defaultValue={mockUserProfile.name} />
+          </div>
+          <div>
+            <Label htmlFor="email">Correo Electrónico</Label>
+            <Input id="email" type="email" defaultValue={mockUserProfile.email} disabled />
+          </div>
+          <Button><Edit3 className="h-4 w-4 mr-2" />Guardar Cambios</Button>
+        </div>
+      </Section>
+
+      <Section title="Apariencia">
+        <ThemeSelector />
+      </Section>
+    </div>
+    
+    <Separator className="my-8" />
+
+    <Section title="Seguridad">
+       <Button variant="outline"><Shield className="h-4 w-4 mr-2" />Cambiar Contraseña</Button>
+    </Section>
+  </>
+);
+
 
 interface SectionProps {
     title: string;

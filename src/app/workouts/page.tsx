@@ -1,13 +1,13 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import WorkoutDisplay from "@/components/workouts/WorkoutDisplay";
 import type { Workout, MachineInfo } from "@/types/domain";
 import { Dumbbell, Home, Cog } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import MachineInfoCard from "@/components/workouts/MachineInfoCard";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
 
-// Mock data for workouts - replace with actual data fetching
+// --- Mock Data ---
 const mockWorkouts: Workout[] = [
   {
     id: "gym_routine_001",
@@ -18,68 +18,12 @@ const mockWorkouts: Workout[] = [
     type: "gym",
     progress: 0,
     exercises: [
-      {
-        id: "ex001",
-        name: "Cinta de correr",
-        duration: "5 min.",
-        notes: "110-140lpm",
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Cardio"],
-        dataAiHint: "treadmill running"
-      },
-      {
-        id: "ex002",
-        name: "Calentamiento de hombros con banda de resistencia",
-        sets: 2,
-        reps: 15,
-        equipment: ["banda de resistencia"],
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Hombros"],
-        dataAiHint: "shoulder warmup"
-      },
-      {
-        id: "ex003",
-        name: "Plancha lateral sobre el codo",
-        sets: 4,
-        duration: "30s",
-        notes: "por lado",
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Core", "Oblicuos"],
-        dataAiHint: "side plank"
-      },
-      {
-        id: "ex004",
-        name: "Press inclinado en máquina",
-        sets: 4,
-        reps: 12,
-        weight: "22.5 kg",
-        equipment: ["máquina de press inclinado"],
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Pectoral Superior"],
-        dataAiHint: "incline press machine"
-      },
-      {
-        id: "ex005",
-        name: "Jalón de polea alta tras nuca con agarre amplio",
-        sets: 4,
-        reps: 12,
-        weight: "40 kg",
-        equipment: ["máquina de polea alta"],
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Espalda", "Dorsales"],
-        dataAiHint: "lat pulldown"
-      },
-      {
-        id: "ex006",
-        name: "Press de pecho con mancuernas",
-        sets: 4,
-        reps: 10,
-        weight: "20 kg",
-        equipment: ["mancuernas"],
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Pectoral"],
-        dataAiHint: "dumbbell press"
-      },
+      { id: "ex001", name: "Cinta de correr", duration: "5 min.", notes: "110-140lpm", imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Cardio"], dataAiHint: "treadmill running" },
+      { id: "ex002", name: "Calentamiento de hombros con banda de resistencia", sets: 2, reps: 15, equipment: ["banda de resistencia"], imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Hombros"], dataAiHint: "shoulder warmup" },
+      { id: "ex003", name: "Plancha lateral sobre el codo", sets: 4, duration: "30s", notes: "por lado", imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Core", "Oblicuos"], dataAiHint: "side plank" },
+      { id: "ex004", name: "Press inclinado en máquina", sets: 4, reps: 12, weight: "22.5 kg", equipment: ["máquina de press inclinado"], imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Pectoral Superior"], dataAiHint: "incline press machine" },
+      { id: "ex005", name: "Jalón de polea alta tras nuca con agarre amplio", sets: 4, reps: 12, weight: "40 kg", equipment: ["máquina de polea alta"], imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Espalda", "Dorsales"], dataAiHint: "lat pulldown" },
+      { id: "ex006", name: "Press de pecho con mancuernas", sets: 4, reps: 10, weight: "20 kg", equipment: ["mancuernas"], imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Pectoral"], dataAiHint: "dumbbell press" },
     ],
   },
   {
@@ -89,78 +33,31 @@ const mockWorkouts: Workout[] = [
     estimatedTime: "~20 min.",
     targetAudience: "para todos los niveles",
     type: "home",
-    progress: 25, // Example progress
+    progress: 25,
     exercises: [
-      {
-        id: "ex_h001",
-        name: "Saltos de Tijera (Jumping Jacks)",
-        duration: "60s",
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Cardio", "Cuerpo Completo"],
-        dataAiHint: "jumping jacks"
-      },
-      {
-        id: "ex_h002",
-        name: "Sentadillas con Peso Corporal",
-        sets: 3,
-        reps: 15,
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Piernas", "Glúteos"],
-        dataAiHint: "bodyweight squats"
-      },
-      {
-        id: "ex_h003",
-        name: "Flexiones (Push-ups)",
-        sets: 3,
-        reps: "Máx.",
-        notes: "Adaptar según nivel (rodillas o estándar)",
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Pectoral", "Hombros", "Tríceps"],
-        dataAiHint: "push ups"
-      },
-      {
-        id: "ex_h004",
-        name: "Plancha Frontal (Plank)",
-        sets: 3,
-        duration: "30-60s",
-        imagePlaceholderUrl: "https://placehold.co/80x80.png",
-        muscleGroups: ["Core"],
-        dataAiHint: "plank exercise"
-      },
+      { id: "ex_h001", name: "Saltos de Tijera (Jumping Jacks)", duration: "60s", imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Cardio", "Cuerpo Completo"], dataAiHint: "jumping jacks" },
+      { id: "ex_h002", name: "Sentadillas con Peso Corporal", sets: 3, reps: 15, imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Piernas", "Glúteos"], dataAiHint: "bodyweight squats" },
+      { id: "ex_h003", name: "Flexiones (Push-ups)", sets: 3, reps: "Máx.", notes: "Adaptar según nivel (rodillas o estándar)", imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Pectoral", "Hombros", "Tríceps"], dataAiHint: "push ups" },
+      { id: "ex_h004", name: "Plancha Frontal (Plank)", sets: 3, duration: "30-60s", imagePlaceholderUrl: "https://placehold.co/80x80.png", muscleGroups: ["Core"], dataAiHint: "plank exercise" },
     ],
   },
 ];
 
 const mockMachineInfo: MachineInfo[] = [
-  {
-    id: "machine001",
-    name: "Máquina de Press de Pecho",
-    description: "Desarrolla la fuerza y el tamaño de los músculos pectorales, deltoides anteriores y tríceps. Permite un movimiento guiado y seguro.",
-    imagePlaceholderUrl: "https://placehold.co/600x400.png",
-    dataAiHint: "chest press machine",
-    affectedMuscleGroups: ["Pectorales", "Hombros (frontal)", "Tríceps"],
-    commonExercises: [{id: "ex_m001", name: "Press de pecho en máquina"}],
-  },
-  {
-    id: "machine002",
-    name: "Máquina de Jalón Dorsal (Lat Pulldown)",
-    description: "Fortalece los músculos de la espalda, especialmente los dorsales anchos, bíceps y antebrazos. Ideal para mejorar la amplitud de la espalda.",
-    imagePlaceholderUrl: "https://placehold.co/600x400.png",
-    dataAiHint: "lat pulldown machine",
-    affectedMuscleGroups: ["Dorsales", "Bíceps", "Espalda Media"],
-     commonExercises: [{id: "ex_m002", name: "Jalón dorsal al pecho"}],
-  },
-  {
-    id: "machine003",
-    name: "Prensa de Piernas (Leg Press)",
-    description: "Trabaja los cuádriceps, glúteos e isquiotibiales. Una alternativa a las sentadillas, especialmente útil para levantar grandes pesos con apoyo lumbar.",
-    imagePlaceholderUrl: "https://placehold.co/600x400.png",
-    dataAiHint: "leg press machine",
-    affectedMuscleGroups: ["Cuádriceps", "Glúteos", "Isquiotibiales"],
-     commonExercises: [{id: "ex_m003", name: "Prensa de piernas"}],
-  },
+  { id: "machine001", name: "Máquina de Press de Pecho", description: "Desarrolla la fuerza y el tamaño de los músculos pectorales, deltoides anteriores y tríceps. Permite un movimiento guiado y seguro.", imagePlaceholderUrl: "https://placehold.co/600x400.png", dataAiHint: "chest press machine", affectedMuscleGroups: ["Pectorales", "Hombros (frontal)", "Tríceps"], commonExercises: [{id: "ex_m001", name: "Press de pecho en máquina"}], },
+  { id: "machine002", name: "Máquina de Jalón Dorsal (Lat Pulldown)", description: "Fortalece los músculos de la espalda, especialmente los dorsales anchos, bíceps y antebrazos. Ideal para mejorar la amplitud de la espalda.", imagePlaceholderUrl: "https://placehold.co/600x400.png", dataAiHint: "lat pulldown machine", affectedMuscleGroups: ["Dorsales", "Bíceps", "Espalda Media"], commonExercises: [{id: "ex_m002", name: "Jalón dorsal al pecho"}], },
+  { id: "machine003", name: "Prensa de Piernas (Leg Press)", description: "Trabaja los cuádriceps, glúteos e isquiotibiales. Una alternativa a las sentadillas, especialmente útil para levantar grandes pesos con apoyo lumbar.", imagePlaceholderUrl: "https://placehold.co/600x400.png", dataAiHint: "leg press machine", affectedMuscleGroups: ["Cuádriceps", "Glúteos", "Isquiotibiales"], commonExercises: [{id: "ex_m003", name: "Prensa de piernas"}], },
 ];
+// --- End Mock Data ---
 
+
+// Lazy load components
+const WorkoutDisplay = dynamic(() => import('@/components/workouts/WorkoutDisplay'), {
+  loading: () => <Skeleton className="h-[500px] w-full" />,
+});
+const MachineInfoCard = dynamic(() => import('@/components/workouts/MachineInfoCard'), {
+  loading: () => <Skeleton className="h-48 w-full" />,
+});
 
 export default function WorkoutsPage() {
   const gymWorkout = mockWorkouts.find(w => w.type === 'gym');
@@ -219,4 +116,3 @@ export default function WorkoutsPage() {
     </div>
   );
 }
-

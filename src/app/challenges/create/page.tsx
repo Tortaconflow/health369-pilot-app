@@ -1,6 +1,14 @@
-import ChallengeCreationForm from "@/components/challenges/ChallengeCreationForm";
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Award } from "lucide-react";
+import dynamic from "next/dynamic";
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load the form component
+const ChallengeCreationForm = dynamic(() => import('@/components/challenges/ChallengeCreationForm'), {
+  loading: () => <Skeleton className="h-[500px] w-full" />,
+  ssr: false // This form is fully client-side, no need for SSR
+});
 
 export default function CreateChallengePage() {
   return (

@@ -1,3 +1,4 @@
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,9 +10,20 @@ import { Challenge, ChallengeParticipant } from "@/types/domain";
 import { Award, CalendarDays, Users, Target, Zap, Clock, Edit, Upload, ShieldCheck, Trophy } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import ProgressRegistrationForm from "@/components/challenges/ProgressRegistrationForm";
-import ChallengeParticipants from "@/components/challenges/ChallengeParticipants";
-import ChallengeResults from "@/components/challenges/ChallengeResults";
+import dynamic from 'next/dynamic';
+import { Skeleton } from "@/components/ui/skeleton";
+
+// Lazy load components that are not visible on initial load
+const ProgressRegistrationForm = dynamic(() => import('@/components/challenges/ProgressRegistrationForm'), {
+  loading: () => <Skeleton className="h-96 w-full" />,
+});
+const ChallengeParticipants = dynamic(() => import('@/components/challenges/ChallengeParticipants'), {
+  loading: () => <Skeleton className="h-64 w-full" />,
+});
+const ChallengeResults = dynamic(() => import('@/components/challenges/ChallengeResults'), {
+  loading: () => <Skeleton className="h-64 w-full" />,
+});
+
 
 // Mock data - replace with actual data fetching for a single challenge by ID
 const mockChallenge: Challenge = {
@@ -68,6 +80,7 @@ export default function ChallengeDetailsPage({ params }: { params: { id: string 
             height={400}
             className="w-full h-60 md:h-80 object-cover"
             data-ai-hint="challenge banner"
+            priority // Prioritize loading of this large image
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
           <div className="absolute bottom-0 left-0 p-6 md:p-8">
