@@ -1,107 +1,82 @@
 
 'use server';
 /**
- * @fileOverview AI-powered photo authentication flow for watermarking and manipulation detection.
+ * @fileOverview Photo authentication flow to generate a watermark text.
+ * @description This flow's primary purpose is to generate a secure, timestamped watermark text.
+ *              The responsibility of applying this watermark to the image is delegated to the client-side (frontend).
+ *              This approach is more efficient, reliable, and cost-effective than attempting server-side image manipulation with an AI model.
  *
- * - authenticatePhoto - A function that handles the photo authentication process.
- * - AuthenticatePhotoInput - The input type for the authenticatePhoto function.
- * - AuthenticatePhotoOutput - The return type for the authenticatePhoto function.
+ * - generateWatermark - A function that creates the watermark text.
+ * - GenerateWatermarkInput - The input type for the generateWatermark function.
+ * - GenerateWatermarkOutput - The return type for the generateWatermark function.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+// CORRECCIÓN: Se importan 'z', 'defineFlow', y 'run' directamente desde 'genkit'.
+import {z, defineFlow, run} from 'genkit';
 
-const AuthenticatePhotoInputSchema = z.object({
-  photoDataUri: z
-    .string()
-    .describe(
-      "A photo to authenticate, as a data URI that must include a MIME type and use Base64 encoding. Expected format: 'data:<mimetype>;base64,<encoded_data>'."
-    ),
-  checkManipulation: z
-    .boolean()
-    .describe('Whether to check for image manipulation or not.'),
+// MEJORA: El esquema de entrada ahora es más simple, ya que no necesitamos la imagen.
+// Podríamos añadir un `userId` si se quisiera registrar quién pidió la marca de agua.
+const GenerateWatermarkInputSchema = z.object({
+  userId: z.string().optional().describe('Optional ID of the user requesting the watermark.'),
 });
-export type AuthenticatePhotoInput = z.infer<typeof AuthenticatePhotoInputSchema>;
+export type GenerateWatermarkInput = z.infer<typeof GenerateWatermarkInputSchema>;
 
-const AuthenticatePhotoOutputSchema = z.object({
-  watermarkedPhotoDataUri: z
-    .string()
-    .describe(
-      'The watermarked photo, as a data URI that must include a MIME type and use Base64 encoding.'
-    ),
-  manipulationDetected: z
-    .boolean()
-    .optional()
-    .describe('Whether image manipulation was detected or not.'),
-  detectionDetails: z
-    .string()
-    .optional()
-    .describe('Details about the detected manipulation, if any.'),
+// MEJORA: El esquema de salida se simplifica para devolver solo el texto de la marca de agua.
+const GenerateWatermarkOutputSchema = z.object({
+  watermarkText: z.string().describe('The text to be used as a watermark on the photo.'),
+  timestamp: z.string().describe('The ISO 8601 timestamp for when the watermark was generated.'),
 });
-export type AuthenticatePhotoOutput = z.infer<typeof AuthenticatePhotoOutputSchema>;
+export type GenerateWatermarkOutput = z.infer<typeof GenerateWatermarkOutputSchema>;
 
-export async function authenticatePhoto(input: AuthenticatePhotoInput): Promise<AuthenticatePhotoOutput> {
-  return authenticatePhotoFlow(input);
+/**
+ * Generates a standardized watermark text with the current timestamp.
+ * This function does NOT process any images. It simply creates the text
+ * that the client should apply to the photo.
+ * @param input - The input object, can be empty.
+ * @returns An object containing the watermark text and timestamp.
+ */
+export async function generateWatermark(input: GenerateWatermarkInput): Promise<GenerateWatermarkOutput> {
+  // Validamos una entrada potencialmente vacía, aunque no sea estrictamente necesario.
+  const validatedInput = GenerateWatermarkInputSchema.safeParse(input);
+  if (!validatedInput.success) {
+    console.error('Invalid input for generateWatermark:', validatedInput.error.flatten());
+    throw new Error('Invalid input provided.');
+  }
+  
+  try {
+    return await run('generateWatermarkFlow', () => generateWatermarkFlow(validatedInput.data));
+  } catch (error) {
+    console.error('Error executing generateWatermarkFlow:', error);
+    throw new Error('Could not generate watermark text at this time.');
+  }
 }
 
-const authenticatePhotoFlow = ai.defineFlow(
+const generateWatermarkFlow = defineFlow(
   {
-    name: 'authenticatePhotoFlow',
-    inputSchema: AuthenticatePhotoInputSchema,
-    outputSchema: AuthenticatePhotoOutputSchema,
+    name: 'generateWatermarkFlow',
+    inputSchema: GenerateWatermarkInputSchema,
+    outputSchema: GenerateWatermarkOutputSchema,
   },
-  async input => {
+  async (input) => {
+    // Lógica central: generar una marca de tiempo fiable.
     const now = new Date();
-    // Using Spanish locale as the app is in Spanish
-    const formattedDateTime = now.toLocaleString('es-ES', {
+    const timestamp = now.toISOString(); // Formato estándar y universal (ISO 8601)
+
+    // Formateamos la fecha y hora en un formato legible para el usuario en español.
+    const userFriendlyDateTime = now.toLocaleString('es-ES', {
       year: 'numeric', month: '2-digit', day: '2-digit',
-      hour: '2-digit', minute: '2-digit', second: '2-digit'
+      hour: '2-digit', minute: '2-digit', second: '2-digit',
+      timeZone: 'UTC' // Especificamos la zona horaria para consistencia.
     });
-    const watermarkText = `Health369 - ${formattedDateTime}`;
-
-    const {media} = await ai.generate({
-      model: 'googleai/gemini-pro-vision', // Use a vision model for image tasks
-      prompt: [
-        {media: {url: input.photoDataUri}},
-        {text: `Add a visible watermark to this image with the text: "${watermarkText}". Place it in a standard watermark position (e.g., bottom right), ensuring it's legible but not too obstructive.`},
-      ],
-    });
-
-    let manipulationDetected = false;
-    let detectionDetails = '';
-
-    if (input.checkManipulation) {
-      const { output: manipulationCheckOutput } = await ai.generate({
-        model: 'googleai/gemini-pro-vision', // Using a vision model for analysis
-        prompt: [
-          {media: {url: input.photoDataUri}},
-          {text: 'Analyze this image for any signs of digital manipulation or editing. Focus on inconsistencies in lighting, shadows, edges, or unusual patterns. Respond with ONLY a JSON object matching this structure: {"manipulationDetected": true, "detectionDetails": "Example: Slight blurring observed around the subject\'s arm, potentially indicative of editing."} or {"manipulationDetected": false, "detectionDetails": "No obvious signs of manipulation detected."}'}
-        ],
-        output: {
-          schema: z.object({
-            manipulationDetected: z.boolean(),
-            detectionDetails: z.string()
-          })
-        }
-      });
-      
-      if (manipulationCheckOutput) {
-        manipulationDetected = manipulationCheckOutput.manipulationDetected;
-        detectionDetails = manipulationCheckOutput.detectionDetails;
-      } else {
-        manipulationDetected = false; 
-        detectionDetails = 'La verificación de manipulación no pudo completarse.';
-      }
-    }
-
-    if (!media?.url) {
-        throw new Error('La IA no pudo generar la imagen con marca de agua.');
-    }
-
+    
+    const watermarkText = `Health369 - ${userFriendlyDateTime} UTC`;
+    
+    console.log(`Watermark generated for user: ${input.userId || 'unknown'}`);
+    
+    // Devolvemos tanto el texto para mostrar como la marca de tiempo oficial.
     return {
-      watermarkedPhotoDataUri: media.url,
-      manipulationDetected: manipulationDetected,
-      detectionDetails: detectionDetails,
+      watermarkText,
+      timestamp,
     };
   }
 );

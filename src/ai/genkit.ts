@@ -6,10 +6,12 @@ export const ai = genkit({
   plugins: [
     googleAI({
       apiKey: process.env.GEMINI_API_KEY,
-      // Usamos gemini-pro como el modelo de texto por defecto.
-      defaultModel: 'googleai/gemini-pro',
-      // Usamos gemini-pro-vision como el modelo de visión por defecto.
-      defaultVisionModel: 'googleai/gemini-pro-vision',
+      // CORRECCIÓN: Usamos 'gemini-pro-latest' como el modelo de texto por defecto,
+      // ya que hemos verificado que tu API key tiene acceso a él.
+      defaultModel: 'googleai/gemini-pro-latest',
+      // MEJORA: Usamos el mismo modelo para visión, ya que los modelos más recientes
+      // son multimodales y capaces de manejar tanto texto como imágenes.
+      defaultVisionModel: 'googleai/gemini-pro-latest',
     }),
   ],
   logLevel: 'debug',
