@@ -2,6 +2,11 @@ import type { Config } from "tailwindcss";
 
 export default {
     darkMode: ["class"],
+    experimental: {
+        // Habilita el nuevo motor de compilación JIT (Just-In-Time) escrito en Rust.
+        // Es significativamente más rápido y puede mejorar la eficiencia del árbol de dependencias.
+        oxide: true,
+    },
     content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
