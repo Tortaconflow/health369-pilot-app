@@ -1,3 +1,4 @@
+
 'use server';
 /**
  * @fileOverview A simple flow to greet Gemini.
@@ -25,7 +26,7 @@ const helloFlow = ai.defineFlow(
     outputSchema: GreetOutputSchema,
   },
   async (name) => { // name is GreetInput (string)
-    // The default model (gemini15Flash) configured in @/ai/genkit.ts will be used.
+    // The default model configured in @/ai/genkit.ts will be used.
     const generationResult = await ai.generate({
         prompt: `Hello Gemini, my name is ${name}. Please write a short, friendly greeting back to me.`,
     });
