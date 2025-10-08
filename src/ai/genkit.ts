@@ -7,7 +7,7 @@ export const ai = genkit({
     googleAI({
       // Usamos gemini-pro como el modelo de texto por defecto.
       // Es un modelo de texto capaz y ampliamente compatible.
-      defaultModel: 'googleai/gemini-pro',
+      defaultModel: 'googleai/gemini-1.5-pro',
       // gemini-pro-vision es ideal para el análisis de imágenes.
       defaultVisionModel: 'googleai/gemini-pro-vision',
     }),
