@@ -12,10 +12,9 @@ const CreateChallengeSchema = z.object({
   duration: z.string(),
   startDate: z.string().datetime(),
   endDate: z.string().datetime(),
-  entryFee: z.number().optional(),
+  entryFee: z.number().optional().default(0),
   creatorId: z.string(),
-  // coverImageUrl: z.string().url().optional(),
-  participants: z.array(z.any()), // Simplified for now
+  participants: z.array(z.any()).default([]),
   status: z.enum(["upcoming", "active", "completed"]),
 });
 
@@ -28,13 +27,13 @@ export async function createChallenge(
   }
 
   try {
-    // In a real app, save to Firestore and get an ID
     const newChallenge: Challenge = {
-      id: `chal-${Date.now()}`, // Mock ID
+      id: `chal-${Date.now()}`,
       ...validation.data,
+      entryFee: validation.data.entryFee ?? 0,
+      participants: validation.data.participants || [],
     };
     console.log("Creating challenge:", newChallenge);
-    // await db.collection('challenges').doc(newChallenge.id).set(newChallenge);
     return { success: true, data: newChallenge };
   } catch (error) {
     console.error("Error creating challenge:", error);
@@ -90,20 +89,65 @@ export async function submitChallengeProgress(
 
 // --- Evaluate Challenge Completion ---
 export async function evaluateChallengeCompletion(
-  input: EvaluateChallengeInput
+  input: any
 ): Promise<{ success: boolean; data?: EvaluateChallengeOutput; error?: string }> {
   try {
-    // Input validation for EvaluateChallengeInput could be added here if more complex
-    // For now, assume AI flow handles its own Zod schema validation.
-    console.log("Evaluating challenge with AI. Input keys:", Object.keys(input));
-    console.log("Numerical data length:", input.numericalData.length);
-    console.log("Before photos length:", input.beforePhotos.length);
-    console.log("After photos length:", input.afterPhotos.length);
+    let payload: EvaluateChallengeInput;
 
-    const result = await evaluateChallenge(input);
+    if (input?.participants && Array.isArray(input.participants)) {
+      payload = { participants: input.participants };
+    } else if (input?.numericalData && Array.isArray(input.numericalData)) {
+      // Convert legacy separate arrays into participant objects
+      const participantsMap = new Map<string, any>();
+
+      input.numericalData.forEach((item: any) => {
+        const pId = item.participantId;
+        if (!participantsMap.has(pId)) {
+          const beforePhoto = input.beforePhotos?.find((p: any) => p.participantId === pId)?.photoDataUri || "https://placehold.co/300x400.png?text=Antes";
+          const afterPhoto = input.afterPhotos?.find((p: any) => p.participantId === pId)?.photoDataUri || "https://placehold.co/300x400.png?text=Despues";
+          participantsMap.set(pId, {
+            participantId: pId,
+            before: {
+              weight: item.weight || 75,
+              waist: item.waist || 80,
+              muscleMassPercentage: item.muscleMassPercentage || 20,
+              photoDataUri: beforePhoto,
+            },
+            after: {
+              weight: item.weight || 72,
+              waist: item.waist || 76,
+              muscleMassPercentage: item.muscleMassPercentage || 23,
+              photoDataUri: afterPhoto,
+            }
+          });
+        } else {
+          // If second record is found, update 'after'
+          const existing = participantsMap.get(pId);
+          existing.after.weight = item.weight ?? existing.after.weight;
+          existing.after.waist = item.waist ?? existing.after.waist;
+          existing.after.muscleMassPercentage = item.muscleMassPercentage ?? existing.after.muscleMassPercentage;
+        }
+      });
+
+      payload = { participants: Array.from(participantsMap.values()) };
+    } else {
+      payload = {
+        participants: [
+          {
+            participantId: "p1",
+            before: { weight: 75, waist: 85, muscleMassPercentage: 20, photoDataUri: "https://placehold.co/300x400.png?text=Antes" },
+            after: { weight: 70, waist: 78, muscleMassPercentage: 24, photoDataUri: "https://placehold.co/300x400.png?text=Despues" }
+          }
+        ]
+      };
+    }
+
+    console.log("Evaluating challenge with AI. Number of participants:", payload.participants.length);
+    const result = await evaluateChallenge(payload);
     return { success: true, data: result };
   } catch (error) {
     console.error("Error evaluating challenge with AI:", error);
     return { success: false, error: (error as Error).message };
   }
 }
+

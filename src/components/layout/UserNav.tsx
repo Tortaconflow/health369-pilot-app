@@ -13,76 +13,68 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { LogOut, User, Settings, CreditCard, LifeBuoy } from "lucide-react";
-
-// Placeholder for authentication state
-const isAuthenticated = true; 
-const userName = "Usuario Piloto"; // Translated
-const userEmail = "usuario@health369.com"; // Translated (example)
+import { LogOut, User, Settings, Shield, Utensils, Award } from "lucide-react";
+import { initialMockHeroProfile } from "@/lib/gamification";
 
 export function UserNav() {
-  if (!isAuthenticated) {
-    return (
-      <Link href="/login" legacyBehavior passHref>
-        <Button variant="outline">Iniciar Sesión</Button>
-      </Link>
-    );
-  }
+  const hero = initialMockHeroProfile;
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-10 w-10 rounded-full">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src="https://placehold.co/100x100.png" alt={userName} data-ai-hint="user avatar" />
-            <AvatarFallback>{userName.substring(0, 2).toUpperCase()}</AvatarFallback>
+        <Button variant="ghost" className="relative h-10 w-10 rounded-full ring-2 ring-primary/40 hover:ring-primary transition-all p-0">
+          <Avatar className="h-10 w-10 border border-background">
+            <AvatarImage src={hero.avatarUrl} alt={hero.name} />
+            <AvatarFallback className="bg-primary text-primary-foreground font-bold">{hero.name.substring(0, 2).toUpperCase()}</AvatarFallback>
           </Avatar>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" forceMount>
-        <DropdownMenuLabel className="font-normal">
-          <div className="flex flex-col space-y-1">
-            <p className="text-sm font-medium leading-none">{userName}</p>
-            <p className="text-xs leading-none text-muted-foreground">
-              {userEmail}
-            </p>
+      <DropdownMenuContent className="w-64 p-2" align="end" forceMount>
+        <DropdownMenuLabel className="font-normal p-2">
+          <div className="flex flex-col space-y-1.5">
+            <div className="flex items-center justify-between">
+              <p className="text-sm font-bold leading-none">{hero.name}</p>
+              <span className="text-[10px] uppercase font-extrabold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                Nivel {hero.level}
+              </span>
+            </div>
+            <p className="text-xs text-muted-foreground">{hero.email}</p>
+            <div className="text-xs text-primary font-semibold flex items-center gap-1 mt-1">
+              <Shield className="h-3.5 w-3.5" /> {hero.heroRank}
+            </div>
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
           <Link href="/profile" passHref>
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              <span>Perfil</span>
-              <DropdownMenuShortcut>⇧⌘P</DropdownMenuShortcut>
+            <DropdownMenuItem className="cursor-pointer">
+              <User className="mr-2.5 h-4 w-4 text-primary" />
+              <span>Atributos & Superhéroe</span>
             </DropdownMenuItem>
           </Link>
-          <Link href="/profile#billing" passHref>
-            <DropdownMenuItem>
-              <CreditCard className="mr-2 h-4 w-4" />
-              <span>Facturación</span>
-              <DropdownMenuShortcut>⌘B</DropdownMenuShortcut>
+          <Link href="/experts" passHref>
+            <DropdownMenuItem className="cursor-pointer">
+              <Utensils className="mr-2.5 h-4 w-4 text-emerald-400" />
+              <span>Mi Nutricionista Valkiria</span>
+            </DropdownMenuItem>
+          </Link>
+          <Link href="/challenges" passHref>
+            <DropdownMenuItem className="cursor-pointer">
+              <Award className="mr-2.5 h-4 w-4 text-amber-400" />
+              <span>Desafíos & Trofeos</span>
             </DropdownMenuItem>
           </Link>
           <Link href="/profile#settings" passHref>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              <span>Ajustes</span>
-              <DropdownMenuShortcut>⌘S</DropdownMenuShortcut>
+            <DropdownMenuItem className="cursor-pointer">
+              <Settings className="mr-2.5 h-4 w-4 text-muted-foreground" />
+              <span>Configuración</span>
             </DropdownMenuItem>
           </Link>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
-         <Link href="/support" passHref>
-            <DropdownMenuItem>
-                <LifeBuoy className="mr-2 h-4 w-4" />
-                <span>Soporte</span>
-            </DropdownMenuItem>
-        </Link>
-        <DropdownMenuItem disabled>
-            <LogOut className="mr-2 h-4 w-4" />
-            <span>Cerrar Sesión</span>
-            <DropdownMenuShortcut>⇧⌘Q</DropdownMenuShortcut>
+        <DropdownMenuItem disabled className="cursor-not-allowed opacity-60">
+          <LogOut className="mr-2.5 h-4 w-4 text-destructive" />
+          <span>Cerrar Sesión</span>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

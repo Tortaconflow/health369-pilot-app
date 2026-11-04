@@ -4,14 +4,14 @@ import { authenticatePhoto, type AuthenticatePhotoInput, type AuthenticatePhotoO
 import { z } from "zod";
 
 const AuthenticatePhotoActionSchema = z.object({
-  photoDataUri: z.string().startsWith("data:image/", { message: "Invalid data URI for photo" }),
-  checkManipulation: z.boolean(),
+  photoDataUri: z.string().min(1, { message: "URI de foto inválido o vacío" }),
+  checkManipulation: z.boolean().optional().default(true),
+  userId: z.string().optional(),
 });
 
 export async function handlePhotoAuthentication(
   input: AuthenticatePhotoInput
 ): Promise<{ success: boolean; data?: AuthenticatePhotoOutput; error?: string }> {
-  
   const validation = AuthenticatePhotoActionSchema.safeParse(input);
   if (!validation.success) {
     return { success: false, error: JSON.stringify(validation.error.flatten().fieldErrors) };
@@ -25,3 +25,4 @@ export async function handlePhotoAuthentication(
     return { success: false, error: (error as Error).message };
   }
 }
+

@@ -12,7 +12,7 @@ export default function SignupPage() {
             <LogoIcon className="h-12 w-12 mx-auto" />
           </Link>
           {/* CardTitle is h2 by default -> Montserrat 18px. The text-3xl here will override it to a larger Montserrat. */}
-          <CardTitle className="text-3xl font-bold text-primary">Crear Cuenta en Health369</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Crea tu Cuenta en Valky</CardTitle>
           <CardDescription>Únete a nuestra comunidad y comienza tu viaje de bienestar.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

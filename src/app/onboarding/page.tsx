@@ -75,14 +75,21 @@ type OnboardingFormValues = z.infer<typeof onboardingFormSchema>;
 
 const totalSteps = stepSchemas.length;
 
-// --- Step Component Definitions (using dynamic import) ---
+import StepAge from '@/components/onboarding/StepAge';
+import StepWeight from '@/components/onboarding/StepWeight';
+import StepHeight from '@/components/onboarding/StepHeight';
+import StepGender from '@/components/onboarding/StepGender';
+import StepActivityLevel from '@/components/onboarding/StepActivityLevel';
+import StepFitnessGoal from '@/components/onboarding/StepFitnessGoal';
+
+// --- Step Component Definitions ---
 const stepComponents = [
-  dynamic(() => import('@/components/onboarding/StepAge'), { loading: () => <Skeleton className="h-[96px] w-full" /> }),
-  dynamic(() => import('@/components/onboarding/StepWeight'), { loading: () => <Skeleton className="h-[96px] w-full" /> }),
-  dynamic(() => import('@/components/onboarding/StepHeight'), { loading: () => <Skeleton className="h-[96px] w-full" /> }),
-  dynamic(() => import('@/components/onboarding/StepGender'), { loading: () => <Skeleton className="h-[188px] w-full" /> }),
-  dynamic(() => import('@/components/onboarding/StepActivityLevel'), { loading: () => <Skeleton className="h-[96px] w-full" /> }),
-  dynamic(() => import('@/components/onboarding/StepFitnessGoal'), { loading: () => <Skeleton className="h-[96px] w-full" /> }),
+  StepAge,
+  StepWeight,
+  StepHeight,
+  StepGender,
+  StepActivityLevel,
+  StepFitnessGoal,
 ];
 
 export default function OnboardingPage() {
@@ -106,7 +113,7 @@ export default function OnboardingPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     toast({
       title: "¡Perfil Completado!",
-      description: "Tu información ha sido guardada. ¡Bienvenido/a a Health369!",
+      description: "Tu información ha sido guardada. ¡Bienvenido/a a Valky369!",
       className: "bg-green-500 text-white",
     });
     router.push("/dashboard");
@@ -136,7 +143,7 @@ export default function OnboardingPage() {
       <Card className="w-full max-w-lg shadow-2xl">
         <CardHeader className="text-center">
           <UserPlus className="h-12 w-12 mx-auto text-primary mb-3" />
-          <CardTitle className="text-2xl font-bold text-primary">¡Bienvenido/a a Health369!</CardTitle>
+          <CardTitle className="text-2xl font-bold text-primary">¡Bienvenido/a a Valky369!</CardTitle>
           {currentStep === 0 && (
             <CardDescription className="text-md text-muted-foreground px-2">
               Para que podamos ofrecerte una experiencia personalizada, por favor, cuéntanos un poco sobre ti.

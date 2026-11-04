@@ -1,102 +1,66 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Expert } from "@/types/domain";
-import { Search, Filter } from "lucide-react";
+import { Search, Utensils, ShieldCheck, Sparkles, HeartHandshake, Video, Users } from "lucide-react";
 import ExpertCard from "@/components/experts/ExpertCard";
-
-// Mock data - replace with actual data fetching
-const mockExperts: Expert[] = [
-  {
-    id: "expert1",
-    name: "Dra. Emilia Campos", // Translated
-    specialty: "Nutricionista",
-    avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Nutricionista dedicada con más de 10 años de experiencia en planes de dieta personalizados y coaching de bienestar.", // Translated
-    rating: 4.9,
-    experienceYears: 10,
-    certifications: ["Dietista-Nutricionista Registrada (RDN)", "Especialista Certificada en Nutrición (CNS)"], // Translated
-  },
-  {
-    id: "expert2",
-    name: "Juan Dávila", // Translated
-    specialty: "Entrenador Personal",
-    avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Entrenador personal certificado enfocado en entrenamiento de fuerza y fitness funcional. Ayudando a clientes a alcanzar su máxima condición física.", // Translated
-    rating: 4.7,
-    experienceYears: 8,
-    certifications: ["Entrenador Personal Certificado ACE", "Especialista Certificado en Fuerza y Acondicionamiento (CSCS)"], // Translated
-  },
-  {
-    id: "expert3",
-    name: "Sofía Lara", // Translated
-    specialty: "Instructora de Yoga y Coach de Mindfulness",
-    avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Instructora de yoga experimentada que integra prácticas de mindfulness para el bienestar holístico.", // Translated
-    rating: 4.8,
-    experienceYears: 7,
-    certifications: ["RYT 500", "Coach de Mindfulness Certificada"], // Translated
-  },
-   {
-    id: "expert4",
-    name: "Marcos Chen",
-    specialty: "Coach de Rendimiento Deportivo",
-    avatarUrl: "https://placehold.co/150x150.png",
-    bio: "Especializado en mejorar el rendimiento atlético a través de programas de entrenamiento personalizados y asesoramiento nutricional.", // Translated
-    rating: 4.9,
-    experienceYears: 12,
-    certifications: ["CSCS", "Nutricionista Deportivo Certificado (CISSN)"], // Translated
-  },
-];
+import { Badge } from "@/components/ui/badge";
+import { mockExperts } from "@/lib/experts";
 
 export default function ExpertsPage() {
-  // TODO: Implement search and filter logic
   const experts = mockExperts;
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-0">
-      <Card className="mb-8 shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-3xl font-bold text-primary">Conecta con Expertos</CardTitle>
-          <CardDescription className="text-lg text-muted-foreground">
-            Encuentra entrenadores, nutricionistas y coaches de bienestar verificados para guiarte.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col md:flex-row gap-4 mb-6">
-            <div className="relative flex-grow">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              <Input placeholder="Buscar expertos por nombre o especialidad..." className="pl-10" />
-            </div>
-            <Select>
-              <SelectTrigger className="w-full md:w-[200px]">
-                <Filter className="h-4 w-4 mr-2 text-muted-foreground" />
-                <SelectValue placeholder="Filtrar por especialidad" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">Todas las Especialidades</SelectItem>
-                <SelectItem value="nutritionist">Nutricionista</SelectItem>
-                <SelectItem value="trainer">Entrenador Personal</SelectItem>
-                <SelectItem value="yoga">Instructor de Yoga</SelectItem>
-                <SelectItem value="mindfulness">Coach de Mindfulness</SelectItem>
-                <SelectItem value="sports-performance">Rendimiento Deportivo</SelectItem>
-              </SelectContent>
-            </Select>
-          </div>
-        </CardContent>
-      </Card>
+    <div className="container mx-auto py-6 space-y-8 max-w-7xl">
+      {/* Header Banner */}
+      <div className="p-8 rounded-2xl bg-gradient-to-r from-card via-card to-emerald-950/20 border border-border/60 shadow-xl relative overflow-hidden">
+        <div className="absolute top-0 right-0 p-8 opacity-10 pointer-events-none">
+          <Utensils className="h-64 w-64 text-emerald-400" />
+        </div>
 
-      {experts.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="max-w-2xl space-y-3">
+          <div className="flex items-center gap-2">
+            <Badge className="bg-emerald-500/15 text-emerald-400 border-emerald-500/30 text-xs font-bold gap-1 px-3 py-1">
+              <ShieldCheck className="h-3.5 w-3.5" /> Red Valkiria de Salud & Nutrición
+            </Badge>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-black tracking-tight text-foreground">
+            Profesionales Certificados a tu Alcance
+          </h1>
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+            La verdadera transformación combina entrenamiento heroico con respaldo clínico. Conéctate con nutriólogos y expertos verificados que prescribirán tu plan de alimentación directamente en tu perfil.
+          </p>
+
+          <div className="pt-2 flex flex-wrap gap-4 text-xs font-semibold text-muted-foreground">
+            <span className="flex items-center gap-1.5 text-foreground">
+              <Video className="h-4 w-4 text-primary" /> Videollamadas 1 a 1
+            </span>
+            <span className="flex items-center gap-1.5 text-foreground">
+              <Utensils className="h-4 w-4 text-emerald-400" /> Planes de Macros Asignables
+            </span>
+            <span className="flex items-center gap-1.5 text-foreground">
+              <HeartHandshake className="h-4 w-4 text-rose-400" /> Seguimiento Clínico
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Directory Grid */}
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <h2 className="text-xl font-bold flex items-center gap-2">
+            <Users className="h-5 w-5 text-primary" /> Directorio de Especialistas
+          </h2>
+          <span className="text-xs text-muted-foreground font-medium">
+            {experts.length} Profesionales Disponibles
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {experts.map((expert) => (
             <ExpertCard key={expert.id} expert={expert} />
           ))}
         </div>
-      ) : (
-        <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground">No se encontraron expertos que coincidan con tus criterios.</p>
-        </div>
-      )}
+      </div>
     </div>
   );
 }

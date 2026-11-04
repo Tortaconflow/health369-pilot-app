@@ -42,17 +42,48 @@ export default function ChallengeResults({ challenge }: ChallengeResultsProps) {
     setIsLoading(true);
     setEvaluationResult(null);
     try {
-      // Prepare data for AI. In a real app, this data would be fetched from a DB.
       const input = {
-        numericalData: mockNumericalData, // Use structured mock data
-        beforePhotos: mockBeforePhotos,   // Use structured mock data
-        afterPhotos: mockAfterPhotos,     // Use structured mock data
+        participants: [
+          {
+            participantId: "p1",
+            before: {
+              weight: 70,
+              waist: 80,
+              muscleMassPercentage: 20,
+              photoDataUri: "https://placehold.co/300x400.png?text=Alicia+Antes",
+            },
+            after: {
+              weight: 65,
+              waist: 75,
+              muscleMassPercentage: 22,
+              photoDataUri: "https://placehold.co/300x400.png?text=Alicia+Despues",
+            }
+          },
+          {
+            participantId: "p2",
+            before: {
+              weight: 85,
+              waist: 90,
+              muscleMassPercentage: 18,
+              photoDataUri: "https://placehold.co/300x400.png?text=Roberto+Antes",
+            },
+            after: {
+              weight: 80,
+              waist: 82,
+              muscleMassPercentage: 20,
+              photoDataUri: "https://placehold.co/300x400.png?text=Roberto+Despues",
+            }
+          }
+        ]
       };
       
       const result = await evaluateChallengeCompletion(input);
       if (result.success && result.data) {
         setEvaluationResult(result.data);
-        const winnerName = challenge.participants.find(p=>p.id === result.data?.winnerId)?.name || result.data?.winnerId;
+        const winnerObj = challenge.participants.find(
+          p => p.id === result.data?.winnerId || p.userId === result.data?.winnerId
+        );
+        const winnerName = winnerObj?.name || result.data?.winnerId;
         toast({ title: "¡Evaluación Completa!", description: `Ganador: ${winnerName}. Resumen disponible.`, className: "bg-green-500 text-white" });
       } else {
         toast({ title: "Evaluación Fallida", description: result.error || "No se pudo evaluar el desafío.", variant: "destructive" });
@@ -65,7 +96,9 @@ export default function ChallengeResults({ challenge }: ChallengeResultsProps) {
     }
   };
   
-  const winner = challenge.participants.find(p => p.userId === (evaluationResult?.winnerId || challenge.winnerId));
+  const winner = challenge.participants.find(
+    p => p.id === (evaluationResult?.winnerId || challenge.winnerId) || p.userId === (evaluationResult?.winnerId || challenge.winnerId)
+  );
 
   if (challenge.status !== 'completed' && !evaluationResult) {
     return (

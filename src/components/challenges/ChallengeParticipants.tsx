@@ -43,7 +43,15 @@ export default function ChallengeParticipants({ participants }: ChallengePartici
               </div>
               {/* Placeholder for participant status or mini-progress */}
               <div className="text-xs text-muted-foreground flex items-center">
-                {Math.random() > 0.5 ? <UserCheck className="h-4 w-4 text-green-500 mr-1" title="Progreso Registrado Recientemente"/> : <ShieldQuestion className="h-4 w-4 text-orange-400 mr-1" title="Esperando Actualización"/>}
+                {Math.random() > 0.5 ? (
+                  <span title="Progreso Registrado Recientemente" className="inline-flex items-center">
+                    <UserCheck className="h-4 w-4 text-green-500 mr-1" />
+                  </span>
+                ) : (
+                  <span title="Esperando Actualización" className="inline-flex items-center">
+                    <ShieldQuestion className="h-4 w-4 text-orange-400 mr-1" />
+                  </span>
+                )}
                 {Math.random() > 0.5 ? 'Activo' : 'Siguiendo'}
               </div>
             </li>

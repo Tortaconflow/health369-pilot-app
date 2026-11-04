@@ -4,109 +4,140 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Expert } from "@/types/domain";
-import { CalendarDays, MessageSquare, Star, Video, Briefcase, GraduationCap } from "lucide-react";
+import { CalendarDays, MessageSquare, Star, Video, Briefcase, GraduationCap, ShieldCheck, CheckCircle2, Clock, Utensils } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { mockExperts } from "@/lib/experts";
+import { BookingModal } from "@/components/experts/BookingModal";
 
-// Mock data - replace with actual data fetching for a single expert by ID
-const mockExpert: Expert = {
-  id: "expert1",
-  name: "Dra. Emilia Campos", // Translated
-  specialty: "Nutricionista",
-  avatarUrl: "https://placehold.co/200x200.png",
-  bio: "La Dra. Emilia Campos es una Dietista-Nutricionista Registrada (RDN) y Especialista Certificada en Nutrición (CNS) altamente aclamada con más de una década de experiencia en el campo de la nutrición clínica y el coaching de bienestar. Le apasiona empoderar a las personas para que alcancen sus metas de salud a través de estrategias dietéticas personalizadas y basadas en evidencia. La Dra. Campos se especializa en manejo de peso, nutrición deportiva y terapia dietética para condiciones crónicas. Su enfoque holístico considera no solo la comida, sino también los factores del estilo de vida para fomentar un bienestar sostenible. Contribuye activamente a la investigación en nutrición y es una ponente solicitada en conferencias de salud.", // Translated
-  rating: 4.9,
-  experienceYears: 10,
-  certifications: ["Dietista-Nutricionista Registrada (RDN)", "Especialista Certificada en Nutrición (CNS)", "Especialista Certificada por la Junta en Dietética Deportiva (CSSD)"], // Translated
-};
-
-// This page will be dynamic based on the expert's ID
-export default function ExpertProfilePage({ params }: { params: { id: string } }) {
-  // In a real app, fetch expert data based on params.id
-  const expert = mockExpert; 
-
-  if (!expert) {
-    return <div className="container mx-auto py-8 text-center">Experto no encontrado.</div>;
-  }
+export default async function ExpertProfilePage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const expert = mockExperts.find(e => e.id === id) || mockExperts[0];
 
   return (
-    <div className="container mx-auto py-8 px-4 md:px-0">
-      <Card className="max-w-4xl mx-auto shadow-xl overflow-hidden">
-        <CardHeader className="p-0 relative">
-          <Image 
-            src="https://placehold.co/1200x300.png" 
-            alt={`Imagen de portada de ${expert.name}`} 
-            width={1200} 
-            height={300}
-            className="w-full h-48 md:h-60 object-cover"
-            data-ai-hint="professional cover"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/20 to-transparent"></div>
-          <div className="absolute bottom-0 left-0 p-6 transform translate-y-1/2">
-            <Avatar className="h-32 w-32 md:h-40 md:w-40 border-4 border-background bg-background shadow-lg">
-              <AvatarImage src={expert.avatarUrl || `https://placehold.co/200x200.png?text=${expert.name.substring(0,1)}`} alt={expert.name} data-ai-hint="expert profile" />
-              <AvatarFallback className="text-4xl">{expert.name.substring(0,2).toUpperCase()}</AvatarFallback>
-            </Avatar>
+    <div className="container mx-auto py-6 max-w-5xl space-y-6">
+      <Link href="/experts" className="text-xs font-bold text-muted-foreground hover:text-foreground inline-flex items-center gap-1">
+        ← Volver al Directorio de la Red Valkiria
+      </Link>
+
+      <Card className="border-border/60 shadow-xl overflow-hidden bg-card/90">
+        {/* Cover Banner */}
+        <div className="h-48 w-full bg-gradient-to-r from-emerald-900/60 via-slate-900 to-amber-900/40 relative">
+          <div className="absolute inset-0 bg-black/20" />
+          <div className="absolute top-4 right-4">
+            <Badge className="bg-emerald-500/20 text-emerald-400 border-emerald-500/30 text-xs font-bold gap-1">
+              <ShieldCheck className="h-3.5 w-3.5" /> Profesional Verificado Valkyrie
+            </Badge>
           </div>
-        </CardHeader>
-        
-        {/* Spacer for translated avatar */}
-        <div className="p-6 pt-20 md:pt-24"> 
-        <CardContent className="p-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
-              <div>
-                <CardTitle className="text-3xl md:text-4xl font-bold text-primary">{expert.name}</CardTitle>
-                <CardDescription className="text-xl text-accent font-medium mt-1">{expert.specialty}</CardDescription>
-                <div className="flex items-center mt-2 text-yellow-500">
-                  <Star className="h-5 w-5 mr-1 fill-current" /> {expert.rating.toFixed(1)}
-                  <span className="text-muted-foreground ml-2 text-sm flex items-center">
-                    <Briefcase className="h-4 w-4 mr-1.5" /> {expert.experienceYears} años de experiencia
+        </div>
+
+        {/* Profile Content */}
+        <div className="px-6 md:px-8 pb-8 relative -mt-16">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-6">
+            <div className="flex items-end gap-5">
+              <Avatar className="h-28 w-28 md:h-32 md:w-32 border-4 border-card shadow-2xl rounded-2xl">
+                <AvatarImage src={expert.avatarUrl} alt={expert.name} className="object-cover" />
+                <AvatarFallback className="text-3xl font-black bg-primary text-primary-foreground">
+                  {expert.name.substring(0, 2).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+
+              <div className="space-y-1 pb-1">
+                <h1 className="text-2xl md:text-3xl font-black text-foreground">{expert.name}</h1>
+                <p className="text-sm font-bold text-emerald-400">{expert.specialty}</p>
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                  <span className="flex items-center text-amber-400 font-bold bg-amber-400/10 px-2 py-0.5 rounded border border-amber-400/20">
+                    <Star className="h-3.5 w-3.5 mr-1 fill-current" /> {expert.rating.toFixed(1)} / 5.0
+                  </span>
+                  <span>•</span>
+                  <span className="flex items-center font-medium">
+                    <Briefcase className="h-3.5 w-3.5 mr-1" /> {expert.experienceYears} años de práctica clínica
                   </span>
                 </div>
               </div>
-              <div className="flex gap-2 mt-4 md:mt-0">
-                <Button size="lg" className="bg-primary hover:bg-primary/90 text-primary-foreground">
-                  <MessageSquare className="mr-2 h-5 w-5" /> Chatear
-                </Button>
-                <Button variant="outline" size="lg" className="text-primary border-primary hover:bg-primary/10">
-                  <Video className="mr-2 h-5 w-5" /> Reservar Videollamada
-                </Button>
-              </div>
             </div>
 
-            <Separator className="my-6" />
+            <div className="flex flex-wrap gap-2.5">
+              <BookingModal expert={expert} />
+              <Button size="lg" variant="outline" className="border-border/60 font-bold">
+                <MessageSquare className="mr-2 h-4 w-4" /> Mensaje Directo
+              </Button>
+            </div>
+          </div>
 
-            <section className="mb-6">
-              <h3 className="text-2xl font-semibold text-foreground mb-3">Sobre Mí</h3>
-              <p className="text-foreground/80 leading-relaxed whitespace-pre-line">{expert.bio}</p>
-            </section>
+          <Separator className="my-6" />
 
-            <Separator className="my-6" />
+          {/* Bio & Approach */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <section className="space-y-2">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <Utensils className="h-4 w-4 text-emerald-400" /> Filosofía de Nutrición & Enfoque
+                </h2>
+                <p className="text-sm text-foreground/85 leading-relaxed">
+                  {expert.bio}
+                </p>
+              </section>
 
-            <section>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">Certificaciones y Cualificaciones</h3>
-              <ul className="space-y-2">
-                {expert.certifications.map((cert) => (
-                  <li key={cert} className="flex items-center text-foreground/90">
-                    <GraduationCap className="h-5 w-5 mr-3 text-accent flex-shrink-0" />
-                    <span>{cert}</span>
-                  </li>
-                ))}
-              </ul>
-            </section>
-            
-            {/* Placeholder for services, schedule, reviews etc. */}
-            <Separator className="my-6" />
-            <section>
-              <h3 className="text-2xl font-semibold text-foreground mb-4">Disponibilidad</h3>
-              <p className="text-muted-foreground">La información de disponibilidad y el calendario de reservas se mostrarán aquí. (Próximamente)</p>
-              <div className="mt-4 p-4 bg-muted/50 rounded-lg flex items-center justify-center">
-                <CalendarDays className="h-10 w-10 text-primary mr-4" />
-                <span className="text-lg">Consultar Mi Calendario</span>
-              </div>
-            </section>
+              <section className="space-y-3">
+                <h2 className="text-lg font-bold text-foreground flex items-center gap-2">
+                  <GraduationCap className="h-4 w-4 text-primary" /> Credenciales y Certificaciones Oficiales
+                </h2>
+                <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  {expert.certifications.map((cert) => (
+                    <li key={cert} className="p-3 rounded-xl bg-muted/40 border border-border/40 text-xs font-semibold text-foreground/90 flex items-center gap-2.5">
+                      <CheckCircle2 className="h-4 w-4 text-emerald-400 shrink-0" />
+                      <span>{cert}</span>
+                    </li>
+                  ))}
+                </ul>
+              </section>
 
-          </CardContent>
+              <section className="space-y-3">
+                <h2 className="text-lg font-bold text-foreground">Lo que incluye la consulta con este profesional:</h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs text-muted-foreground">
+                  <div className="p-3 rounded-xl bg-background/80 border border-border/40">
+                    <strong className="text-foreground block mb-1">📋 Plan de Macros Integrado</strong>
+                    Prescripción sincronizada directamente en tu dashboard de Valky369.
+                  </div>
+                  <div className="p-3 rounded-xl bg-background/80 border border-border/40">
+                    <strong className="text-foreground block mb-1">🎥 Videollamada 45 min</strong>
+                    Evaluación clínica de composición corporal, hábitos y suplementación.
+                  </div>
+                  <div className="p-3 rounded-xl bg-background/80 border border-border/40">
+                    <strong className="text-foreground block mb-1">💬 Chat de Seguimiento</strong>
+                    Resolución de dudas semanales y ajustes de calorías.
+                  </div>
+                  <div className="p-3 rounded-xl bg-background/80 border border-border/40">
+                    <strong className="text-foreground block mb-1">⚡ Sinergia con Valky AI</strong>
+                    Tus misiones diarias se sincronizan con las indicaciones del especialista en Valky.
+                  </div>
+                </div>
+              </section>
+            </div>
+
+            {/* Right sidebar: Booking Info */}
+            <div className="space-y-4">
+              <Card className="border-border/60 bg-muted/20 p-4 rounded-xl space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-muted-foreground">Consulta Inicial</span>
+                  <span className="text-xl font-black text-foreground">$45 USD</span>
+                </div>
+                <div className="text-xs text-muted-foreground space-y-1.5 border-t border-border/30 pt-3">
+                  <div className="flex items-center gap-1.5 text-foreground">
+                    <Clock className="h-3.5 w-3.5 text-primary" /> Duración: 45 minutos
+                  </div>
+                  <div className="flex items-center gap-1.5 text-foreground">
+                    <CalendarDays className="h-3.5 w-3.5 text-emerald-400" /> Próxima fecha: Mañana disponible
+                  </div>
+                </div>
+                <Button className="w-full font-bold bg-emerald-600 hover:bg-emerald-500 text-white shadow-md">
+                  Reservar Mi Sesión
+                </Button>
+              </Card>
+            </div>
+          </div>
+        </div>
       </Card>
     </div>
   );

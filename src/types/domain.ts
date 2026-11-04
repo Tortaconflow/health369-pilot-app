@@ -35,6 +35,61 @@ export type Challenge = {
   coverImageUrl?: string;
 };
 
+export type HeroRank = 'Iniciado' | 'Guerrero Valkyrie' | 'Campeón de Asgard' | 'Superhéroe Titán' | 'Valkyria Suprema';
+
+export type HeroAttributes = {
+  strength: number;    // Fuerza (STR) - 0 a 100
+  endurance: number;   // Resistencia (END) - 0 a 100
+  vitality: number;    // Nutrición / Vitalidad (VIT) - 0 a 100
+  agility: number;     // Agilidad (AGI) - 0 a 100
+  discipline: number;  // Disciplina / Mentalidad (MND) - 0 a 100
+  recovery?: number;   // Recuperación (REC) - 0 a 100
+};
+
+export type DailyQuest = {
+  id: string;
+  title: string;
+  description: string;
+  category: 'strength' | 'endurance' | 'vitality' | 'agility' | 'discipline';
+  xpReward: number;
+  attributeBoost: { attribute: keyof HeroAttributes; points: number };
+  completed: boolean;
+  iconType: string;
+};
+
+export type NutritionPlan = {
+  id: string;
+  expertId: string;
+  expertName: string;
+  assignedDate: string;
+  title: string;
+  dailyCaloriesTarget: number;
+  macros: {
+    proteinGrams: number;
+    carbsGrams: number;
+    fatsGrams: number;
+  };
+  guidelines: string[];
+  meals: {
+    time: string;
+    name: string;
+    description: string;
+    calories: number;
+  }[];
+};
+
+export type NutritionConsultation = {
+  id: string;
+  expertId: string;
+  expertName: string;
+  specialty: string;
+  date: string;
+  time: string;
+  status: 'scheduled' | 'completed' | 'cancelled';
+  sessionType: 'videocall' | 'chat';
+  meetLink?: string;
+};
+
 export type UserProgress = {
   weight?: number;
   waist?: number;
@@ -52,6 +107,10 @@ export type UserProfile = {
   avatarUrl?: string;
   level: number;
   experiencePoints: number;
+  xpToNextLevel: number;
+  heroRank: HeroRank;
+  heroAttributes: HeroAttributes;
+  streakDays: number;
   badges: string[]; // Array of badge names or IDs
   virtualCurrency: number;
   currentChallengeIds?: string[];
@@ -59,6 +118,7 @@ export type UserProfile = {
   healthGoals?: string[];
   preferences?: Record<string, any>;
   progress?: UserProgress;
+  activeNutritionPlan?: NutritionPlan;
 };
 
 export type RecipeSuggestion = {

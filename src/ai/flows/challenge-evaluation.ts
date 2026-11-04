@@ -9,12 +9,9 @@
  * - EvaluateChallengeOutput - The return type for the evaluateChallenge function.
  */
 
-import {ai} from '@/ai/genkit';
-// CORRECCIÓN: Se importan 'z', 'defineFlow', y 'run' directamente desde 'genkit'.
-import {z, defineFlow, run} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
 
-// MEJORA: Se reestructura la entrada para agrupar todos los datos por participante.
-// Esto es CRÍTICO para que el modelo pueda asociar correctamente las fotos y los datos.
 const ParticipantDataSchema = z.object({
   participantId: z.string().describe('The unique ID of the participant.'),
   before: z.object({
@@ -47,7 +44,6 @@ const EvaluateChallengeOutputSchema = z.object({
 });
 export type EvaluateChallengeOutput = z.infer<typeof EvaluateChallengeOutputSchema>;
 
-// MEJORA: Se añade una capa de validación y manejo de errores.
 export async function evaluateChallenge(input: EvaluateChallengeInput): Promise<EvaluateChallengeOutput> {
   const validatedInput = EvaluateChallengeInputSchema.safeParse(input);
   if (!validatedInput.success) {
@@ -56,7 +52,7 @@ export async function evaluateChallenge(input: EvaluateChallengeInput): Promise<
   }
 
   try {
-    return await run('evaluateChallengeFlow', () => evaluateChallengeFlow(validatedInput.data));
+    return await evaluateChallengeFlow(validatedInput.data);
   } catch (error) {
     console.error('Error al ejecutar evaluateChallengeFlow:', error);
     throw new Error('No se pudo completar la evaluación del desafío en este momento. Por favor, inténtalo de nuevo.');
@@ -65,9 +61,9 @@ export async function evaluateChallenge(input: EvaluateChallengeInput): Promise<
 
 const prompt = ai.definePrompt({
   name: 'evaluateChallengePrompt',
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: EvaluateChallengeInputSchema},
   output: {schema: EvaluateChallengeOutputSchema},
-  // MEJORA: Prompt refinado para ser más específico, estructurado y analítico.
   prompt: `You are an expert panel of unbiased judges for a fitness competition. Your task is to analyze the data for each participant and determine the winner based on the "best overall physical transformation."
 
   **Evaluation Criteria (in order of importance):**
@@ -109,26 +105,23 @@ const prompt = ai.definePrompt({
   Evaluate the participants and produce the JSON output now.`,
 });
 
-const evaluateChallengeFlow = defineFlow(
+const evaluateChallengeFlow = ai.defineFlow(
   {
     name: 'evaluateChallengeFlow',
     inputSchema: EvaluateChallengeInputSchema,
     outputSchema: EvaluateChallengeOutputSchema,
   },
   async (input) => {
-    const evaluationResult = await run('evaluate-challenge-data', async () => {
-        const {output} = await prompt(input);
-        if (!output) {
-            throw new Error('The AI model did not return any output.');
-        }
-        return output;
-    });
+    const { output } = await prompt(input);
+    if (!output) {
+      throw new Error('The AI model did not return any output.');
+    }
 
-    const parsedOutput = EvaluateChallengeOutputSchema.safeParse(evaluationResult);
+    const parsedOutput = EvaluateChallengeOutputSchema.safeParse(output);
     if (!parsedOutput.success) {
       console.error("Fallo en la validación del esquema de salida.", {
         input: input,
-        rawOutput: JSON.stringify(evaluationResult, null, 2),
+        rawOutput: JSON.stringify(output, null, 2),
         errors: parsedOutput.error.flatten(),
       });
       throw new Error(`The AI model's output did not conform to the expected schema.`);
@@ -138,3 +131,4 @@ const evaluateChallengeFlow = defineFlow(
     return parsedOutput.data;
   }
 );
+

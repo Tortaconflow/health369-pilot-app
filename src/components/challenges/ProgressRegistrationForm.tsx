@@ -75,7 +75,6 @@ export default function ProgressRegistrationForm({ challengeId }: ProgressRegist
           title: "¡Progreso Enviado!",
           description: "Tu progreso ha sido registrado exitosamente.",
           className: "bg-green-500 text-white",
-          icon: <CheckCircle className="h-5 w-5" />,
         });
         form.reset();
         setUploadedPhotoInfo(null); 

@@ -1,29 +1,20 @@
-
 'use server';
+
 /**
- * @fileOverview Un agente de IA para chatear sobre recetas y cocina.
- * @description Este flujo se centra exclusivamente en la conversación sobre nutrición y recetas.
- *              La lógica para iniciar otros procesos (como la generación de rutinas) debe
- *              ser manejada por la lógica de negocio en el backend o frontend, no dentro de este prompt.
- *
- * - chatAboutRecipes - Una función que maneja las conversaciones sobre recetas.
- * - RecipeChatInput - El tipo de entrada para la función chatAboutRecipes.
- * - RecipeChatOutput - El tipo de retorno para la función chatAboutRecipes.
+ * @fileOverview Un agente de IA para chatear sobre fitness, recetas, hábitos y motivación de superhéroes.
  */
 
-import {ai} from '@/ai/genkit';
-// CORRECCIÓN: Se importan 'z', 'defineFlow', y 'run' directamente desde 'genkit'.
-import {z, defineFlow, run} from 'genkit';
+import { ai } from '@/ai/genkit';
+import { z } from 'genkit';
+import { getSmartValkyResponse } from '@/ai/valky-knowledge-engine';
 
 const RecipeChatInputSchema = z.object({
-  // MEJORA: Se separa el contexto del usuario de la consulta para un procesamiento más claro.
   userContext: z.object({
     goal: z.string().optional().describe("El objetivo principal de fitness del usuario, ej. 'ganar masa muscular'."),
-    // Se pueden añadir más datos de contexto aquí si es necesario (ej. alergias, preferencias).
   }).optional().describe("Contexto sobre las preferencias y objetivos del usuario."),
   userQuery: z.string().describe('La pregunta o mensaje del usuario.'),
   chatHistory: z.array(z.object({
-    role: z.enum(['user', 'model']), // MEJORA: Se usa 'model' en lugar de 'assistant' para alinearse con Genkit.
+    role: z.enum(['user', 'model', 'assistant']),
     content: z.string(),
   })).optional().describe('Historial de la conversación previa para mantener el contexto.'),
 });
@@ -34,7 +25,6 @@ const RecipeChatOutputSchema = z.object({
 });
 export type RecipeChatOutput = z.infer<typeof RecipeChatOutputSchema>;
 
-
 export async function chatAboutRecipes(input: RecipeChatInput): Promise<RecipeChatOutput> {
   const validatedInput = RecipeChatInputSchema.safeParse(input);
   if (!validatedInput.success) {
@@ -43,31 +33,44 @@ export async function chatAboutRecipes(input: RecipeChatInput): Promise<RecipeCh
   }
 
   try {
-    return await run('recipeChatFlow', () => recipeChatFlow(validatedInput.data));
+    // Attempt Genkit Gemini 2.0 Flow
+    if (process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY) {
+      return await recipeChatFlow(validatedInput.data);
+    }
   } catch (error) {
-    console.error('Error al ejecutar recipeChatFlow:', error);
-    throw new Error('NutriChef AI no está disponible en este momento. Por favor, inténtalo más tarde.');
+    console.warn('Genkit online API no disponible, utilizando Valky Knowledge Engine:', error);
   }
+
+  // Resilient Knowledge Engine Fallback (Garantiza 100% disponibilidad y respuestas empáticas)
+  const localResponse = getSmartValkyResponse({
+    userQuery: validatedInput.data.userQuery,
+    goal: validatedInput.data.userContext?.goal,
+  });
+
+  return {
+    aiResponse: localResponse,
+  };
 }
 
 const recipeChatPrompt = ai.definePrompt({
   name: 'recipeChatPrompt',
+  model: 'googleai/gemini-2.0-flash',
   input: {schema: RecipeChatInputSchema},
   output: {schema: RecipeChatOutputSchema},
-  // MEJORA: Prompt simplificado y enfocado en una sola tarea: ser un chatbot de nutrición.
-  prompt: `Eres "NutriChef AI", un coach de fitness y nutrición entusiasta y empático para la aplicación Health369. Tu tono es motivador y usas emojis ocasionalmente (💪, 🥗, 🚀).
+  prompt: `Eres "Valky AI Coach", un coach de fitness y nutrición de superhéroes entusiasta y empático para la aplicación Valky (inspirada en Valkiria). Tu tono es heroico, empático y motivador para principiantes. Usas emojis ocasionalmente (⚡, 💪, 🥗, 🛡️).
 
-REGLA DE ORO: Cada respuesta tuya debe terminar con una pregunta abierta para mantener la conversación fluida y natural.
+REGLA DE ORO: Cada respuesta tuya debe ser clara, comprensible para principiantes y terminar con una pregunta abierta para mantener la conversación fluida y natural.
 
 TAREA PRINCIPAL:
-Tu único objetivo es chatear con el usuario sobre recetas, nutrición y consejos de cocina.
-- Proporciona recetas, listas de ingredientes y pasos de preparación.
-- Da consejos sobre técnicas de cocina saludables.
-- Responde preguntas sobre el valor nutricional de los alimentos.
+Tu objetivo es acompañar al usuario en su camino fitness:
+- Motivación en días difíciles y creación de hábitos sostenibles.
+- Ideas de comidas y recetas saludables fáciles y accesibles.
+- Consejos de técnica, recuperación y cómo empezar sin lesionarse.
+- Explicar cómo subir sus atributos de superhéroe en Valky.
 
 PERSONALIZACIÓN:
 {{#if userContext.goal}}
-- Adapta tus sugerencias al objetivo del usuario: "{{userContext.goal}}". Por ejemplo, si el objetivo es "ganar masa muscular", sugiere recetas altas en proteínas. Si es "perder peso", sugiere opciones más ligeras y ricas en nutrientes.
+- Adapta tus sugerencias al objetivo del usuario: "{{userContext.goal}}".
 {{/if}}
 
 HISTORIAL DE CONVERSACIÓN:
@@ -75,34 +78,28 @@ HISTORIAL DE CONVERSACIÓN:
   {{#each chatHistory}}
     {{#if_eq role "user"}}USER: {{{content}}}{{/if_eq}}
     {{#if_eq role "model"}}AI: {{{content}}}{{/if_eq}}
+    {{#if_eq role "assistant"}}AI: {{{content}}}{{/if_eq}}
   {{/each}}
 {{/if}}
 
 PREGUNTA ACTUAL DEL USUARIO:
 {{{userQuery}}}
 
-Tu respuesta como NutriChef AI (recuerda terminar con una pregunta abierta):
+Tu respuesta como Valky AI Coach:
 `,
 });
 
-const recipeChatFlow = defineFlow(
+const recipeChatFlow = ai.defineFlow(
   {
     name: 'recipeChatFlow',
     inputSchema: RecipeChatInputSchema,
     outputSchema: RecipeChatOutputSchema,
   },
   async (input) => {
-
-    const {output} = await run('invoke-recipe-chat-prompt', async () => {
-        const llmResponse = await recipeChatPrompt(input);
-        return llmResponse.output;
-    });
-
+    const { output } = await recipeChatPrompt(input);
     if (!output) {
-      console.error('El modelo de IA no devolvió una salida para recipeChatFlow. Input:', input);
-      throw new Error('NutriChef AI no pudo generar una respuesta en este momento.');
+      throw new Error('Sin respuesta del modelo.');
     }
-    
     return output;
   }
 );

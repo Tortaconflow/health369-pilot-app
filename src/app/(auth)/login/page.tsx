@@ -12,7 +12,7 @@ export default function LoginPage() {
             <LogoIcon className="h-12 w-12 mx-auto" />
           </Link>
           {/* CardTitle is h2 by default -> Montserrat 18px. The text-3xl here will override it to a larger Montserrat. */}
-          <CardTitle className="text-3xl font-bold text-primary">Iniciar Sesión en Health369</CardTitle>
+          <CardTitle className="text-3xl font-bold text-primary">Iniciar Sesión en Valky</CardTitle>
           <CardDescription>Ingresa tus credenciales para acceder a tu cuenta.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">

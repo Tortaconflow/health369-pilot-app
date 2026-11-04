@@ -1,30 +1,28 @@
 
 import type { Metadata } from 'next';
-import { Roboto, Montserrat } from 'next/font/google';
+import { Plus_Jakarta_Sans, Outfit } from 'next/font/google';
 import './globals.css';
 import { SidebarProvider } from '@/components/ui/sidebar';
 import { AppShell } from '@/components/layout/AppShell';
 import { Toaster } from "@/components/ui/toaster";
 import { QueryProvider } from '@/components/providers/QueryProvider';
-import { ThemeProvider } from '@/components/providers/ThemeProvider'; // Importado
+import { ThemeProvider } from '@/components/providers/ThemeProvider';
 
-const roboto = Roboto({
-  weight: ['400', '500', '700'],
+const jakarta = Plus_Jakarta_Sans({
   subsets: ['latin'],
-  variable: '--font-roboto',
+  variable: '--font-sans',
   display: 'swap',
 });
 
-const montserrat = Montserrat({
-  weight: ['600', '700'],
+const outfit = Outfit({
   subsets: ['latin'],
-  variable: '--font-montserrat',
+  variable: '--font-heading',
   display: 'swap',
 });
 
 export const metadata: Metadata = {
-  title: 'Health369 Piloto',
-  description: 'Revolucionando las metas de salud y fitness.',
+  title: 'Valky • Fitness Gamificado, Nutrición & Superhéroe RPG',
+  description: 'Desarrolla tu superhéroe fitness, accede a planes nutricionales con expertos de Valkiria y supera tus límites con IA.',
 };
 
 export default function RootLayout({
@@ -34,12 +32,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" suppressHydrationWarning>
-      <body className={`${roboto.variable} ${montserrat.variable} antialiased`} suppressHydrationWarning={true}>
+      <body className={`${jakarta.variable} ${outfit.variable} font-sans antialiased`} suppressHydrationWarning={true}>
         <ThemeProvider
-          defaultTheme="light"
+          defaultTheme="dark"
           defaultThemeVariant="standard"
-          storageKey="health369-ui-theme"
-          variantStorageKey="health369-ui-theme-variant"
+          storageKey="valky-ui-theme"
+          variantStorageKey="valky-ui-theme-variant"
         >
           <QueryProvider>
             <SidebarProvider defaultOpen={true}>
@@ -54,3 +52,4 @@ export default function RootLayout({
     </html>
   );
 }
+

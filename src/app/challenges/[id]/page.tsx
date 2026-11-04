@@ -47,11 +47,13 @@ const mockChallenge: Challenge = {
 };
 
 // Mock current user ID
-const currentUserId = "uCurrent";
+import { mockChallenges } from "@/lib/challenges";
 
-export default function ChallengeDetailsPage({ params }: { params: { id: string } }) {
-  // In a real app, fetch challenge data based on params.id
-  const challenge = mockChallenge;
+const currentUserId = "valky-hero-1";
+
+export default async function ChallengeDetailsPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params;
+  const challenge = mockChallenges.find(c => c.id === id) || mockChallenges[0];
 
   if (!challenge) {
     return <div className="container mx-auto py-8 text-center">Desafío no encontrado.</div>;

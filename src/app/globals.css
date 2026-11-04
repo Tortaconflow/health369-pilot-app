@@ -2,253 +2,98 @@
 @tailwind components;
 @tailwind utilities;
 
-body {
-  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
-  @apply text-sm; /* Default body text 14px (Roboto, 400) */
-}
-
-h1 {
-  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
-  @apply text-2xl font-bold; /* Montserrat, 24px, weight 700 */
-}
-
-h2 {
-  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
-  @apply text-lg font-semibold; /* Montserrat, 18px, weight 600 (font-semibold is 600) */
-}
-
-a {
-  font-family: var(--font-roboto), Arial, Helvetica, sans-serif;
-  @apply text-xs font-medium text-secondary; /* Roboto, 12px, weight 500, color Azul Suave */
-}
-
-
 @layer base {
-  /* --- ESTÁNDAR THEME (HEALTH369 PILOT - REVISED VIBRANT) --- */
   :root {
-    --background: 0 0% 96%; /* #F5F5F5 - Gris Claro */
-    --foreground: 0 0% 13%;    /* #212121 - Negro */
+    --background: 210 20% 98%;      /* #F8FAFC - Blanco Titanio / Slate Suave */
+    --foreground: 222 47% 11%;      /* #0F172A - Deep Slate Obsidian */
 
-    --card: 0 0% 100%;             /* #FFFFFF - Blanco */
-    --card-foreground: 0 0% 13%; /* #212121 - Negro */
+    --card: 0 0% 100%;              /* #FFFFFF */
+    --card-foreground: 222 47% 11%;
 
-    --popover: 0 0% 100%;          /* #FFFFFF - Blanco */
-    --popover-foreground: 0 0% 13%; /* #212121 - Negro */
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
 
-    --primary: 124 46% 24%;       /* #2E7D32 - Verde Esmeralda */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --primary: 38 92% 50%;          /* #F59E0B - Valkyrie Gold / Electric Amber */
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 199 98% 48%;     /* #03A9F4 - Azul Suave */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --secondary: 158 64% 45%;       /* #10B981 - Bio Emerald (Salud & Nutrición) */
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 0 0% 94%;         /* #F0F0F0 - Gris más claro */
-    --muted-foreground: 0 0% 40%;  /* #666666 - Gris Oscuro para texto muted */
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 14 100% 57%;        /* #FF5722 - Naranja Vibrante */
-    --accent-foreground: 0 0% 100%;  /* #FFFFFF - Blanco (para Naranja Vibrante) */
-    
-    --cta-button: 14 100% 57%;      /* #FF5722 - Naranja Vibrante (for primary buttons) */
-    --cta-button-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
+    --accent: 346 84% 53%;          /* #E11D48 - Valkyrie Crimson / Strength Energy */
+    --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 0 0% 88%;         /* #E0E0E0 - Gris Claro */
-    --input: 0 0% 92%;          /* #EBEDF0 - Gris muy claro para input backgrounds */
-    --ring: 122 49% 34%;          /* #2E7D32 - Verde Esmeralda para focus rings */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 38 92% 50%;
 
-    --radius: 0.75rem; /* 12px */
+    --radius: 0.85rem;
 
-    /* Standard Sidebar Vars - Light Mode (Health369 Pilot - Revised Vibrant) */
-    --sidebar-background: 0 0% 96%;   /* #F5F5F5 - Gris Claro */
-    --sidebar-foreground: 122 49% 34%; /* #2E7D32 - Verde Esmeralda (for icons/text) */
-    --sidebar-primary: 14 100% 57%;    /* #FF5722 - Naranja Vibrante (for active in sidebar) */
-    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --sidebar-accent: 14 100% 57%;     /* #FF5722 - Naranja Vibrante (for hover background) */
-    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (for hover text) */
-    --sidebar-border: 0 0% 88%;       /* #E0E0E0 - Gris Claro */
-    --sidebar-ring: 14 100% 57%;       /* Naranja Vibrante for ring in sidebar context */
-
-    --chart-1: 122 49% 45%; /* Shades of Verde Esmeralda */
-    --chart-2: 14 100% 65%; /* Shades of Naranja Vibrante */
-    --chart-3: 199 98% 55%; /* Shades of Azul Suave */
-    --chart-4: 0 0% 50%; /* Neutral Gray */
-    --chart-5: 45 100% 57%;  /* Amarillo Suave #FFCA28 (from vibrante theme, could be used) */
-  }
-
-  .dark { /* ESTÁNDAR THEME - DARK (REVISED VIBRANT) */
-    --background: 0 0% 10%; /* #1A1A1A - Very Dark Gray */
-    --foreground: 0 0% 95%;    /* #F2F2F2 - Blanco Hueso */
-
-    --card: 0 0% 13%;       /* #212121 - Dark Gray for cards */
-    --card-foreground: 0 0% 95%; /* #F2F2F2 - Blanco */
-
-    --popover: 0 0% 8%;    /* #141414 - Even darker for popovers */
-    --popover-foreground: 0 0% 95%; /* #F2F2F2 - Blanco */
-
-    --primary: 122 49% 55%;    /* #4CAF50 - Verde Esmeralda (lighter for dark mode) */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco para contraste */
-
-    --secondary: 199 98% 60%;  /* #29B6F6 - Azul Suave (lighter) */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco para contraste */
-
-    --muted: 0 0% 18%;      /* #2E2E2E - Dark muted gray */
-    --muted-foreground: 0 0% 70%; /* #B3B3B3 - Gris claro para texto */
-
-    --accent: 14 100% 65%;     /* #FF8A65 - Naranja Vibrante (lighter for dark mode) */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    
-    --cta-button: 14 100% 65%; /* #FF8A65 - Naranja Vibrante (lighter for dark mode) */
-    --cta-button-foreground: 0 0% 100%; /* #FFFFFF */
-
-    --destructive: 0 70% 55%; /* Slightly adjusted red for dark */
-    --destructive-foreground: 0 0% 98%;
-
-    --border: 0 0% 25%;     /* #404040 - Borde gris oscuro sutil */
-    --input: 0 0% 15%;      /* #262626 - Fondo de input gris oscuro */
-    --ring: 122 49% 55%;       /* Lighter Verde Esmeralda for focus rings */
-
-    /* Standard Sidebar Vars - Dark Mode (Revised Vibrant) */
-    --sidebar-background: 0 0% 12%; /* #1F1F1F - Dark Gray */
-    --sidebar-foreground: 122 49% 65%; /* #66BB6A - Lighter Verde Esmeralda */
-    --sidebar-primary: 14 100% 65%;    /* #FF8A65 - Naranja Vibrante (active item bg) */
-    --sidebar-primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --sidebar-accent: 14 100% 65%;     /* #FF8A65 - Naranja Vibrante (hover bg) */
-    --sidebar-accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco (for hover text) */
-    --sidebar-border: 0 0% 20%;     /* #333333 */
-    --sidebar-ring: 14 100% 65%;       /* Lighter Naranja Vibrante */
-  }
-
-  /* --- MINIMALISTA THEME --- */
-  html[data-theme-variant="minimalist"] :root {
-    --background: 0 0% 96%; /* #F5F5F5 - Gris muy claro */
-    --foreground: 0 0% 13%; /* #212121 - Negro */
-    --card: 0 0% 100%; /* #FFFFFF - Blanco */
-    --card-foreground: 0 0% 13%; /* #212121 - Negro */
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
-    --primary: 0 0% 40%; /* #666666 - Gris medio */
-    --primary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --secondary: 0 0% 55%; /* #8C8C8C - Gris un poco más claro */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --muted: 0 0% 90%; /* #E6E6E6 - Gris claro */
-    --muted-foreground: 0 0% 35%; /* #595959 */
-    --accent: 0 0% 25%; /* #404040 - Gris oscuro */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --cta-button: 0 0% 30%;      /* #4D4D4D - Darker gray for CTA */
-    --cta-button-foreground: 0 0% 100%; /* #FFFFFF */
-    --border: 0 0% 85%; /* #D9D9D9 */
-    --input: 0 0% 98%; /* #FAFAFA */
-    --ring: 0 0% 40%; /* Gris medio */
-
-    /* Minimalist Sidebar Vars - Light Mode */
-    --sidebar-background: 0 0% 92%; /* #EBEDF0 */
-    --sidebar-foreground: 0 0% 25%; /* #404040 */
-    --sidebar-primary: 0 0% 30%;    /* #4D4D4D */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 38 92% 50%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 85%;     /* #D9D9D9 */
-    --sidebar-accent-foreground: 0 0% 15%;
-    --sidebar-border: 0 0% 80%;
-    --sidebar-ring: 0 0% 30%;
+    --sidebar-accent: 210 40% 96.1%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214.3 31.8% 91.4%;
+    --sidebar-ring: 38 92% 50%;
+
+    --chart-1: 38 92% 50%;
+    --chart-2: 346 84% 53%;
+    --chart-3: 158 64% 45%;
+    --chart-4: 199 89% 48%;
+    --chart-5: 262 83% 58%;
   }
 
-  html[data-theme-variant="minimalist"].dark :root {
-    --background: 0 0% 12%; /* #1F1F1F - Gris muy oscuro */
-    --foreground: 0 0% 90%; /* #E6E6E6 - Gris muy claro */
-    --card: 0 0% 15%; /* #262626 */
-    --card-foreground: 0 0% 90%;
-    --popover: 0 0% 10%;
-    --popover-foreground: 0 0% 90%;
-    --primary: 0 0% 60%; /* #999999 - Gris claro */
-    --primary-foreground: 0 0% 10%; /* #1A1A1A - Negro */
-    --secondary: 0 0% 45%; /* #737373 - Gris medio-oscuro */
-    --secondary-foreground: 0 0% 90%;
-    --muted: 0 0% 20%; /* #333333 */
-    --muted-foreground: 0 0% 65%; /* #A6A6A6 */
-    --accent: 0 0% 75%; /* #BFBFBF - Gris muy claro */
-    --accent-foreground: 0 0% 10%; /* #1A1A1A - Negro */
-    --cta-button: 0 0% 70%;      /* #B3B3B3 - Lighter gray for CTA */
-    --cta-button-foreground: 0 0% 10%; /* #1A1A1A */
-    --border: 0 0% 25%; /* #404040 */
-    --input: 0 0% 18%; /* #2E2E2E */
-    --ring: 0 0% 75%;
+  .dark {
+    --background: 224 71% 4%;       /* #020617 - Obsidian Carbon */
+    --foreground: 210 40% 98%;      /* #F8FAFC - Titanium White */
 
-    /* Minimalist Sidebar Vars - Dark Mode */
-    --sidebar-background: 0 0% 10%; /* #1A1A1A */
-    --sidebar-foreground: 0 0% 75%; /* #BFBFBF */
-    --sidebar-primary: 0 0% 70%;    /* #B3B3B3 */
-    --sidebar-primary-foreground: 0 0% 10%;
-    --sidebar-accent: 0 0% 20%;     /* #333333 */
-    --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 0 0% 22%;
-    --sidebar-ring: 0 0% 70%;
+    --card: 222 47% 8%;             /* #0B1120 - Dark Frosted Card */
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222 47% 7%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 38 92% 52%;          /* #F59E0B - Valkyrie Radiant Amber */
+    --primary-foreground: 222 47% 11%;
+
+    --secondary: 158 64% 50%;       /* #10B981 - Bio Emerald */
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 217 33% 15%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 346 84% 61%;          /* #F43F5E - Valkyrie Crimson */
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 38 92% 52%;
+
+    --sidebar-background: 224 71% 5%;
+    --sidebar-foreground: 210 40% 98%;
+    --sidebar-primary: 38 92% 52%;
+    --sidebar-primary-foreground: 222 47% 11%;
+    --sidebar-accent: 217 33% 13%;
+    --sidebar-accent-foreground: 210 40% 98%;
+    --sidebar-border: 217 33% 16%;
+    --sidebar-ring: 38 92% 52%;
+
+    --chart-1: 38 92% 52%;
+    --chart-2: 346 84% 61%;
+    --chart-3: 158 64% 50%;
+    --chart-4: 199 89% 58%;
+    --chart-5: 262 83% 68%;
   }
-
-  /* --- VIBRANTE THEME --- */
-  html[data-theme-variant="vibrante"] :root {
-    --background: 0 0% 100%; /* #FFFFFF - Blanco */
-    --foreground: 0 0% 13%; /* #212121 - Negro */
-    --card: 0 0% 98%; /* #FAFAFA - Casi Blanco */
-    --card-foreground: 0 0% 13%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
-    --primary: 45 100% 57%; /* #FFCA28 - Amarillo Suave */
-    --primary-foreground: 0 0% 13%; /* Negro para contraste */
-    --secondary: 340 82% 52%; /* #E91E63 - Fucsia/Magenta */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --muted: 0 0% 94%; /* #F0F0F0 */
-    --muted-foreground: 0 0% 35%; /* #595959 */
-    --accent: 200 100% 50%; /* #00AEEF - Cyan Vibrante */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --cta-button: 14 100% 57%;      /* #FF5722 - Naranja Vibrante (consistent CTA) */
-    --cta-button-foreground: 0 0% 100%; /* #FFFFFF */
-    --border: 0 0% 88%; /* #E0E0E0 */
-    --input: 0 0% 96%; /* #F5F5F5 */
-    --ring: 14 100% 57%; /* Naranja Vibrante */
-
-    /* Vibrante Sidebar Vars - Light Mode */
-    --sidebar-background: 0 0% 97%; /* #F7F7F7 */
-    --sidebar-foreground: 340 82% 45%; /* Darker Fucsia */
-    --sidebar-primary: 14 100% 57%;    /* Naranja Vibrante */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 100% 90%;     /* Amarillo muy claro */
-    --sidebar-accent-foreground: 45 100% 30%; /* Amarillo oscuro */
-    --sidebar-border: 0 0% 90%;
-    --sidebar-ring: 14 100% 57%;
-  }
-
-  html[data-theme-variant="vibrante"].dark :root {
-    --background: 240 10% 4%; /* #0A0A0B - Muy oscuro, casi negro azulado */
-    --foreground: 0 0% 95%; /* #F2F2F2 - Blanco Hueso */
-    --card: 240 8% 8%; /* #131315 */
-    --card-foreground: 0 0% 95%;
-    --popover: 240 10% 3%;
-    --popover-foreground: 0 0% 95%;
-    --primary: 45 100% 60%; /* #FFD24D - Amarillo Suave (lig. más claro) */
-    --primary-foreground: 0 0% 10%; /* #1A1A1A - Negro */
-    --secondary: 340 82% 60%; /* #EC407A - Fucsia/Magenta (lig. más claro) */
-    --secondary-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --muted: 240 6% 12%; /* #1D1D20 */
-    --muted-foreground: 0 0% 70%; /* #B3B3B3 */
-    --accent: 200 100% 55%; /* #1AC9FF - Cyan Vibrante (lig. más claro) */
-    --accent-foreground: 0 0% 100%; /* #FFFFFF - Blanco */
-    --cta-button: 14 100% 60%;      /* #FF6D3B - Naranja Vibrante (lighter for dark mode) */
-    --cta-button-foreground: 0 0% 100%; /* #FFFFFF */
-    --border: 240 5% 18%; /* #2A2A2E */
-    --input: 240 7% 10%; /* #18181A */
-    --ring: 14 100% 60%;
-
-    /* Vibrante Sidebar Vars - Dark Mode */
-    --sidebar-background: 240 10% 5%; /* #0C0C0E */
-    --sidebar-foreground: 340 82% 70%; /* Lighter Fucsia */
-    --sidebar-primary: 14 100% 60%;    /* Naranja Vibrante */
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 100% 25%;     /* Darker Amarillo */
-    --sidebar-accent-foreground: 45 100% 70%; /* Lighter Amarillo */
-    --sidebar-border: 240 5% 15%;
-    --sidebar-ring: 14 100% 60%;
-  }
-
 }
 
 @layer base {
@@ -256,10 +101,27 @@ a {
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1;
   }
 }
 
-    
+/* Glassmorphic & Hero Card Utilities */
+.hero-glass {
+  background: rgba(15, 23, 42, 0.65);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-glow-str {
+  box-shadow: 0 0 20px -5px rgba(239, 68, 68, 0.35);
+}
+
+.stat-glow-vit {
+  box-shadow: 0 0 20px -5px rgba(16, 185, 129, 0.35);
+}
+
+.stat-glow-xp {
+  box-shadow: 0 0 25px -5px rgba(245, 158, 11, 0.4);
+}

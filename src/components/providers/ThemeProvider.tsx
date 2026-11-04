@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
@@ -22,7 +21,7 @@ interface ThemeProviderState {
 }
 
 const initialState: ThemeProviderState = {
-  theme: 'light',
+  theme: 'dark',
   themeVariant: 'standard',
   setTheme: () => null,
   setThemeVariant: () => null,
@@ -32,25 +31,31 @@ const ThemeProviderContext = createContext<ThemeProviderState>(initialState);
 
 export function ThemeProvider({
   children,
-  defaultTheme = 'light',
+  defaultTheme = 'dark',
   defaultThemeVariant = 'standard',
-  storageKey = 'ui-theme',
-  variantStorageKey = 'ui-theme-variant',
+  storageKey = 'valky-ui-theme',
+  variantStorageKey = 'valky-ui-theme-variant',
   ...props
 }: ThemeProviderProps) {
-  const [theme, setThemeState] = useState<Theme>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem(storageKey) as Theme) || defaultTheme;
-    }
-    return defaultTheme;
-  });
+  const [theme, setThemeState] = useState<Theme>(defaultTheme);
+  const [themeVariant, setThemeVariantState] = useState<ThemeVariant>(defaultThemeVariant);
+  const [mounted, setMounted] = useState(false);
 
-  const [themeVariant, setThemeVariantState] = useState<ThemeVariant>(() => {
-    if (typeof window !== 'undefined') {
-      return (localStorage.getItem(variantStorageKey) as ThemeVariant) || defaultThemeVariant;
+  useEffect(() => {
+    setMounted(true);
+    try {
+      const storedTheme = localStorage.getItem(storageKey) as Theme | null;
+      if (storedTheme) {
+        setThemeState(storedTheme);
+      }
+      const storedVariant = localStorage.getItem(variantStorageKey) as ThemeVariant | null;
+      if (storedVariant) {
+        setThemeVariantState(storedVariant);
+      }
+    } catch (e) {
+      console.warn("Could not read theme from localStorage", e);
     }
-    return defaultThemeVariant;
-  });
+  }, [storageKey, variantStorageKey]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -60,21 +65,25 @@ export function ThemeProvider({
     root.classList.add(theme);
 
     root.removeAttribute('data-theme-variant');
-    if (themeVariant !== 'standard') { // 'standard' is the default, no attribute needed
+    if (themeVariant !== 'standard') {
       root.setAttribute('data-theme-variant', themeVariant);
     }
   }, [theme, themeVariant]);
 
   const setTheme = (newTheme: Theme) => {
-    if (typeof window !== 'undefined') {
+    try {
       localStorage.setItem(storageKey, newTheme);
+    } catch (e) {
+      console.warn("Could not save theme to localStorage", e);
     }
     setThemeState(newTheme);
   };
 
   const setThemeVariant = (newVariant: ThemeVariant) => {
-    if (typeof window !== 'undefined') {
+    try {
       localStorage.setItem(variantStorageKey, newVariant);
+    } catch (e) {
+      console.warn("Could not save variant to localStorage", e);
     }
     setThemeVariantState(newVariant);
   };

@@ -13,6 +13,18 @@ const ReactQueryDevtools = process.env.NODE_ENV === "development"
   : () => null;
 
 
+// Filter out browser-extension injected attribute mismatches in dev mode (e.g. Bitdefender bis_skin_checked)
+if (typeof window !== "undefined") {
+  const originalError = console.error;
+  console.error = (...args: any[]) => {
+    const errorStr = args.map(a => (typeof a === "string" ? a : (a?.message || ""))).join(" ");
+    if (errorStr.includes("bis_skin_checked") || errorStr.includes("bis_register") || errorStr.includes("cz-shortcut-listen")) {
+      return;
+    }
+    originalError.apply(console, args);
+  };
+}
+
 export function QueryProvider({ children }: { children: React.ReactNode }) {
   const [queryClient] = React.useState(() => new QueryClient({
     defaultOptions: {

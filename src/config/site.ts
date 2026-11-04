@@ -1,6 +1,17 @@
-
 import type { LucideIcon } from 'lucide-react';
-import { LayoutDashboard, Users, Zap, UserCircle, ShieldCheck, MessageSquare, Activity, Award, UploadCloud, BarChart3, SparklesIcon, Compass, Dumbbell, Bot, Youtube } from 'lucide-react'; // Added Bot, Youtube
+import { 
+  Shield, 
+  Users, 
+  Zap, 
+  UserCircle, 
+  Dumbbell, 
+  Bot, 
+  Utensils, 
+  Flame, 
+  Trophy, 
+  Sparkles,
+  LayoutDashboard
+} from 'lucide-react';
 
 export type NavItem = {
   title: string;
@@ -18,6 +29,7 @@ export type SidebarNavItem = NavItem & {
 
 export type SiteConfig = {
   name: string;
+  tagline: string;
   description: string;
   url: string;
   ogImage: string;
@@ -26,20 +38,21 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  name: "Health369 Piloto",
-  description: "Revolucionando las metas de salud y fitness con bienestar personalizado, conexiones con expertos y desafíos sociales gamificados.",
-  url: "https://health369.example.com", // Reemplazar con tu URL real
-  ogImage: "https://health369.example.com/og.jpg", // Reemplazar con tu URL real de imagen OG
+  name: "Valky 369",
+  tagline: "El Código de Transformación Heroica (RPG + Nutrición Clínica + IA)",
+  description: "Desbloquea tu potencial de superhéroe fitness con el código 3-6-9. Stats RPG, nutrición con la Red Valkiria y coaching adaptativo con IA.",
+  url: "https://valky369.app",
+  ogImage: "https://valky369.app/og.jpg",
   mainNav: [
     {
-      title: "Panel de Control",
+      title: "Hero HQ",
       href: "/dashboard",
       icon: LayoutDashboard,
     },
     {
-      title: "Guía Inicial",
-      href: "/onboarding",
-      icon: Compass,
+      title: "Superhéroe & Stats",
+      href: "/profile",
+      icon: Shield,
     },
     {
       title: "Entrenamientos",
@@ -47,89 +60,57 @@ export const siteConfig: SiteConfig = {
       icon: Dumbbell,
     },
     {
-      title: "Expertos",
+      title: "Red Valkiria de Nutrición",
       href: "/experts",
-      icon: Users,
+      icon: Utensils,
     },
     {
-      title: "Desafíos",
-      href: "/challenges",
-      icon: Zap,
-    },
-     {
-      title: "Chat IA",
+      title: "Valky AI Coach",
       href: "/ai-chat",
       icon: Bot,
     },
     {
-      title: "Buscar Videos",
-      href: "/youtube-search",
-      icon: Youtube,
-    },
-    {
-      title: "Perfil",
-      href: "/profile",
-      icon: UserCircle,
+      title: "Desafíos Comunitarios",
+      href: "/challenges",
+      icon: Trophy,
     },
   ],
   sidebarNav: [
     {
-      title: "Resumen",
+      title: "Hero HQ (Dashboard)",
       href: "/dashboard",
       icon: LayoutDashboard,
-      description: "Tu centro personal de salud y fitness."
+      description: "Tu centro de comando y stats del superhéroe."
     },
     {
-      title: "Guía Inicial",
-      href: "/onboarding",
-      icon: Compass,
-      description: "Configura tus preferencias iniciales."
-    },
-    {
-      title: "Mi Perfil",
+      title: "Perfil & Atributos",
       href: "/profile",
-      icon: UserCircle,
-      description: "Gestiona tu perfil y configuraciones."
+      icon: Shield,
+      description: "Radar de habilidades, rango e insignias."
     },
     {
-      title: "Entrenamientos",
+      title: "Misiones & Rutinas",
       href: "/workouts",
       icon: Dumbbell, 
-      description: "Planes de ejercicio y guías."
+      description: "Misiones activas y biblioteca de ejercicios."
     },
     {
-      title: "Chat con IA",
+      title: "Nutrición & Expertos",
+      href: "/experts",
+      icon: Utensils,
+      description: "Planes de alimentación y videollamadas con profesionales."
+    },
+    {
+      title: "Valky AI Coach",
       href: "/ai-chat",
       icon: Bot,
-      description: "Consulta recetas y consejos con IA.",
+      description: "Generador inteligente de planes y nutrición."
     },
     {
-      title: "Buscar Videos",
-      href: "/youtube-search",
-      icon: Youtube,
-      description: "Encuentra videos de salud y fitness."
-    },
-    {
-      title: "Conectar",
-      href: "/experts",
-      icon: Users,
-      description: "Encuentra entrenadores y nutricionistas certificados."
-    },
-    {
-      title: "Desafíos",
+      title: "Desafíos & Rankings",
       href: "/challenges",
-      icon: Zap,
-      description: "Únete o crea desafíos de fitness.",
-      items: [
-        { title: "Explorar Desafíos", href: "/challenges", icon: Activity },
-        { title: "Crear Nuevo Desafío", href: "/challenges/create", icon: Award },
-      ],
-    },
-     {
-      title: "Sugerencias IA",
-      href: "/dashboard#ai-suggestions",
-      icon: SparklesIcon,
-      description: "Obtén consejos personalizados.",
+      icon: Trophy,
+      description: "Compite y valida tu transformación física con fotos autenticadas."
     },
   ],
 };
